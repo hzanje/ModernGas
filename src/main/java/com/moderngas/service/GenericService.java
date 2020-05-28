@@ -1,0 +1,34 @@
+package com.moderngas.service;
+
+import com.moderngas.jpaentity.UserEntity;
+import com.moderngas.pojo.UserEntityDto;
+import org.springframework.stereotype.Service;
+
+
+public interface GenericService {
+
+    /**
+     * Converting User DTO to its Respective Entity.
+     *
+     * @param userEntityDto
+     * @return
+     */
+    UserEntity convertDtoToUserData(UserEntityDto userEntityDto);
+
+    /**
+     * Converting User Entity to its Respective DTO.
+     *
+     * @param clientEntity
+     * @return
+     */
+    UserEntityDto convertUserDataToDto(UserEntity clientEntity);
+
+    /**
+     * Encoding the User's Password with SHA256 Hashing
+     *
+     * @param password
+     * @return
+     */
+    String encodeUserPassword(String password);
+
+}
