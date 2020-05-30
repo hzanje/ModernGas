@@ -33,7 +33,7 @@ public class UserEntity extends GenericEntity {
     @Column(name = "contact_person")
     private String contactPerson;
 
-    @Column(name = "company_contact")
-    private Long companyContact;
+    @Column(name = "role")
+    private String role;
 
 }

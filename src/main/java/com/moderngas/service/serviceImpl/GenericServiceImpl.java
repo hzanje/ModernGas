@@ -23,7 +23,7 @@ public class GenericServiceImpl implements GenericService {
             userEntity.setAddress(userEntityDto.getAddress());
             userEntity.setMobileNumber(userEntityDto.getMobileNumber());
             userEntity.setCompanyName(userEntityDto.getCompanyName());
-            userEntity.setCompanyContact(userEntityDto.getCompanyContact());
+            userEntity.setRole(userEntityDto.getRole());
             userEntity.setContactPerson(userEntityDto.getContactPerson());
             if (null != userEntityDto.getPassword() && !userEntityDto.getPassword().isEmpty()) {
                 userEntity.setPassword(encodeUserPassword(userEntity.getPassword()));
@@ -41,7 +41,7 @@ public class GenericServiceImpl implements GenericService {
         userEntityDto.setAddress(userEntity.getAddress());
         userEntityDto.setMobileNumber(userEntity.getMobileNumber());
         userEntityDto.setCompanyName(userEntity.getCompanyName());
-        userEntityDto.setCompanyContact(userEntity.getCompanyContact());
+        userEntityDto.setRole(userEntity.getRole());
         userEntityDto.setContactPerson(userEntity.getContactPerson());
         return userEntityDto;
     }

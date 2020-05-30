@@ -49,8 +49,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .addFilter(new JwtAuthenicationFilter(authenticationManager()))
                 .addFilter(new JwtAuthorizationFilter(authenticationManager(), this.userRepo))
                 .authorizeRequests()
-                .antMatchers(HttpMethod.POST, "/login").permitAll().
-                anyRequest().authenticated();
+                .antMatchers(HttpMethod.POST, "/login").permitAll()
+                .antMatchers("/moderngas/**").permitAll()
+                .anyRequest().authenticated();
     }
 
     @Bean

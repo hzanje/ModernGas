@@ -22,6 +22,6 @@ public class UserEntityDto {
 
     private String contactPerson;
 
-    private Long companyContact;
+    private String role;
 
 }

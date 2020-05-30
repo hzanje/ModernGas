@@ -6,6 +6,7 @@ import com.moderngas.repository.UserRepo;
 import com.moderngas.service.GenericService;
 import com.moderngas.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -20,6 +21,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private GenericService genericService;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Override
     public String addUser(UserEntityDto userEntityDto) {
@@ -72,5 +76,17 @@ public class UserServiceImpl implements UserService {
     public UserEntity getUserByLoginId(Long username) {
         Optional<UserEntity> userEntity = userRepo.findByMobileNumber(username);
         return userEntity.get();
+    }
+
+    @Override
+    public String changePassword(Long username, String oldPassword, String newPassword) {
+        String result = "Failure";
+        UserEntity userEntity = userRepo.findByMobileNumber(username).get();
+        if (passwordEncoder.matches(oldPassword, userEntity.getPassword())) {
+            userEntity.setPassword(passwordEncoder.encode(newPassword));
+            updateUser(userEntity);
+            result =  "Success";
+        }
+        return result;
     }
 }

@@ -19,7 +19,6 @@ public class UserController {
     @Autowired
     GenericService genericService;
 
-
     @PostMapping(value = "/addClient")
     public String addClient(@RequestBody UserEntityDto userEntityDto) {
         return userService.addUser(userEntityDto);
@@ -40,9 +39,11 @@ public class UserController {
         return genericService.convertUserDataToDto(userService.getUserByLoginId(userName));
     }
 
-    @GetMapping(value = "/checkUserExist")
-    public String checkUserExist(@RequestParam("mobileNumber") Long mobileNumber) {
-        return userService.checkUserExist(mobileNumber);
+    @PostMapping(value = "/changePassword")
+    public String changePassword(@RequestParam("userName") final Long username,
+                                 @RequestParam("oldPassword") final String oldPassword,
+                                 @RequestParam("newPassword") final String newPassword) {
+        return userService.changePassword(username, oldPassword, newPassword);
     }
 
 

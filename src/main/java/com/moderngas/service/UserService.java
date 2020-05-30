@@ -45,4 +45,6 @@ public interface UserService {
 
 
     UserEntity getUserByLoginId(Long username);
+
+    String changePassword(Long username, String oldPassword, String newPassword);
 }
