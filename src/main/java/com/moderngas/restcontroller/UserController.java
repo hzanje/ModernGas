@@ -1,6 +1,7 @@
 package com.moderngas.restcontroller;
 
 import com.moderngas.pojo.UserEntityDto;
+import com.moderngas.service.GenericService;
 import com.moderngas.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +15,9 @@ public class UserController {
 
     @Autowired
     UserService userService;
+
+    @Autowired
+    GenericService genericService;
 
 
     @PostMapping(value = "/addClient")
@@ -29,6 +33,11 @@ public class UserController {
     @GetMapping(value = "/getClientById")
     public UserEntityDto getClientById(@RequestParam("userId") Long userId) {
         return userService.getUserById(userId);
+    }
+
+    @GetMapping(value = "/getUser")
+    public UserEntityDto getUser(@RequestParam("userName") Long userName) {
+        return genericService.convertUserDataToDto(userService.getUserByLoginId(userName));
     }
 
     @GetMapping(value = "/checkUserExist")
