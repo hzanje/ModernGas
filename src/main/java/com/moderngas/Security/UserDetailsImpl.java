@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UserDetailsImpl implements UserDetails {
@@ -23,19 +24,14 @@ public class UserDetailsImpl implements UserDetails {
     public UserDetailsImpl(UserEntity userEntity) {
         this.userName = String.valueOf(userEntity.getMobileNumber());
         this.password = userEntity.getPassword();
-        /*this.authorities = Arrays.stream(userEntity.getRoles().split(","))
+        this.authorities = Arrays.stream(userEntity.getRole().split(","))
                 .map(SimpleGrantedAuthority :: new)
-                .collect(Collectors.toList());*/
+                .collect(Collectors.toList());
     }
-
-    /*@Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return authorities;
-    }*/
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Arrays.asList(new SimpleGrantedAuthority("ROLE_ADMIN"));
+        return authorities;
     }
 
     @Override

@@ -29,8 +29,10 @@ public class UserServiceImpl implements UserService {
     public String addUser(UserEntityDto userEntityDto) {
         /* Add new Client to DataBase */
         String response = "failure";
-        UserEntity userEntity = userRepo.save(genericService.convertDtoToUserData(userEntityDto));
-        if (null != userEntity) {
+        UserEntity userEntity = genericService.convertDtoToUserData(userEntityDto);
+        userEntity.setPassword(passwordEncoder.encode(userEntityDto.getPassword()));
+        userEntity = userRepo.save(userEntity);
+        if (null != userEntity && userEntity.getId() != null) {
             response = "success";
         }
         return response;

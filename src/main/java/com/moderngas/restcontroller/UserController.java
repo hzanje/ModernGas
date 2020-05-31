@@ -19,11 +19,6 @@ public class UserController {
     @Autowired
     GenericService genericService;
 
-    @PostMapping(value = "/addClient")
-    public String addClient(@RequestBody UserEntityDto userEntityDto) {
-        return userService.addUser(userEntityDto);
-    }
-
     @GetMapping(value = "/getAllClient")
     public List<UserEntityDto> getAllClient() {
         return userService.getAllUser();
@@ -45,6 +40,5 @@ public class UserController {
                                  @RequestParam("newPassword") final String newPassword) {
         return userService.changePassword(username, oldPassword, newPassword);
     }
-
 
 }
