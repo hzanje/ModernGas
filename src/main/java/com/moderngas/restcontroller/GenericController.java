@@ -8,7 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
-@RequestMapping(value = "/moderngas")
+@RequestMapping(value = "/moderngas", produces = "application/json")
 public class GenericController {
 
     @Autowired
@@ -28,4 +28,11 @@ public class GenericController {
     public String addClient(@RequestBody UserEntityDto userEntityDto) {
         return userService.addUser(userEntityDto);
     }
+
+    @ResponseBody
+    @GetMapping(value = "/forgetPassword")
+    public String forgetPassword(@RequestParam("userName") Long userName) {
+        return userService.forgetPassword(userName);
+    }
+
 }

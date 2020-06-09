@@ -3,6 +3,7 @@ package com.moderngas.service.serviceImpl;
 import com.moderngas.jpaentity.UserEntity;
 import com.moderngas.pojo.UserEntityDto;
 import com.moderngas.repository.UserRepo;
+import com.moderngas.service.EmailService;
 import com.moderngas.service.GenericService;
 import com.moderngas.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private EmailService emailService;
 
     @Override
     public String addUser(UserEntityDto userEntityDto) {
@@ -90,5 +94,34 @@ public class UserServiceImpl implements UserService {
             result =  "Success";
         }
         return result;
+    }
+
+    @Override
+    public String forgetPassword(Long userName) {
+        String result = "Failure";
+        /* Check if User Exits */
+        UserEntity userEntity = userRepo.findByMobileNumber(userName).get();
+        if (null != userEntity && null != userEntity.getEmail()) {
+            String tempPassword = genericService.generateRandomPassword();
+
+            /* Send forget password mail */
+            String subject = "Forget Password..?";
+            emailService.sendMail(userEntity.getEmail(), subject, createEmailBody(userEntity.getName(), tempPassword));
+
+            /* Update user with random password */
+
+
+            result = "Success";
+        }
+        return result;
+    }
+
+    private String createEmailBody(String name, String tempPassword) {
+        StringBuffer stringBuffer = new StringBuffer("Hi " + name + ", /n");
+        stringBuffer.append("You have requested to reset password for your Modern Gas Account. We have provided the temporary passeord to login your account /n/n");
+        stringBuffer.append("Password : " + tempPassword);
+        stringBuffer.append("If you didn't request for forget password, You can ignore the email you'r password will not be changed. /n/n");
+        stringBuffer.append("Thanks & Regards, /n A.B. Chaudhary");
+        return stringBuffer.toString();
     }
 }

@@ -31,4 +31,5 @@ public interface GenericService {
      */
     String encodeUserPassword(String password);
 
+    String generateRandomPassword();
 }
