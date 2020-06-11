@@ -2,6 +2,7 @@ package com.moderngas.service.serviceImpl;
 
 import com.moderngas.service.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
@@ -30,34 +31,40 @@ public class EmailServiceImpl implements EmailService {
     @Autowired
     private JavaMailSender javaMailSender;
 
+    @Value("${spring.mail.username}")
+    private String fromMail;
+
 
     @Override
-    public void sendMail(String to, String subject, String body) {
+    public void sendMail(String to, String subject, String body) throws MessagingException {
         try {
             MimeMessage mimeMessage = javaMailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED,
                     StandardCharsets.UTF_8.name());
             mimeMessage.setRecipient(Message.RecipientType.TO, new InternetAddress(to));
-            mimeMessage.setFrom(new InternetAddress("abhishekmoderngas@gmail.com"));
+            mimeMessage.setFrom(new InternetAddress(fromMail));
             mimeMessage.setSubject(subject);
+            //mimeMessage.setReplyTo(new InternetAddress(""));
 
             Multipart multipart = new MimeMultipart();
             MimeBodyPart mimeBodyPart = new MimeBodyPart();
             mimeBodyPart.setContent("<html><body>" +
-                    "<p>" + body + "</p><br><br>" +
-                    "<img src='cid:identifier1234'></body></html>", "text/html;charset=utf-8");
+                    "<p>" + body + "</p><br>" +
+                    "</body></html>", "text/html;charset=utf-8");
             multipart.addBodyPart(mimeBodyPart);
             mimeMessage.setContent(multipart);
 
             /*FileSystemResource res = new FileSystemResource(new File("fileToAttach"));
-            helper.addInline("projectImg", res);*/
+            helper.addInline("projectImg", res);
+            <img src='cid:identifier1234'>
+            */
 
             javaMailSender.send(mimeMessage);
 
         } catch (MailException | AddressException mex) {
-            mex.printStackTrace();
+            throw mex;
         } catch (MessagingException e) {
-            e.printStackTrace();
+            throw e;
         }
     }
 }

@@ -90,8 +90,7 @@ public class UserServiceImpl implements UserService {
         UserEntity userEntity = userRepo.findByMobileNumber(username).get();
         if (passwordEncoder.matches(oldPassword, userEntity.getPassword())) {
             userEntity.setPassword(passwordEncoder.encode(newPassword));
-            updateUser(userEntity);
-            result =  "Success";
+            result = updateUser(userEntity);
         }
         return result;
     }
@@ -101,27 +100,31 @@ public class UserServiceImpl implements UserService {
         String result = "Failure";
         /* Check if User Exits */
         UserEntity userEntity = userRepo.findByMobileNumber(userName).get();
-        if (null != userEntity && null != userEntity.getEmail()) {
-            String tempPassword = genericService.generateRandomPassword();
+        try {
+            if (null != userEntity && null != userEntity.getEmail()) {
+                String tempPassword = genericService.generateRandomPassword();
 
-            /* Send forget password mail */
-            String subject = "Forget Password..?";
-            emailService.sendMail(userEntity.getEmail(), subject, createEmailBody(userEntity.getName(), tempPassword));
+                /* Send forget password mail */
+                String subject = "Forget Password..?";
+                emailService.sendMail(userEntity.getEmail(), subject, createEmailBody(userEntity.getName(), tempPassword));
 
-            /* Update user with random password */
+                /* Update user with random password */
+                userEntity.setPassword(passwordEncoder.encode(tempPassword));
+                result = updateUser(userEntity);
 
-
-            result = "Success";
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return result;
     }
 
     private String createEmailBody(String name, String tempPassword) {
-        StringBuffer stringBuffer = new StringBuffer("Hi " + name + ", /n");
-        stringBuffer.append("You have requested to reset password for your Modern Gas Account. We have provided the temporary passeord to login your account /n/n");
-        stringBuffer.append("Password : " + tempPassword);
-        stringBuffer.append("If you didn't request for forget password, You can ignore the email you'r password will not be changed. /n/n");
-        stringBuffer.append("Thanks & Regards, /n A.B. Chaudhary");
+        StringBuffer stringBuffer = new StringBuffer("Hi " + name + ", <Br>");
+        stringBuffer.append("Have you forget your password to Modern Gas App, Don't worry we have provided a temporary password below, ");
+        stringBuffer.append("<Br><Br>Password : <Strong>" + tempPassword + "</Strong>");
+        stringBuffer.append("<Br>Now you may directly login to Modern Gas Account with temporary password. ");
+        stringBuffer.append("<Br><Br>Thanks & Regards, <Br> A.B. Chaudhary");
         return stringBuffer.toString();
     }
 }

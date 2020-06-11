@@ -67,8 +67,8 @@ public class GenericServiceImpl implements GenericService {
         * 1 interger and 1 special character  */
         password[0] = smallLetters.charAt(random.nextInt(smallLetters.length()));
         password[1] = numbers.charAt(random.nextInt(numbers.length()));
-        password[7] = capitalLetters.charAt(random.nextInt(capitalLetters.length()));
-        password[8] = specialCharacters.charAt(random.nextInt(specialCharacters.length()));
+        password[6] = capitalLetters.charAt(random.nextInt(capitalLetters.length()));
+        password[7] = specialCharacters.charAt(random.nextInt(specialCharacters.length()));
 
         /* Remaining character of password is generated  */
         for(int i = 2; i< 6 ; i++) {
