@@ -38,7 +38,7 @@ public class EmailServiceImpl implements EmailService {
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED,
                     StandardCharsets.UTF_8.name());
             mimeMessage.setRecipient(Message.RecipientType.TO, new InternetAddress(to));
-            mimeMessage.setFrom(new InternetAddress("analyticshemz@gmail.com"));
+            mimeMessage.setFrom(new InternetAddress("abhishekmoderngas@gmail.com"));
             mimeMessage.setSubject(subject);
 
             Multipart multipart = new MimeMultipart();
