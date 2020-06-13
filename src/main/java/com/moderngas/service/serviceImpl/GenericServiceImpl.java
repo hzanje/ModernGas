@@ -28,7 +28,7 @@ public class GenericServiceImpl implements GenericService {
             userEntity.setRole(userEntityDto.getRole());
             userEntity.setContactPerson(userEntityDto.getContactPerson());
             if (null != userEntityDto.getPassword() && !userEntityDto.getPassword().isEmpty()) {
-                userEntity.setPassword(encodeUserPassword(userEntity.getPassword()));
+                userEntity.setPassword(encodeUserPassword(userEntityDto.getPassword()));
             }
         }
         return userEntity;
