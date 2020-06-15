@@ -34,7 +34,6 @@ public class UserServiceImpl implements UserService {
         /* Add new Client to DataBase */
         String response = "failure";
         UserEntity userEntity = genericService.convertDtoToUserData(userEntityDto);
-        //userEntity.setPassword(passwordEncoder.encode(userEntityDto.getPassword()));
         userEntity = userRepo.save(userEntity);
         if (null != userEntity && userEntity.getId() != null) {
             response = "success";
@@ -70,10 +69,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String checkUserExist(Long mobileNumber) {
-        String result = "Success";
+        String result = "Failure";
         Optional<UserEntity> userEntity = userRepo.findByMobileNumber(mobileNumber);
-        if (null == userEntity) {
-            result = "Failure";
+        if (userEntity.isPresent()) {
+            result = "Success";
         }
         return result;
     }

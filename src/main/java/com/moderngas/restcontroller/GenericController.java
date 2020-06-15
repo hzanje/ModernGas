@@ -8,7 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
-@RequestMapping(value = "/moderngas", produces = "application/json")
+@RequestMapping(value = "/moderngas")
 public class GenericController {
 
     @Autowired
