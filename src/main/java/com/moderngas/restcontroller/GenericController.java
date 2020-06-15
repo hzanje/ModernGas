@@ -1,14 +1,17 @@
 package com.moderngas.restcontroller;
 
 import com.moderngas.Security.UserDetailsServiceImpl;
+import com.moderngas.pojo.ResponseStatus;
 import com.moderngas.pojo.UserEntityDto;
 import com.moderngas.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
-@RequestMapping(value = "/moderngas")
+@RequestMapping(value = "/moderngas", produces = "application/json")
 public class GenericController {
 
     @Autowired
@@ -19,20 +22,23 @@ public class GenericController {
 
     @ResponseBody
     @GetMapping(value = "/checkUserExist")
-    public String checkUserExist(@RequestParam("mobileNumber") Long mobileNumber) {
-        return userService.checkUserExist(mobileNumber);
+    public ResponseEntity<ResponseStatus> checkUserExist(@RequestParam("mobileNumber") Long mobileNumber) {
+        String response = userService.checkUserExist(mobileNumber);
+        return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
     }
 
     @ResponseBody
     @PostMapping(value = "/addClient")
-    public String addClient(@RequestBody UserEntityDto userEntityDto) {
-        return userService.addUser(userEntityDto);
+    public ResponseEntity<ResponseStatus> addClient(@RequestBody UserEntityDto userEntityDto) {
+        String response = userService.addUser(userEntityDto);
+        return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
     }
 
     @ResponseBody
     @GetMapping(value = "/forgetPassword")
-    public String forgetPassword(@RequestParam("userName") Long userName) {
-        return userService.forgetPassword(userName);
+    public ResponseEntity<ResponseStatus> forgetPassword(@RequestParam("userName") Long userName) {
+        String response = userService.forgetPassword(userName);
+        return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
     }
 
 }
