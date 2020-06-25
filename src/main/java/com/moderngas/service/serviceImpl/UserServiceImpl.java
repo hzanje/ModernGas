@@ -11,6 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,6 +35,8 @@ public class UserServiceImpl implements UserService {
         /* Add new Client to DataBase */
         String response = "failure";
         UserEntity userEntity = genericService.convertDtoToUserData(userEntityDto);
+        userEntity.setCreatedDate(new Date());
+        userEntity.setUpdatedDate(new Date());
         userEntity = userRepo.save(userEntity);
         if (null != userEntity && userEntity.getId() != null) {
             response = "success";
@@ -43,6 +46,7 @@ public class UserServiceImpl implements UserService {
 
     public String updateUser(UserEntity userEntity) {
         String response = "failure";
+        userEntity.setUpdatedDate(new Date());
         UserEntity savedUserEntity = userRepo.save(userEntity);
         if (null != savedUserEntity) {
             response = "success";
