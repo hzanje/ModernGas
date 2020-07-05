@@ -28,8 +28,8 @@ public class GenericController {
     }
 
     @ResponseBody
-    @PostMapping(value = "/addClient")
-    public ResponseEntity<ResponseStatus> addClient(@RequestBody UserEntityDto userEntityDto) {
+    @PostMapping(value = "/addUser")
+    public ResponseEntity<ResponseStatus> addUser(@RequestBody UserEntityDto userEntityDto) {
         String response = userService.addUser(userEntityDto);
         return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
     }
