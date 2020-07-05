@@ -1,6 +1,7 @@
 package com.moderngas.service.serviceImpl;
 
 import com.moderngas.jpaentity.UserEntity;
+import com.moderngas.pojo.UserDashboardDto;
 import com.moderngas.pojo.UserEntityDto;
 import com.moderngas.repository.UserRepo;
 import com.moderngas.service.EmailService;
@@ -129,5 +130,10 @@ public class UserServiceImpl implements UserService {
         stringBuffer.append("<Br>Now you may directly login to Modern Gas Account with temporary password. ");
         stringBuffer.append("<Br><Br>Thanks & Regards, <Br> A.B. Chaudhary");
         return stringBuffer.toString();
+    }
+
+    @Override
+    public List<UserDashboardDto> getUserDashboard(Long userId) {
+        return null;
     }
 }

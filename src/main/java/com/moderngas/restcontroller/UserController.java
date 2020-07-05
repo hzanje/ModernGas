@@ -1,6 +1,7 @@
 package com.moderngas.restcontroller;
 
 import com.moderngas.pojo.ResponseStatus;
+import com.moderngas.pojo.UserDashboardDto;
 import com.moderngas.pojo.UserEntityDto;
 import com.moderngas.service.GenericService;
 import com.moderngas.service.UserService;
@@ -43,6 +44,17 @@ public class UserController {
                                                          @RequestParam("newPassword") final String newPassword) {
         String response = userService.changePassword(username, oldPassword, newPassword);
         return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/getUserDashboard")
+    public List<UserDashboardDto> getUserDashboard(@RequestParam("userId") final Long userId) {
+        return userService.getUserDashboard(userId);
+    }
+    
+    @PostMapping(value = "/updateUser")
+    public ResponseEntity<ResponseStatus> updateUser(@RequestBody UserEntityDto userEntityDto) {
+    	String response = userService.updateUser(genericService.convertDtoToUserData(userEntityDto));
+    	return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
     }
 
 }

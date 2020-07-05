@@ -1,6 +1,7 @@
 package com.moderngas.service;
 
 import com.moderngas.jpaentity.UserEntity;
+import com.moderngas.pojo.UserDashboardDto;
 import com.moderngas.pojo.UserEntityDto;
 import org.springframework.stereotype.Service;
 
@@ -43,10 +44,33 @@ public interface UserService {
      */
     String checkUserExist(Long mobileNumber);
 
-
+    /**
+     * 
+     * @param username
+     * @return
+     */
     UserEntity getUserByLoginId(Long username);
 
+    /**
+     * 
+     * @param username
+     * @param oldPassword
+     * @param newPassword
+     * @return
+     */
     String changePassword(Long username, String oldPassword, String newPassword);
 
+    /**
+     * 
+     * @param userName
+     * @return
+     */
     String forgetPassword(Long userName);
+
+    /**
+     * 
+     * @param userId
+     * @return
+     */
+    List<UserDashboardDto> getUserDashboard(Long userId);
 }

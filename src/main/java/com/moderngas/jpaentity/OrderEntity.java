@@ -34,4 +34,8 @@ public class OrderEntity extends GenericEntity {
     @JoinColumn(name = "gas_id", referencedColumnName = "id")
     private GasMaster gasMaster;
 
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "category_id", referencedColumnName = "id")
+    private CategoryMaster categoryMaster;
+
 }
