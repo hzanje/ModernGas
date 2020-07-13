@@ -1,6 +1,8 @@
 package com.moderngas.service.serviceImpl;
 
+import com.moderngas.jpaentity.AddressEntity;
 import com.moderngas.jpaentity.UserEntity;
+import com.moderngas.pojo.AddressDto;
 import com.moderngas.pojo.UserEntityDto;
 import com.moderngas.service.GenericService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,7 +76,32 @@ public class GenericServiceImpl implements GenericService {
         for(int i = 2; i< 6 ; i++) {
             password[i] = combinedChars.charAt(random.nextInt(combinedChars.length()));
         }
-
         return new String(password);
+    }
+
+    @Override
+    public AddressEntity convertDtoToAddressEntity(AddressDto addressDto) {
+        AddressEntity addressEntity = new AddressEntity();
+        addressEntity.setId(addressDto.getId());
+        addressEntity.setAddress1(addressDto.getAddress1());
+        addressEntity.setAddress2(addressDto.getAddress2());
+        addressEntity.setLandmark(addressDto.getLandmark());
+        addressEntity.setCity(addressDto.getCity());
+        addressEntity.setState(addressDto.getState());
+        addressEntity.setPincode(addressDto.getPincode());
+        return addressEntity;
+    }
+
+    @Override
+    public AddressDto convertAddressEntityToDto(AddressEntity addressEntity) {
+        AddressDto addressDto = new AddressDto();
+        addressDto.setId(addressEntity.getId());
+        addressDto.setAddress1(addressEntity.getAddress1());
+        addressDto.setAddress2(addressEntity.getAddress2());
+        addressDto.setLandmark(addressEntity.getLandmark());
+        addressDto.setCity(addressEntity.getCity());
+        addressDto.setState(addressEntity.getState());
+        addressDto.setPincode(addressEntity.getPincode());
+        return addressDto;
     }
 }

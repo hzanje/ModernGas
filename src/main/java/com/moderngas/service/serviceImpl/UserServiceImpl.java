@@ -1,5 +1,6 @@
 package com.moderngas.service.serviceImpl;
 
+import com.moderngas.jpaentity.AddressEntity;
 import com.moderngas.jpaentity.UserEntity;
 import com.moderngas.pojo.UserDashboardDto;
 import com.moderngas.pojo.UserEntityDto;
@@ -135,5 +136,17 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserDashboardDto> getUserDashboard(Long userId) {
         return null;
+    }
+
+    @Override
+    public String updateAddress(AddressEntity addressEntity, Long userName) {
+        String response = "Failure";
+        UserEntity userEntity = userRepo.findByMobileNumber(userName).get();
+        userEntity.setAddressEntity(addressEntity);
+        UserEntity savedUserEntity = userRepo.save(userEntity);
+        if (null != savedUserEntity) {
+            response = "success";
+        }
+        return response;
     }
 }

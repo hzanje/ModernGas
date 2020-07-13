@@ -1,5 +1,6 @@
 package com.moderngas.service;
 
+import com.moderngas.jpaentity.AddressEntity;
 import com.moderngas.jpaentity.UserEntity;
 import com.moderngas.pojo.UserDashboardDto;
 import com.moderngas.pojo.UserEntityDto;
@@ -73,4 +74,11 @@ public interface UserService {
      * @return
      */
     List<UserDashboardDto> getUserDashboard(Long userId);
+
+    /**
+     *
+     * @param addressEntity
+     * @return
+     */
+    String updateAddress(AddressEntity addressEntity, Long userName);
 }

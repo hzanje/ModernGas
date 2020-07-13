@@ -1,6 +1,8 @@
 package com.moderngas.service;
 
+import com.moderngas.jpaentity.AddressEntity;
 import com.moderngas.jpaentity.UserEntity;
+import com.moderngas.pojo.AddressDto;
 import com.moderngas.pojo.UserEntityDto;
 import org.springframework.stereotype.Service;
 
@@ -32,4 +34,8 @@ public interface GenericService {
     String encodeUserPassword(String password);
 
     String generateRandomPassword();
+
+    AddressEntity convertDtoToAddressEntity(AddressDto addressDto);
+
+    AddressDto convertAddressEntityToDto(AddressEntity addressEntity);
 }

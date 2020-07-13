@@ -1,5 +1,8 @@
 package com.moderngas.restcontroller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.moderngas.pojo.AddressDto;
 import com.moderngas.pojo.ResponseStatus;
 import com.moderngas.pojo.UserDashboardDto;
 import com.moderngas.pojo.UserEntityDto;
@@ -55,6 +58,14 @@ public class UserController {
     public ResponseEntity<ResponseStatus> updateUser(@RequestBody UserEntityDto userEntityDto) {
     	String response = userService.updateUser(genericService.convertDtoToUserData(userEntityDto));
     	return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
+    }
+
+    @PostMapping(value = "/updateAddress")
+    public ResponseEntity<ResponseStatus> updateAddress(@RequestParam("addressDtoStr") String addressDtoStr,
+                                                        @RequestParam("userName") final Long username) throws JsonProcessingException {
+        AddressDto addressDto = new ObjectMapper().readValue(addressDtoStr, AddressDto.class);
+        String response = userService.updateAddress(genericService.convertDtoToAddressEntity(addressDto), username);
+        return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
     }
 
 }

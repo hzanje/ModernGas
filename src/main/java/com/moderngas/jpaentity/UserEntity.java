@@ -20,10 +20,6 @@ public class UserEntity extends GenericEntity {
     private String email;
 
     @Lob
-    @Column(name = "address")
-    private String address;
-
-    @Lob
     @Column(name = "password")
     private String password;
 
@@ -35,5 +31,9 @@ public class UserEntity extends GenericEntity {
 
     @Column(name = "role", nullable = false)
     private String role;
+
+    @OneToOne
+    @JoinColumn(name = "addressId", referencedColumnName = "id")
+    private AddressEntity addressEntity;
 
 }
