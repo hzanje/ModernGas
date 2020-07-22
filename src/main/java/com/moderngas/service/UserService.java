@@ -80,5 +80,5 @@ public interface UserService {
      * @param addressEntity
      * @return
      */
-    String updateAddress(AddressEntity addressEntity, Long userName);
+    String updateAddress(AddressEntity addressEntity, Long userId);
 }

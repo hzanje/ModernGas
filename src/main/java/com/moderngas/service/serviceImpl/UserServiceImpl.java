@@ -9,6 +9,7 @@ import com.moderngas.service.EmailService;
 import com.moderngas.service.GenericService;
 import com.moderngas.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.annotation.Transient;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -139,9 +140,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String updateAddress(AddressEntity addressEntity, Long userName) {
+    public String updateAddress(AddressEntity addressEntity, Long userId) {
         String response = "Failure";
-        UserEntity userEntity = userRepo.findByMobileNumber(userName).get();
+        UserEntity userEntity = userRepo.findById(userId).get();
         userEntity.setAddressEntity(addressEntity);
         UserEntity savedUserEntity = userRepo.save(userEntity);
         if (null != savedUserEntity) {

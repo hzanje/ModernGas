@@ -24,7 +24,6 @@ public class GenericServiceImpl implements GenericService {
             userEntity = new UserEntity();
             userEntity.setName(userEntityDto.getName());
             userEntity.setEmail(userEntityDto.getEmail());
-            userEntity.setAddress(userEntityDto.getAddress());
             userEntity.setMobileNumber(userEntityDto.getMobileNumber());
             userEntity.setCompanyName(userEntityDto.getCompanyName());
             userEntity.setRole(userEntityDto.getRole());
@@ -42,7 +41,6 @@ public class GenericServiceImpl implements GenericService {
         userEntityDto.setId(userEntity.getId());
         userEntityDto.setName(userEntity.getName());
         userEntityDto.setEmail(userEntity.getEmail());
-        userEntityDto.setAddress(userEntity.getAddress());
         userEntityDto.setMobileNumber(userEntity.getMobileNumber());
         userEntityDto.setCompanyName(userEntity.getCompanyName());
         userEntityDto.setRole(userEntity.getRole());

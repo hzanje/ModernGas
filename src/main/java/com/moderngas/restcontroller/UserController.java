@@ -62,9 +62,9 @@ public class UserController {
 
     @PostMapping(value = "/updateAddress")
     public ResponseEntity<ResponseStatus> updateAddress(@RequestParam("addressDtoStr") String addressDtoStr,
-                                                        @RequestParam("userName") final Long username) throws JsonProcessingException {
+                                                        @RequestParam("userId") final Long userId) throws JsonProcessingException {
         AddressDto addressDto = new ObjectMapper().readValue(addressDtoStr, AddressDto.class);
-        String response = userService.updateAddress(genericService.convertDtoToAddressEntity(addressDto), username);
+        String response = userService.updateAddress(genericService.convertDtoToAddressEntity(addressDto), userId);
         return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
     }
 

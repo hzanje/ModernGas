@@ -20,6 +20,9 @@ public class OrderEntity extends GenericEntity {
     @Column(name = "quantity")
     private int quantity;
 
+    @Column(name = "cylinder_type")
+    private String cylinderType;
+
     @Column(name = "is_refil")
     private boolean isRefil;
 
