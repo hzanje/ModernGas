@@ -8,6 +8,9 @@ import com.moderngas.pojo.UserDashboardDto;
 import com.moderngas.pojo.UserEntityDto;
 import com.moderngas.service.GenericService;
 import com.moderngas.service.UserService;
+
+import net.minidev.json.JSONObject;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -66,6 +69,18 @@ public class UserController {
         AddressDto addressDto = new ObjectMapper().readValue(addressDtoStr, AddressDto.class);
         String response = userService.updateAddress(genericService.convertDtoToAddressEntity(addressDto), userId);
         return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
+    }
+    
+    @GetMapping(value="/getAddress")
+    public ResponseEntity<JSONObject> getAddress(@RequestParam("userId") final Long userId){
+    	JSONObject obj=userService.getAddress(userId);
+    	if(obj.getAsString("message").equals("User does not exists")) {
+    		return new ResponseEntity<>(obj, HttpStatus.NO_CONTENT);
+    	}else if(obj.getAsString("message").equals("Address does not exist")){
+    		return new ResponseEntity<>(obj, HttpStatus.NO_CONTENT);
+    	}else {
+    		return new ResponseEntity<>(obj, HttpStatus.OK);
+    	}
     }
 
 }

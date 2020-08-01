@@ -4,6 +4,7 @@ import com.moderngas.jpaentity.AddressEntity;
 import com.moderngas.jpaentity.CategoryMaster;
 import com.moderngas.jpaentity.GasMaster;
 import com.moderngas.jpaentity.UserEntity;
+import com.moderngas.pojo.AddressDto;
 import com.moderngas.pojo.UserDashboardDto;
 import com.moderngas.pojo.UserEntityDto;
 import com.moderngas.repository.GasRepo;
@@ -11,8 +12,13 @@ import com.moderngas.repository.UserRepo;
 import com.moderngas.service.EmailService;
 import com.moderngas.service.GenericService;
 import com.moderngas.service.UserService;
+
+import net.minidev.json.JSONObject;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.annotation.Transient;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -111,7 +117,9 @@ public class UserServiceImpl implements UserService {
     public String forgetPassword(Long userName) {
         String result = "Failure";
         /* Check if User Exits */
-        UserEntity userEntity = userRepo.findByMobileNumber(userName).get();
+        Optional<UserEntity> entity=userRepo.findByMobileNumber(userName);
+        if(entity!=null && entity.isPresent()) {
+        UserEntity userEntity = entity.get();
         try {
             if (null != userEntity && null != userEntity.getEmail()) {
                 String tempPassword = genericService.generateRandomPassword();
@@ -127,6 +135,9 @@ public class UserServiceImpl implements UserService {
             }
         } catch (Exception e) {
             e.printStackTrace();
+        }
+        }else {
+        	result="User does not exist";
         }
         return result;
     }
@@ -150,11 +161,13 @@ public class UserServiceImpl implements UserService {
 
         /* Get Dashboard Gas  */
         GasMaster gasMaster = gasRepo.getGasMasterByNameEquals("Medical Oxygen");
+        if(gasMaster!=null) {
         UserDashboardDto userDashboardDto = new UserDashboardDto();
         userDashboardDto.setId(gasMaster.getId());
         userDashboardDto.setName(gasMaster.getName());
         userDashboardDto.setCategory(false);
         userDashboardDtoList.add(userDashboardDto);
+        }
 
         return userDashboardDtoList;
     }
@@ -170,4 +183,21 @@ public class UserServiceImpl implements UserService {
         }
         return response;
     }
+
+	@Override
+	public JSONObject getAddress(Long userId) {
+		UserEntity userEntity=userRepo.findById(userId).get();
+		JSONObject obj=new JSONObject();
+		if(userEntity==null) {
+			obj.put("message", "User does not exists");
+		}else {
+			AddressEntity address=userEntity.getAddressEntity();
+			if(address==null) {
+				obj.put("message", "Address does not exist");
+			}else {
+				obj.put("address", genericService.convertAddressEntityToDto(address));
+			}
+		}
+		return obj;
+	}
 }
