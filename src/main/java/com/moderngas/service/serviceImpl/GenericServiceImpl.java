@@ -1,14 +1,19 @@
 package com.moderngas.service.serviceImpl;
 
 import com.moderngas.jpaentity.AddressEntity;
+import com.moderngas.jpaentity.CategoryMaster;
 import com.moderngas.jpaentity.UserEntity;
 import com.moderngas.pojo.AddressDto;
+import com.moderngas.pojo.UserDashboardDto;
 import com.moderngas.pojo.UserEntityDto;
 import com.moderngas.service.GenericService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 @Service
@@ -101,5 +106,25 @@ public class GenericServiceImpl implements GenericService {
         addressDto.setState(addressEntity.getState());
         addressDto.setPincode(addressEntity.getPincode());
         return addressDto;
+    }
+
+    @Override
+    public List<UserDashboardDto> convertCategoryToDto(List<CategoryMaster> categoryMasterList, Long userId) {
+        List<UserDashboardDto> userDashboardDtoList = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(categoryMasterList)) {
+            for (CategoryMaster categoryMaster : categoryMasterList) {
+                UserDashboardDto userDashboardDto = new UserDashboardDto();
+                userDashboardDto.setId(categoryMaster.getId());
+                userDashboardDto.setName(categoryMaster.getName());
+                userDashboardDto.setCategory(true);
+
+                /* Add O2 kit details */
+                /*if (null != userId && categoryMaster.getId().equals(3L)) {
+
+                }*/
+                userDashboardDtoList.add(userDashboardDto);
+            }
+        }
+        return userDashboardDtoList;
     }
 }

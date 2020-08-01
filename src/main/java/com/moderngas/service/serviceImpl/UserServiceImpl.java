@@ -1,9 +1,12 @@
 package com.moderngas.service.serviceImpl;
 
 import com.moderngas.jpaentity.AddressEntity;
+import com.moderngas.jpaentity.CategoryMaster;
+import com.moderngas.jpaentity.GasMaster;
 import com.moderngas.jpaentity.UserEntity;
 import com.moderngas.pojo.UserDashboardDto;
 import com.moderngas.pojo.UserEntityDto;
+import com.moderngas.repository.GasRepo;
 import com.moderngas.repository.UserRepo;
 import com.moderngas.service.EmailService;
 import com.moderngas.service.GenericService;
@@ -32,6 +35,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private EmailService emailService;
+
+    @Autowired
+    private GasRepo gasRepo;
 
     @Override
     public String addUser(UserEntityDto userEntityDto) {
@@ -136,7 +142,21 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserDashboardDto> getUserDashboard(Long userId) {
-        return null;
+        List<UserDashboardDto> userDashboardDtoList = new ArrayList<>();
+
+        /* Get all Category*/
+        List<CategoryMaster> categoryMasterList = gasRepo.getAllCategory();
+        userDashboardDtoList.addAll(genericService.convertCategoryToDto(categoryMasterList, userId));
+
+        /* Get Dashboard Gas  */
+        GasMaster gasMaster = gasRepo.getGasMasterByNameEquals("Medical Oxygen");
+        UserDashboardDto userDashboardDto = new UserDashboardDto();
+        userDashboardDto.setId(gasMaster.getId());
+        userDashboardDto.setName(gasMaster.getName());
+        userDashboardDto.setCategory(false);
+        userDashboardDtoList.add(userDashboardDto);
+
+        return userDashboardDtoList;
     }
 
     @Override

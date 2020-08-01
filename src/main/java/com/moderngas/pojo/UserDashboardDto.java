@@ -2,6 +2,8 @@ package com.moderngas.pojo;
 
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class UserDashboardDto {
 
@@ -9,11 +11,11 @@ public class UserDashboardDto {
 
     private String name;
 
-    private byte[] icon;
-
     private boolean isRefill;
 
-    private String type;
+    private boolean isCategory;
 
     private int remainingRefill;
+
+    List<String> imageURlList;
 }

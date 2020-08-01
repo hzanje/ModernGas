@@ -29,6 +29,9 @@ public class OrderEntity extends GenericEntity {
     @Column(name = "med_kit_refil_count")
     private int medKitRefilCount;
 
+    @Column(name = "user_id")
+    private Long userId;
+
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "status_id", referencedColumnName = "id")
     private StatusMaster statusMaster;
@@ -36,9 +39,5 @@ public class OrderEntity extends GenericEntity {
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "gas_id", referencedColumnName = "id")
     private GasMaster gasMaster;
-
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinColumn(name = "category_id", referencedColumnName = "id")
-    private CategoryMaster categoryMaster;
 
 }
