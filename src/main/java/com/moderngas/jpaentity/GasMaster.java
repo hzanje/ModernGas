@@ -21,7 +21,7 @@ public class GasMaster extends GenericEntity {
     private String description;
 
     @Column(name = "price")
-    private int price;
+    private Integer price;
 
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "type_id", referencedColumnName = "id")

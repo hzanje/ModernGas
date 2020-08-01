@@ -11,11 +11,7 @@ public class UserDashboardDto {
 
     private String name;
 
-    private boolean isRefill;
-
     private boolean isCategory;
-
-    private int remainingRefill;
 
     List<String> imageURlList;
 }

@@ -50,7 +50,7 @@ public class UserController {
     }
 
     @GetMapping(value = "/getUserDashboard")
-    public List<UserDashboardDto> getUserDashboard(@RequestParam("userId") final Long userId) {
+    public List<UserDashboardDto> getUserDashboard(@RequestParam("userId") Long userId) {
         return userService.getUserDashboard(userId);
     }
     
