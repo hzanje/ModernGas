@@ -44,5 +44,5 @@ public interface GenericService {
 
     AddressDto convertAddressEntityToDto(AddressEntity addressEntity);
 
-    List<UserDashboardDto> convertCategoryToDto(List<CategoryMaster> categoryMasterList, Long userId);
+    List<UserDashboardDto> convertCategoryToDto(List<CategoryMaster> categoryMasterList);
 }

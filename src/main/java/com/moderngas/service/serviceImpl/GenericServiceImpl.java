@@ -112,7 +112,7 @@ public class GenericServiceImpl implements GenericService {
     }
 
     @Override
-    public List<UserDashboardDto> convertCategoryToDto(List<CategoryMaster> categoryMasterList, Long userId) {
+    public List<UserDashboardDto> convertCategoryToDto(List<CategoryMaster> categoryMasterList) {
         List<UserDashboardDto> userDashboardDtoList = new ArrayList<>();
         if (!CollectionUtils.isEmpty(categoryMasterList)) {
             for (CategoryMaster categoryMaster : categoryMasterList) {
@@ -120,11 +120,6 @@ public class GenericServiceImpl implements GenericService {
                 userDashboardDto.setId(categoryMaster.getId());
                 userDashboardDto.setName(categoryMaster.getName());
                 userDashboardDto.setCategory(true);
-
-                /* Add O2 kit details */
-                /*if (null != userId && categoryMaster.getId().equals(3L)) {
-
-                }*/
                 userDashboardDtoList.add(userDashboardDto);
             }
         }

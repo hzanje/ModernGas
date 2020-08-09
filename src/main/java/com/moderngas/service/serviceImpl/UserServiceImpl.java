@@ -4,7 +4,8 @@ import com.moderngas.jpaentity.AddressEntity;
 import com.moderngas.jpaentity.CategoryMaster;
 import com.moderngas.jpaentity.GasMaster;
 import com.moderngas.jpaentity.UserEntity;
-import com.moderngas.pojo.AddressDto;
+import com.moderngas.pojo.GasDto;
+import com.moderngas.pojo.NameIdDto;
 import com.moderngas.pojo.UserDashboardDto;
 import com.moderngas.pojo.UserEntityDto;
 import com.moderngas.repository.GasRepo;
@@ -16,16 +17,15 @@ import com.moderngas.service.UserService;
 import net.minidev.json.JSONObject;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.annotation.Transient;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -157,7 +157,7 @@ public class UserServiceImpl implements UserService {
 
         /* Get all Category*/
         List<CategoryMaster> categoryMasterList = gasRepo.getAllCategory();
-        userDashboardDtoList.addAll(genericService.convertCategoryToDto(categoryMasterList, userId));
+        userDashboardDtoList.addAll(genericService.convertCategoryToDto(categoryMasterList));
 
         /* Get Dashboard Gas  */
         GasMaster gasMaster = gasRepo.getGasMasterByNameEquals("Medical Oxygen");
@@ -168,8 +168,22 @@ public class UserServiceImpl implements UserService {
         userDashboardDto.setCategory(false);
         userDashboardDtoList.add(userDashboardDto);
         }
-
         return userDashboardDtoList;
+    }
+
+    @Override
+    public List<NameIdDto> getListByCategoryId(Long id) {
+        List<NameIdDto> nameIdDtoList = new ArrayList<>();
+        List<GasMaster> gasMasterList = gasRepo.getGasMasterByCategoryMaster_Id(id);
+        if (!CollectionUtils.isEmpty(gasMasterList)) {
+            for (GasMaster gasMaster : gasMasterList) {
+                NameIdDto nameIdDto = new NameIdDto();
+                nameIdDto.setId(gasMaster.getId());
+                nameIdDto.setName(gasMaster.getName());
+                nameIdDtoList.add(nameIdDto);
+            }
+        }
+        return nameIdDtoList;
     }
 
     @Override
@@ -200,4 +214,34 @@ public class UserServiceImpl implements UserService {
 		}
 		return obj;
 	}
+
+    @Override
+    public String refreshToken(String existingToken) {
+        return null;
+    }
+
+    @Override
+    public GasDto getGasDetailsById(Long id, Long userId) {
+        GasMaster gasMaster = gasRepo.getOne(id);
+        GasDto gasDto = new GasDto();
+        if (null != gasMaster) {
+            gasDto.setId(gasMaster.getId());
+            gasDto.setName(gasMaster.getName());
+            gasDto.setCylinderType(gasMaster.getCylinderType());
+            gasDto.setDescription(gasMaster.getDescription());
+            gasDto.setPrice(gasMaster.getPrice());
+            /*gasDto.setRefillRange();*/
+            gasDto.setAvailable(gasMaster.isAvaliable());
+            if (!CollectionUtils.isEmpty(gasMaster.getGasImageEntityList())) {
+                gasDto.setImageList(gasMaster.getGasImageEntityList().stream()
+                        .map(e -> e.getImageUrl()).collect(Collectors.toList()));
+            }
+
+            /* Check order of user for */
+
+
+            return gasDto;
+        }
+        return null;
+    }
 }

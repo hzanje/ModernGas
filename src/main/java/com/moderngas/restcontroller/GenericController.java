@@ -41,4 +41,11 @@ public class GenericController {
         return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
     }
 
+    @ResponseBody
+    @PostMapping(value = "/refreshToken")
+    public ResponseEntity<ResponseStatus> refreshToken(@RequestParam("existingToken") String existingToken) {
+        String response = userService.refreshToken(existingToken);
+        return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
+    }
+
 }

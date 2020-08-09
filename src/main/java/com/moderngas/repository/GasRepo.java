@@ -16,4 +16,6 @@ public interface GasRepo extends JpaRepository<GasMaster,Long> {
     public List<CategoryMaster> getAllCategory();
 
     public GasMaster getGasMasterByNameEquals(String name);
+
+    public List<GasMaster> getGasMasterByCategoryMaster_Id(Long id);
 }

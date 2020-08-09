@@ -2,10 +2,8 @@ package com.moderngas.restcontroller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.moderngas.pojo.AddressDto;
+import com.moderngas.pojo.*;
 import com.moderngas.pojo.ResponseStatus;
-import com.moderngas.pojo.UserDashboardDto;
-import com.moderngas.pojo.UserEntityDto;
 import com.moderngas.service.GenericService;
 import com.moderngas.service.UserService;
 
@@ -56,6 +54,16 @@ public class UserController {
     public List<UserDashboardDto> getUserDashboard(@RequestParam("userId") Long userId) {
         return userService.getUserDashboard(userId);
     }
+
+    @GetMapping(value = "/getListByCategoryId")
+    public List<NameIdDto> getListByCategoryId(@RequestParam("id") Long id) {
+        return userService.getListByCategoryId(id);
+    }
+
+    @GetMapping(value = "/getGasDetailsById")
+    public GasDto getGasDetailsById(@RequestParam("id") Long id, @RequestParam("userId") Long userId) {
+        return userService.getGasDetailsById(id, userId);
+    }
     
     @PostMapping(value = "/updateUser")
     public ResponseEntity<ResponseStatus> updateUser(@RequestBody UserEntityDto userEntityDto) {
@@ -82,5 +90,7 @@ public class UserController {
     		return new ResponseEntity<>(obj, HttpStatus.OK);
     	}
     }
+
+
 
 }

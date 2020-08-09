@@ -1,14 +1,17 @@
 package com.moderngas.pojo;
 
+import lombok.Data;
+
 import java.util.List;
 
-public class ItemDto {
+@Data
+public class GasDto {
 
     private Long id;
 
     private String Name;
 
-    private String type;
+    private String cylinderType;
 
     private boolean isRefill;
 
@@ -17,4 +20,8 @@ public class ItemDto {
     private List<Integer> refillRange;
 
     private String description;
+
+    private Integer price;
+
+    private List<String> imageList;
 }
