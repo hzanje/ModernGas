@@ -2,8 +2,10 @@ package com.moderngas.service.serviceImpl;
 
 import com.moderngas.jpaentity.AddressEntity;
 import com.moderngas.jpaentity.CategoryMaster;
+import com.moderngas.jpaentity.OrderEntity;
 import com.moderngas.jpaentity.UserEntity;
 import com.moderngas.pojo.AddressDto;
+import com.moderngas.pojo.OrderDto;
 import com.moderngas.pojo.UserDashboardDto;
 import com.moderngas.pojo.UserEntityDto;
 import com.moderngas.service.GenericService;
@@ -99,15 +101,14 @@ public class GenericServiceImpl implements GenericService {
     public AddressDto convertAddressEntityToDto(AddressEntity addressEntity) {
         AddressDto addressDto = new AddressDto();
         if(addressEntity==null) {
-        	
+            addressDto.setId(addressEntity.getId());
+            addressDto.setAddress1(addressEntity.getAddress1());
+            addressDto.setAddress2(addressEntity.getAddress2());
+            addressDto.setLandmark(addressEntity.getLandmark());
+            addressDto.setCity(addressEntity.getCity());
+            addressDto.setState(addressEntity.getState());
+            addressDto.setPincode(addressEntity.getPincode());
         }
-        addressDto.setId(addressEntity.getId());
-        addressDto.setAddress1(addressEntity.getAddress1());
-        addressDto.setAddress2(addressEntity.getAddress2());
-        addressDto.setLandmark(addressEntity.getLandmark());
-        addressDto.setCity(addressEntity.getCity());
-        addressDto.setState(addressEntity.getState());
-        addressDto.setPincode(addressEntity.getPincode());
         return addressDto;
     }
 
@@ -124,5 +125,21 @@ public class GenericServiceImpl implements GenericService {
             }
         }
         return userDashboardDtoList;
+    }
+
+    @Override
+    public OrderEntity convertDtoToOrderEntity(OrderDto orderDto) {
+        OrderEntity orderEntity = null;
+        if (null != orderDto) {
+            orderEntity = new OrderEntity();
+            orderEntity.setCylinderType(orderDto.getCylinderType());
+            orderEntity.setUserId(orderDto.getUserId());
+            orderEntity.setMedKitRefilCount(orderEntity.getMedKitRefilCount());
+            //orderEntity.setStatusMaster(orderDto.);
+            //orderEntity.setGasMaster();
+            orderEntity.setRefill(orderDto.isRefill());
+            orderEntity.setRefillCount(orderDto.getRefillCount());
+        }
+        return orderEntity;
     }
 }

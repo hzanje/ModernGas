@@ -2,15 +2,13 @@ package com.moderngas.service;
 
 import com.moderngas.jpaentity.AddressEntity;
 import com.moderngas.jpaentity.CategoryMaster;
+import com.moderngas.jpaentity.OrderEntity;
 import com.moderngas.jpaentity.UserEntity;
 import com.moderngas.pojo.AddressDto;
+import com.moderngas.pojo.OrderDto;
 import com.moderngas.pojo.UserDashboardDto;
 import com.moderngas.pojo.UserEntityDto;
-import org.springframework.stereotype.Service;
-
-import java.util.Collection;
 import java.util.List;
-
 
 public interface GenericService {
 
@@ -45,4 +43,6 @@ public interface GenericService {
     AddressDto convertAddressEntityToDto(AddressEntity addressEntity);
 
     List<UserDashboardDto> convertCategoryToDto(List<CategoryMaster> categoryMasterList);
+
+    OrderEntity convertDtoToOrderEntity(OrderDto orderDto);
 }
