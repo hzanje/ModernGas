@@ -10,12 +10,10 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface OrderRepo extends JpaRepository<OrderEntity, Long> {
+public interface CartRepo extends JpaRepository<CartEntity, Long> {
 
-    List<OrderEntity> getOrderEntitiesByUserIdAndActiveFlagTrueOrderByUpdatedDate(Long userId);
+    List<CartEntity> getCartEntitiesByUserIdOrderByUpdatedDate(Long userId);
 
-    OrderEntity getOrderEntitiesById(Long id);
-
-    @Query(" UPDATE OrderEntity SET activeFlag = 0 where id = :id")
-    void deleteOrderById(@Param("id") Long orderId);
+    @Query("update CartEntity set activeFlag = 0 where id = :id")
+    void deleteCartById(@Param("id") Long cartId);
 }

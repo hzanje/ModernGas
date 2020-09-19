@@ -3,13 +3,11 @@ package com.moderngas.pojo;
 import lombok.Data;
 
 @Data
-public class OrderDto {
+public class CartDto {
 
     private Long id;
 
     private String cylinderType;
-
-    private boolean isRefill;
 
     private Long userId;
 
@@ -17,13 +15,9 @@ public class OrderDto {
 
     private String gasName;
 
-    private String statusName;
+    private String categoryName;
 
-    private int quantity;
+        private int quantity;
 
-    private int refillCount;
 
-    private String date;
-
-    private Long statusId;
 }

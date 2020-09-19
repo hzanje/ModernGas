@@ -1,13 +1,17 @@
 package com.moderngas.service;
 
 import com.moderngas.jpaentity.AddressEntity;
+import com.moderngas.jpaentity.CartEntity;
 import com.moderngas.jpaentity.CategoryMaster;
 import com.moderngas.jpaentity.OrderEntity;
 import com.moderngas.jpaentity.UserEntity;
 import com.moderngas.pojo.AddressDto;
+import com.moderngas.pojo.CartDto;
 import com.moderngas.pojo.OrderDto;
 import com.moderngas.pojo.UserDashboardDto;
 import com.moderngas.pojo.UserEntityDto;
+
+import java.text.ParseException;
 import java.util.List;
 
 public interface GenericService {
@@ -45,4 +49,10 @@ public interface GenericService {
     List<UserDashboardDto> convertCategoryToDto(List<CategoryMaster> categoryMasterList);
 
     OrderEntity convertDtoToOrderEntity(OrderDto orderDto);
+
+    OrderDto convertOrderEntityToDto(OrderEntity orderEntity);
+
+    CartEntity convertDtoToCartEntity(CartDto cartDto);
+
+    CartDto convertCartEntityToDto(CartEntity cartEntity);
 }

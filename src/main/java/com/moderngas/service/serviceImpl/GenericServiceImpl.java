@@ -1,20 +1,26 @@
 package com.moderngas.service.serviceImpl;
 
 import com.moderngas.jpaentity.AddressEntity;
+import com.moderngas.jpaentity.CartEntity;
 import com.moderngas.jpaentity.CategoryMaster;
 import com.moderngas.jpaentity.OrderEntity;
 import com.moderngas.jpaentity.UserEntity;
 import com.moderngas.pojo.AddressDto;
+import com.moderngas.pojo.CartDto;
 import com.moderngas.pojo.OrderDto;
 import com.moderngas.pojo.UserDashboardDto;
 import com.moderngas.pojo.UserEntityDto;
+import com.moderngas.repository.GasRepo;
 import com.moderngas.service.GenericService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
@@ -23,6 +29,9 @@ public class GenericServiceImpl implements GenericService {
 
     @Autowired
     PasswordEncoder passwordEncoder;
+
+    @Autowired
+    GasRepo gasRepo;
 
     @Override
     public UserEntity convertDtoToUserData(UserEntityDto userEntityDto) {
@@ -132,14 +141,65 @@ public class GenericServiceImpl implements GenericService {
         OrderEntity orderEntity = null;
         if (null != orderDto) {
             orderEntity = new OrderEntity();
+            orderEntity.setActiveFlag(true);
+            orderEntity.setCreatedDate(new Date());
+            orderEntity.setUpdatedDate(new Date());
             orderEntity.setCylinderType(orderDto.getCylinderType());
             orderEntity.setUserId(orderDto.getUserId());
-            orderEntity.setMedKitRefilCount(orderEntity.getMedKitRefilCount());
-            //orderEntity.setStatusMaster(orderDto.);
-            //orderEntity.setGasMaster();
+            orderEntity.setStatusMaster(gasRepo.getStatusById(orderDto.getStatusId()));
+            orderEntity.setGasMaster(gasRepo.getOne(orderDto.getGasId()));
             orderEntity.setRefill(orderDto.isRefill());
             orderEntity.setRefillCount(orderDto.getRefillCount());
+            //orderEntity.setOrderDate(new SimpleDateFormat("yyyy/MM/dd hh:mm:ss").parse(orderDto.getDate()));
         }
         return orderEntity;
+    }
+
+    @Override
+    public OrderDto convertOrderEntityToDto(OrderEntity orderEntity) {
+        OrderDto orderDto = null;
+        if (null != orderEntity) {
+            orderDto = new OrderDto();
+            orderDto.setId(orderEntity.getId());
+            orderDto.setGasName(orderEntity.getGasMaster().getName());
+            orderDto.setQuantity(orderEntity.getQuantity());
+            orderDto.setRefill(orderEntity.isRefill());
+            orderDto.setStatusName(orderEntity.getStatusMaster().getStatus());
+        }
+        return orderDto;
+    }
+
+    @Override
+    public CartEntity convertDtoToCartEntity(CartDto cartDto) {
+        CartEntity cartEntity = null;
+        if (null != cartDto) {
+            cartEntity = new CartEntity();
+            cartEntity.setId(cartDto.getId());
+            cartEntity.setActiveFlag(true);
+            cartEntity.setCreatedDate(new Date());
+            cartEntity.setUpdatedDate(new Date());
+            cartEntity.setCylinderType(cartDto.getCylinderType());
+            cartEntity.setQuantity(cartDto.getQuantity());
+            cartEntity.setUserId(cartDto.getUserId());
+            cartEntity.setGasMaster(gasRepo.getOne(cartDto.getGasId()));
+        }
+        return cartEntity;
+    }
+
+    @Override
+    public CartDto convertCartEntityToDto(CartEntity cartEntity) {
+        CartDto cartDto = null;
+        if (null != cartEntity) {
+            cartDto = new CartDto();
+            cartDto.setId(cartEntity.getId());
+            cartDto.setCylinderType(cartEntity.getCylinderType());
+            cartDto.setQuantity(cartEntity.getQuantity());
+            cartDto.setUserId(cartEntity.getUserId());
+            if (null != cartEntity.getGasMaster()) {
+                cartDto.setGasName(cartEntity.getGasMaster().getName());
+                cartDto.setCategoryName(cartEntity.getGasMaster().getCategoryMaster().getName());
+            }
+        }
+        return cartDto;
     }
 }

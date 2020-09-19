@@ -50,6 +50,7 @@ public class UserServiceImpl implements UserService {
         /* Add new Client to DataBase */
         String response = "failure";
         UserEntity userEntity = genericService.convertDtoToUserData(userEntityDto);
+        userEntity.setActiveFlag(true);
         userEntity.setCreatedDate(new Date());
         userEntity.setUpdatedDate(new Date());
         userEntity = userRepo.save(userEntity);

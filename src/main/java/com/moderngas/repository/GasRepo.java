@@ -3,8 +3,10 @@ package com.moderngas.repository;
 
 import com.moderngas.jpaentity.CategoryMaster;
 import com.moderngas.jpaentity.GasMaster;
+import com.moderngas.jpaentity.StatusMaster;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -13,9 +15,12 @@ import java.util.List;
 public interface GasRepo extends JpaRepository<GasMaster,Long> {
 
     @Query(" FROM CategoryMaster")
-    public List<CategoryMaster> getAllCategory();
+    List<CategoryMaster> getAllCategory();
 
-    public GasMaster getGasMasterByNameEquals(String name);
+    GasMaster getGasMasterByNameEquals(String name);
 
-    public List<GasMaster> getGasMasterByCategoryMaster_Id(Long id);
+    List<GasMaster> getGasMasterByCategoryMaster_Id(Long id);
+
+    @Query(" FROM StatusMaster WHERE id = :id")
+    StatusMaster getStatusById(@Param("id") Long id);
 }
