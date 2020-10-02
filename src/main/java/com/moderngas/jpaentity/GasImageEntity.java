@@ -1,12 +1,15 @@
 package com.moderngas.jpaentity;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.List;
 import java.util.Set;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "gas_image")
 public class GasImageEntity {
