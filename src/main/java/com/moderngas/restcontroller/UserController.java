@@ -84,9 +84,9 @@ public class UserController {
     	JSONObject obj=userService.getAddress(userId);
     	if(obj.getAsString("message").equals("User does not exists")) {
     		return new ResponseEntity<>(obj, HttpStatus.NO_CONTENT);
-    	}else if(obj.getAsString("message").equals("Address does not exist")){
+    	} else if(obj.getAsString("message").equals("Address does not exist")){
     		return new ResponseEntity<>(obj, HttpStatus.NO_CONTENT);
-    	}else {
+    	} else {
     		return new ResponseEntity<>(obj, HttpStatus.OK);
     	}
     }

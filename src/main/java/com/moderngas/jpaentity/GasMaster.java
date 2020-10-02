@@ -21,9 +21,6 @@ public class GasMaster extends GenericEntity {
     @Column(name = "price")
     private Integer price;
 
-    @Column(name = "refil_range")
-    private String refilRange;
-
     @Column(name = "is_avaliable", columnDefinition = "tinyint(1) DEFAULT 1")
     private boolean isAvaliable;
 
@@ -31,12 +28,14 @@ public class GasMaster extends GenericEntity {
     @JoinColumn(name = "type_id", referencedColumnName = "id")
     private CategoryMaster categoryMaster;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "gas_id", referencedColumnName = "id")
-    private List<GasImageEntity> gasImageEntityList;
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinTable(name = "gas_image_mapping", joinColumns = {@JoinColumn(name = "gas_id")}
+    , inverseJoinColumns = {@JoinColumn(name = "image_id")})
+    private Set<GasImageEntity> gasImageEntityList;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "cylinder_type", referencedColumnName = "id")
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinTable(name = "gas_cylinder_mapping", joinColumns = {@JoinColumn(name = "gas_id")}
+            , inverseJoinColumns = {@JoinColumn(name = "cylinder_id")})
     private Set<CylinderTypeMaster> cylinderTypeMasterList;
 
 }

@@ -5,7 +5,10 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
+import java.util.List;
+import java.util.Set;
 
 @Data
 @Entity
@@ -22,4 +25,7 @@ public class CylinderTypeMaster {
 
     @Column(name = "description")
     private String description;
+
+    @ManyToMany(mappedBy = "cylinderTypeMasterList")
+    Set<GasMaster> gasMasterList;
 }
