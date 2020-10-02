@@ -228,10 +228,9 @@ public class UserServiceImpl implements UserService {
         if (null != gasMaster) {
             gasDto.setId(gasMaster.getId());
             gasDto.setName(gasMaster.getName());
-            gasDto.setCylinderType(gasMaster.getCylinderType());
+            gasDto.setAvailableCylinderType(gasMaster.getCylinderTypeMasterList());
             gasDto.setDescription(gasMaster.getDescription());
             gasDto.setPrice(gasMaster.getPrice());
-            /*gasDto.setRefillRange();*/
             gasDto.setAvailable(gasMaster.isAvaliable());
             if (!CollectionUtils.isEmpty(gasMaster.getGasImageEntityList())) {
                 gasDto.setImageList(gasMaster.getGasImageEntityList().stream()

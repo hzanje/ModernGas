@@ -4,6 +4,7 @@ import lombok.Data;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Data
@@ -12,9 +13,6 @@ public class GasMaster extends GenericEntity {
 
     @Column(name = "name")
     private String name;
-
-    @Column(name = "cylinder_type")
-    private String cylinderType;
 
     @Lob
     @Column(name = "description")
@@ -36,5 +34,9 @@ public class GasMaster extends GenericEntity {
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "gas_id", referencedColumnName = "id")
     private List<GasImageEntity> gasImageEntityList;
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "cylinder_type", referencedColumnName = "id")
+    private Set<CylinderTypeMaster> cylinderTypeMasterList;
 
 }

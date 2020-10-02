@@ -1,8 +1,10 @@
 package com.moderngas.pojo;
 
+import com.moderngas.jpaentity.CylinderTypeMaster;
 import lombok.Data;
 
 import java.util.List;
+import java.util.Set;
 
 @Data
 public class GasDto {
@@ -17,11 +19,13 @@ public class GasDto {
 
     private boolean isAvailable;
 
-    private List<Integer> refillRange;
-
     private String description;
 
     private Integer price;
 
     private List<String> imageList;
+
+    private Set<CylinderTypeMaster> availableCylinderType;
+
+    private Set<CylinderTypeMaster> purchasedCylinderType;
 }

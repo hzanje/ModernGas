@@ -32,4 +32,7 @@ public class CartEntity extends GenericEntity {
 
     @Column(name = "quantity")
     private int quantity;
+
+    @Column(name = "price")
+    private int price;
 }

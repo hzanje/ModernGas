@@ -17,7 +17,8 @@ public class CartDto {
 
     private String categoryName;
 
-        private int quantity;
+    private int quantity;
 
+    private int price;
 
 }
