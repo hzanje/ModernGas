@@ -13,7 +13,4 @@ import java.util.List;
 public interface CartRepo extends JpaRepository<CartEntity, Long> {
 
     List<CartEntity> getCartEntitiesByUserIdOrderByUpdatedDate(Long userId);
-
-    @Query("update CartEntity set activeFlag = 0 where id = :id")
-    void deleteCartById(@Param("id") Long cartId);
 }

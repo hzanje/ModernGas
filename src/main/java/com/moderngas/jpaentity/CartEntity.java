@@ -26,7 +26,7 @@ public class CartEntity extends GenericEntity {
     @Column(name = "userId")
     private Long userId;
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToOne
     @JoinColumn(name = "gas_id", referencedColumnName = "id")
     private GasMaster gasMaster;
 

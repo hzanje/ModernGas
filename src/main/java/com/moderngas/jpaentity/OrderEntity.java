@@ -35,11 +35,11 @@ public class OrderEntity extends GenericEntity {
     @Column(name = "user_id")
     private Long userId;
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToOne
     @JoinColumn(name = "status_id", referencedColumnName = "id")
     private StatusMaster statusMaster;
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToOne
     @JoinColumn(name = "gas_id", referencedColumnName = "id")
     private GasMaster gasMaster;
 

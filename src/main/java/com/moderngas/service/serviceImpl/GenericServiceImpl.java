@@ -181,6 +181,7 @@ public class GenericServiceImpl implements GenericService {
             cartEntity.setCylinderType(cartDto.getCylinderType());
             cartEntity.setQuantity(cartDto.getQuantity());
             cartEntity.setUserId(cartDto.getUserId());
+            cartEntity.setPrice(cartDto.getPrice());
             cartEntity.setGasMaster(gasRepo.getOne(cartDto.getGasId()));
         }
         return cartEntity;
@@ -195,6 +196,8 @@ public class GenericServiceImpl implements GenericService {
             cartDto.setCylinderType(cartEntity.getCylinderType());
             cartDto.setQuantity(cartEntity.getQuantity());
             cartDto.setUserId(cartEntity.getUserId());
+            cartDto.setPrice(cartEntity.getPrice());
+            cartDto.setRefill(cartEntity.isRefill());
             if (null != cartEntity.getGasMaster()) {
                 cartDto.setGasId(cartEntity.getGasMaster().getId());
                 cartDto.setGasName(cartEntity.getGasMaster().getName());

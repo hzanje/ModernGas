@@ -21,4 +21,6 @@ public class CartDto {
 
     private int price;
 
+    private boolean isRefill;
+
 }
