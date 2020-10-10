@@ -109,7 +109,7 @@ public class GenericServiceImpl implements GenericService {
     @Override
     public AddressDto convertAddressEntityToDto(AddressEntity addressEntity) {
         AddressDto addressDto = new AddressDto();
-        if(addressEntity==null) {
+        if(addressEntity!=null) {
             addressDto.setId(addressEntity.getId());
             addressDto.setAddress1(addressEntity.getAddress1());
             addressDto.setAddress2(addressEntity.getAddress2());

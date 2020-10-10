@@ -62,10 +62,17 @@ public class UserServiceImpl implements UserService {
 
     public String updateUser(UserEntity userEntity) {
         String response = "failure";
-        userEntity.setUpdatedDate(new Date());
-        UserEntity savedUserEntity = userRepo.save(userEntity);
-        if (null != savedUserEntity) {
-            response = "success";
+        Optional<UserEntity> user=userRepo.findByMobileNumber(userEntity.getMobileNumber());
+        if(user!=null && user.isPresent()) {
+        	UserEntity tempUser=user.get();
+        	tempUser.setUpdatedDate(new Date());
+        	tempUser.setName(userEntity.getName());
+        	tempUser.setEmail(userEntity.getEmail());
+        	tempUser.setCompanyName(userEntity.getCompanyName());
+            UserEntity savedUserEntity = userRepo.save(tempUser);
+            if (null != savedUserEntity) {
+            	response = "success";
+            }
         }
         return response;
     }
@@ -201,17 +208,17 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public JSONObject getAddress(Long userId) {
-		UserEntity userEntity=userRepo.findById(userId).get();
+		Optional<UserEntity> optional=userRepo.findById(userId);
 		JSONObject obj=new JSONObject();
-		if(userEntity==null) {
-			obj.put("message", "User does not exists");
-		}else {
-			AddressEntity address=userEntity.getAddressEntity();
+		if(optional!=null &&optional.isPresent()) {
+			AddressEntity address=optional.get().getAddressEntity();
 			if(address==null) {
 				obj.put("message", "Address does not exist");
 			}else {
 				obj.put("address", genericService.convertAddressEntityToDto(address));
 			}
+		}else {
+			obj.put("message", "User does not exists");
 		}
 		return obj;
 	}
