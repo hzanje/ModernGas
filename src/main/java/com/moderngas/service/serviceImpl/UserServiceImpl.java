@@ -210,14 +210,14 @@ public class UserServiceImpl implements UserService {
 	public JSONObject getAddress(Long userId) {
 		Optional<UserEntity> optional=userRepo.findById(userId);
 		JSONObject obj=new JSONObject();
-		if(optional!=null &&optional.isPresent()) {
+		if (optional!=null &&optional.isPresent()) {
 			AddressEntity address=optional.get().getAddressEntity();
-			if(address==null) {
+			if (address==null) {
 				obj.put("message", "Address does not exist");
-			}else {
+			} else {
 				obj.put("address", genericService.convertAddressEntityToDto(address));
 			}
-		}else {
+		} else {
 			obj.put("message", "User does not exists");
 		}
 		return obj;

@@ -23,6 +23,9 @@ public class CartEntity extends GenericEntity {
     @Column(name = "is_refill")
     private boolean isRefill;
 
+    @Column(name = "refill_count")
+    private int refillCount;
+
     @Column(name = "userId")
     private Long userId;
 

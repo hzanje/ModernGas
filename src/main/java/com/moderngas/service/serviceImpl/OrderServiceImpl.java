@@ -87,4 +87,20 @@ public class OrderServiceImpl implements OrderService {
         cartRepo.deleteById(cartId);
         return response;
     }
+
+    @Override
+    public String placeOrderFromCart(Long userId) {
+        String response = "Failure";
+        List<CartEntity> cartEntityList = cartRepo.getCartEntitiesByUserIdOrderByUpdatedDate(userId);
+        if (!CollectionUtils.isEmpty(cartEntityList)) {
+            List<OrderEntity> orderEntityList = genericService.convertCartToOrderEntity(cartEntityList);
+            orderRepo.saveAll(orderEntityList);
+
+            /* Delete Cart Entity */
+            cartRepo.deleteByUserId(userId);
+
+            response = "Success";
+        }
+        return response;
+    }
 }

@@ -74,7 +74,6 @@ public class UserController {
     @PostMapping(value = "/updateAddress")
     public ResponseEntity<ResponseStatus> updateAddress(@RequestBody AddressDto addressDtoStr,
                                                         @RequestParam("userId") final Long userId) throws JsonProcessingException {
-//        AddressDto addressDto = new ObjectMapper().readValue(addressDtoStr, AddressDto.class);
         String response = userService.updateAddress(genericService.convertDtoToAddressEntity(addressDtoStr), userId);
         return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
     }
@@ -82,26 +81,11 @@ public class UserController {
     @GetMapping(value="/getAddress")
     public ResponseEntity<JSONObject> getAddress(@RequestParam("userId") final Long userId){
     	JSONObject obj=userService.getAddress(userId);
-//<<<<<<< Updated upstream
-//    	if(obj.getAsString("message").equals("User does not exists")) {
-//    		return new ResponseEntity<>(obj, HttpStatus.NO_CONTENT);
-//    	} else if(obj.getAsString("message").equals("Address does not exist")){
-//    		return new ResponseEntity<>(obj, HttpStatus.NO_CONTENT);
-//    	} else {
-//=======
     	if(obj.containsKey("message")) {
     		return new ResponseEntity<>(obj, HttpStatus.BAD_REQUEST);
-    	}else {
-//>>>>>>> Stashed changes
+    	} else {
     		return new ResponseEntity<>(obj, HttpStatus.OK);
     	}
-//    	if(obj.containsKey("message")&&obj.getAsString("message").equals("User does not exists")) {
-//    		return new ResponseEntity<>(obj, HttpStatus.BAD_REQUEST);
-//    	}else if(obj.containsKey("message")&&obj.getAsString("message").equals("Address does not exist")){
-//    		return new ResponseEntity<>(obj, HttpStatus.BAD_REQUEST);
-//    	}else {
-//    		return new ResponseEntity<>(obj, HttpStatus.OK);
-//    	}
     }
 
 

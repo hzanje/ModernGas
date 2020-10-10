@@ -5,6 +5,8 @@ import com.moderngas.pojo.OrderDto;
 import com.moderngas.pojo.ResponseStatus;
 import com.moderngas.service.OrderService;
 import com.moderngas.service.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +30,7 @@ public class OrderController {
     @Autowired
     OrderService orderService;
 
+    private static final Logger LOG = LoggerFactory.getLogger(OrderController.class);
 
     @PostMapping("/placeOrder")
     public ResponseEntity<ResponseStatus> placeOrder(@RequestBody OrderDto orderDto) {
@@ -61,5 +64,11 @@ public class OrderController {
     @GetMapping("/getCartListByUser")
     public List<CartDto> getCartListByUser(@RequestParam("userId") Long userId) {
         return orderService.getCartByUser(userId);
+    }
+
+    @GetMapping("/placeOrderFromCart")
+    public ResponseEntity<ResponseStatus> placeOrderFromCart(@RequestParam("userId") Long userId) {
+        String response = orderService.placeOrderFromCart(userId);
+        return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
     }
 }

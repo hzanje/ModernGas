@@ -20,4 +20,7 @@ public interface OrderService {
     String deleteOrder(Long orderId);
 
     String deleteCart(Long cartId);
+
+    String placeOrderFromCart(Long userId);
+
 }

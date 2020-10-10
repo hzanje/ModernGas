@@ -18,9 +18,4 @@ public class GasImageEntity {
 
     @Column(name = "imageUrl")
     private String imageUrl;
-
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
 }

@@ -150,7 +150,7 @@ public class GenericServiceImpl implements GenericService {
             orderEntity.setGasMaster(gasRepo.getOne(orderDto.getGasId()));
             orderEntity.setRefill(orderDto.isRefill());
             orderEntity.setRefillCount(orderDto.getRefillCount());
-            //orderEntity.setOrderDate(new SimpleDateFormat("yyyy/MM/dd hh:mm:ss").parse(orderDto.getDate()));
+            orderEntity.setOrderDate(new Date());
         }
         return orderEntity;
     }
@@ -205,5 +205,25 @@ public class GenericServiceImpl implements GenericService {
             }
         }
         return cartDto;
+    }
+
+    @Override
+    public List<OrderEntity> convertCartToOrderEntity(List<CartEntity> cartEntityList) {
+        List<OrderEntity> orderEntityList = new ArrayList<>();
+        for (CartEntity cartEntity : cartEntityList) {
+            OrderEntity orderEntity = new OrderEntity();
+            orderEntity.setActiveFlag(true);
+            orderEntity.setCreatedDate(new Date());
+            orderEntity.setUpdatedDate(new Date());
+            orderEntity.setCylinderType(cartEntity.getCylinderType());
+            orderEntity.setUserId(cartEntity.getUserId());
+            orderEntity.setStatusMaster(gasRepo.getStatusById(1L));
+            orderEntity.setGasMaster(cartEntity.getGasMaster());
+            orderEntity.setRefill(cartEntity.isRefill());
+            orderEntity.setRefillCount(cartEntity.getRefillCount());
+            orderEntity.setOrderDate(new Date());
+            orderEntityList.add(orderEntity);
+        }
+        return orderEntityList;
     }
 }
