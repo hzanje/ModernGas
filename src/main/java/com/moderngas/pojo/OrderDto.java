@@ -17,11 +17,15 @@ public class OrderDto {
 
     private String gasName;
 
+    private String categoryName;
+
     private String statusName;
 
     private int quantity;
 
     private int refillCount;
+
+    private int price;
 
     private String date;
 

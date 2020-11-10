@@ -162,9 +162,13 @@ public class GenericServiceImpl implements GenericService {
             orderDto = new OrderDto();
             orderDto.setId(orderEntity.getId());
             orderDto.setGasName(orderEntity.getGasMaster().getName());
+            orderDto.setCategoryName(orderEntity.getGasMaster().getCategoryMaster().getName());
             orderDto.setQuantity(orderEntity.getQuantity());
+            orderDto.setPrice(orderEntity.getPrice());
+            orderDto.setCylinderType(orderEntity.getCylinderType());
             orderDto.setRefill(orderEntity.isRefill());
             orderDto.setStatusName(orderEntity.getStatusMaster().getStatus());
+            orderDto.setStatusId(orderEntity.getStatusMaster().getId());
         }
         return orderDto;
     }

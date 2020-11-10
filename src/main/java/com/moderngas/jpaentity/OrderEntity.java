@@ -46,4 +46,7 @@ public class OrderEntity extends GenericEntity {
     @Column(name = "order_date")
     private Date orderDate;
 
+    @Column(name = "price")
+    private int price;
+
 }
