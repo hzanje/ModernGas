@@ -98,7 +98,6 @@ public class OrderServiceImpl implements OrderService {
 
             /* Delete Cart Entity */
             cartRepo.deleteByUserId(userId);
-
             response = "Success";
         }
         return response;

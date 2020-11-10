@@ -20,7 +20,7 @@ public class CartEntity extends GenericEntity {
     @Column(name = "cylinder_type")
     private String cylinderType;
 
-    @Column(name = "is_refill")
+    @Column(name = "is_refill", columnDefinition = "tinyint(1) DEFAULT 1")
     private boolean isRefill;
 
     @Column(name = "refill_count")

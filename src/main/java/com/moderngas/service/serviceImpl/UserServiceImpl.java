@@ -244,7 +244,7 @@ public class UserServiceImpl implements UserService {
                         .map(e -> e.getImageUrl()).collect(Collectors.toList()));
             }
 
-            /* Check order of user for */
+            /* Check Order placed by user */
 
 
             return gasDto;

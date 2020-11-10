@@ -182,6 +182,7 @@ public class GenericServiceImpl implements GenericService {
             cartEntity.setQuantity(cartDto.getQuantity());
             cartEntity.setUserId(cartDto.getUserId());
             cartEntity.setPrice(cartDto.getPrice());
+            cartEntity.setRefill(cartDto.isRefill());
             cartEntity.setGasMaster(gasRepo.getOne(cartDto.getGasId()));
         }
         return cartEntity;

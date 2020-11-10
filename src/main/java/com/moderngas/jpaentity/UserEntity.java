@@ -32,7 +32,7 @@ public class UserEntity extends GenericEntity {
     @Column(name = "role", nullable = false)
     private String role;
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "addressId", referencedColumnName = "id")
     private AddressEntity addressEntity;
 
