@@ -46,6 +46,15 @@ public class OrderEntity extends GenericEntity {
     @Column(name = "order_date")
     private Date orderDate;
 
+    @Column(name = "loaded_date")
+    private Date loadedDate;
+
+    @Column(name = "shipped_date")
+    private Date shippedDate;
+
+    @Column(name = "delivered_date")
+    private Date deliveredDate;
+
     @Column(name = "price")
     private int price;
 

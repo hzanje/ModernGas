@@ -2,10 +2,12 @@ package com.moderngas.service.serviceImpl;
 
 import com.moderngas.jpaentity.CartEntity;
 import com.moderngas.jpaentity.OrderEntity;
+import com.moderngas.jpaentity.UserEntity;
 import com.moderngas.pojo.CartDto;
 import com.moderngas.pojo.OrderDto;
 import com.moderngas.repository.CartRepo;
 import com.moderngas.repository.OrderRepo;
+import com.moderngas.repository.UserRepo;
 import com.moderngas.service.GenericService;
 import com.moderngas.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +31,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     CartRepo cartRepo;
+
+    @Autowired
+    UserRepo userRepo;
 
     @Override
     public String placeOrder(OrderDto orderDto) {
@@ -98,6 +103,30 @@ public class OrderServiceImpl implements OrderService {
 
             /* Delete Cart Entity */
             cartRepo.deleteByUserId(userId);
+            response = "Success";
+        }
+        return response;
+    }
+
+    @Override
+    public OrderDto getOrderDetailsById(Long orderId) {
+        OrderEntity orderEntity = orderRepo.getOrderEntitiesById(orderId);
+        UserEntity userEntity = userRepo.getOne(orderEntity.getUserId());
+        OrderDto orderDto = genericService.convertOrderEntityToDto(orderEntity);
+        orderDto.setAddressDto(genericService.convertAddressEntityToDto(userEntity.getAddressEntity()));
+        orderDto.setOrderedOnDate(orderEntity.getOrderDate());
+        orderDto.setLoadedOnDate(orderEntity.getLoadedDate());
+        orderDto.setShippedOnDate(orderEntity.getShippedDate());
+        orderDto.setDeliveredOnDate(orderEntity.getDeliveredDate());
+        return orderDto;
+    }
+
+    @Override
+    public String updateOrderStatus(Long orderId, Long statusId) {
+        String response = "Failure";
+        OrderEntity orderEntity = orderRepo.getOrderEntitiesById(orderId);
+        if (null != orderEntity) {
+            /*genericService.*/
             response = "Success";
         }
         return response;

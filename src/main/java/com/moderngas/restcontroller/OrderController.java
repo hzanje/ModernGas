@@ -1,6 +1,7 @@
 package com.moderngas.restcontroller;
 
 import com.moderngas.pojo.CartDto;
+import com.moderngas.pojo.NameIdDto;
 import com.moderngas.pojo.OrderDto;
 import com.moderngas.pojo.ResponseStatus;
 import com.moderngas.service.OrderService;
@@ -70,5 +71,22 @@ public class OrderController {
     public ResponseEntity<ResponseStatus> placeOrderFromCart(@RequestParam("userId") Long userId) {
         String response = orderService.placeOrderFromCart(userId);
         return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
+    }
+
+    @GetMapping("/getOrderDetailsById")
+    public OrderDto getOrderDetailsById(@RequestParam("orderId") Long orderId) {
+        return orderService.getOrderDetailsById(orderId);
+    }
+
+    @GetMapping("/updateOrderStatus")
+    public ResponseEntity<ResponseStatus> updateOrderStatus(@RequestParam("orderId") Long orderId,
+                                                            @RequestParam("statusId") Long statusId ) {
+        String response = orderService.updateOrderStatus(orderId, statusId);
+        return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
+    }
+
+    @GetMapping("/getOrderStatusList")
+    public NameIdDto getOrderStatusList() {
+        return new NameIdDto();
     }
 }

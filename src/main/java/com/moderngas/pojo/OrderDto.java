@@ -2,6 +2,8 @@ package com.moderngas.pojo;
 
 import lombok.Data;
 
+import java.util.Date;
+
 @Data
 public class OrderDto {
 
@@ -27,7 +29,15 @@ public class OrderDto {
 
     private int price;
 
-    private String date;
-
     private Long statusId;
+
+    private Date orderedOnDate;
+
+    private Date loadedOnDate;
+
+    private Date shippedOnDate;
+
+    private Date deliveredOnDate;
+
+    private AddressDto addressDto;
 }

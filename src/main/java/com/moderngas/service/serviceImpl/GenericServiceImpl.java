@@ -169,6 +169,8 @@ public class GenericServiceImpl implements GenericService {
             orderDto.setRefill(orderEntity.isRefill());
             orderDto.setStatusName(orderEntity.getStatusMaster().getStatus());
             orderDto.setStatusId(orderEntity.getStatusMaster().getId());
+            orderDto.setUserId(orderDto.getUserId());
+            orderDto.setGasId(orderDto.getGasId());
         }
         return orderDto;
     }
@@ -226,6 +228,7 @@ public class GenericServiceImpl implements GenericService {
             orderEntity.setGasMaster(cartEntity.getGasMaster());
             orderEntity.setRefill(cartEntity.isRefill());
             orderEntity.setRefillCount(cartEntity.getRefillCount());
+            orderEntity.setQuantity(cartEntity.getQuantity());
             orderEntity.setOrderDate(new Date());
             orderEntityList.add(orderEntity);
         }

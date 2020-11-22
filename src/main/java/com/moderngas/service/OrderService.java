@@ -23,4 +23,7 @@ public interface OrderService {
 
     String placeOrderFromCart(Long userId);
 
+    OrderDto getOrderDetailsById(Long orderId);
+
+    String updateOrderStatus(Long orderId, Long statusId);
 }
