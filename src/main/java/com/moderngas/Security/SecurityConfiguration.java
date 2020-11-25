@@ -1,8 +1,5 @@
 package com.moderngas.Security;
 
-import com.moderngas.Security.JwtAuthenicationFilter;
-import com.moderngas.Security.JwtAuthorizationFilter;
-import com.moderngas.Security.UserDetailsServiceImpl;
 import com.moderngas.repository.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -65,6 +62,5 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Bean
     PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
-        /*return NoOpPasswordEncoder.getInstance();*/
     }
 }

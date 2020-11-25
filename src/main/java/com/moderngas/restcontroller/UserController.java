@@ -1,7 +1,5 @@
 package com.moderngas.restcontroller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.moderngas.pojo.*;
 import com.moderngas.pojo.ResponseStatus;
 import com.moderngas.service.GenericService;
@@ -73,7 +71,7 @@ public class UserController {
 
     @PostMapping(value = "/updateAddress")
     public ResponseEntity<ResponseStatus> updateAddress(@RequestBody AddressDto addressDtoStr,
-                                                        @RequestParam("userId") final Long userId) throws JsonProcessingException {
+                                                        @RequestParam("userId") final Long userId) {
         String response = userService.updateAddress(genericService.convertDtoToAddressEntity(addressDtoStr), userId);
         return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
     }

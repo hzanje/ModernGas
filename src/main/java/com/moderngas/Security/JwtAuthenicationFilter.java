@@ -5,7 +5,6 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.moderngas.pojo.LoginDto;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -45,8 +44,7 @@ public class JwtAuthenicationFilter extends UsernamePasswordAuthenticationFilter
                 credentials.getUserName(), credentials.getPassword(), new ArrayList<>());
 
         //Authenticate User
-        Authentication auth = authenticationManager.authenticate(authenticationToken);
-        return auth;
+        return authenticationManager.authenticate(authenticationToken);
     }
 
     @Override

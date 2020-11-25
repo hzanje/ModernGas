@@ -2,6 +2,7 @@ package com.moderngas.service.serviceImpl;
 
 import com.moderngas.jpaentity.AddressEntity;
 import com.moderngas.jpaentity.CategoryMaster;
+import com.moderngas.jpaentity.GasImageEntity;
 import com.moderngas.jpaentity.GasMaster;
 import com.moderngas.jpaentity.UserEntity;
 import com.moderngas.pojo.GasDto;
@@ -45,34 +46,36 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private GasRepo gasRepo;
 
+    private static final String FAILURE_STR = "Failure";
+
+    private static final String SUCCESS_STR = "Success";
+
     @Override
     public String addUser(UserEntityDto userEntityDto) {
         /* Add new Client to DataBase */
-        String response = "failure";
+        String response = FAILURE_STR;
         UserEntity userEntity = genericService.convertDtoToUserData(userEntityDto);
         userEntity.setActiveFlag(true);
         userEntity.setCreatedDate(new Date());
         userEntity.setUpdatedDate(new Date());
         userEntity = userRepo.save(userEntity);
-        if (null != userEntity && userEntity.getId() != null) {
-            response = "success";
+        if (userEntity.getId() != null) {
+            response = SUCCESS_STR;
         }
         return response;
     }
 
     public String updateUser(UserEntity userEntity) {
-        String response = "failure";
+        String response = FAILURE_STR;
         Optional<UserEntity> user=userRepo.findByMobileNumber(userEntity.getMobileNumber());
-        if(user!=null && user.isPresent()) {
+        if(user.isPresent()) {
         	UserEntity tempUser=user.get();
         	tempUser.setUpdatedDate(new Date());
         	tempUser.setName(userEntity.getName());
         	tempUser.setEmail(userEntity.getEmail());
         	tempUser.setCompanyName(userEntity.getCompanyName());
-            UserEntity savedUserEntity = userRepo.save(tempUser);
-            if (null != savedUserEntity) {
-            	response = "success";
-            }
+            userRepo.save(tempUser);
+            response = SUCCESS_STR;
         }
         return response;
     }
@@ -96,10 +99,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String checkUserExist(Long mobileNumber) {
-        String result = "Failure";
+        String result = FAILURE_STR;
         Optional<UserEntity> userEntity = userRepo.findByMobileNumber(mobileNumber);
         if (userEntity.isPresent()) {
-            result = "Success";
+            result = SUCCESS_STR;
         }
         return result;
     }
@@ -107,26 +110,33 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserEntity getUserByLoginId(Long username) {
         Optional<UserEntity> userEntity = userRepo.findByMobileNumber(username);
-        return userEntity.get();
+        if (userEntity.isPresent()) {
+            return userEntity.get();
+        }
+        return null;
     }
 
     @Override
     public String changePassword(Long username, String oldPassword, String newPassword) {
-        String result = "Failure";
-        UserEntity userEntity = userRepo.findByMobileNumber(username).get();
-        if (passwordEncoder.matches(oldPassword, userEntity.getPassword())) {
-            userEntity.setPassword(passwordEncoder.encode(newPassword));
-            result = updateUser(userEntity);
+        String result = FAILURE_STR;
+        UserEntity userEntity;
+        Optional<UserEntity> optionalUserEntity = userRepo.findByMobileNumber(username);
+        if (optionalUserEntity.isPresent()) {
+            userEntity = optionalUserEntity.get();
+            if (passwordEncoder.matches(oldPassword, userEntity.getPassword())) {
+                userEntity.setPassword(passwordEncoder.encode(newPassword));
+                result = updateUser(userEntity);
+            }
         }
         return result;
     }
 
     @Override
     public String forgetPassword(Long userName) {
-        String result = "Failure";
+        String result = FAILURE_STR;
         /* Check if User Exits */
         Optional<UserEntity> entity=userRepo.findByMobileNumber(userName);
-        if(entity!=null && entity.isPresent()) {
+        if(entity.isPresent()) {
         UserEntity userEntity = entity.get();
         try {
             if (null != userEntity && null != userEntity.getEmail()) {
@@ -151,12 +161,12 @@ public class UserServiceImpl implements UserService {
     }
 
     private String createEmailBody(String name, String tempPassword) {
-        StringBuffer stringBuffer = new StringBuffer("Hi " + name + ", <Br>");
-        stringBuffer.append("Have you forget your password to Modern Gas App, Don't worry we have provided a temporary password below, ");
-        stringBuffer.append("<Br><Br>Password : <Strong>" + tempPassword + "</Strong>");
-        stringBuffer.append("<Br>Now you may directly login to Modern Gas Account with temporary password. ");
-        stringBuffer.append("<Br><Br>Thanks & Regards, <Br> A.B. Chaudhary");
-        return stringBuffer.toString();
+        StringBuilder stringBuilder = new StringBuilder("Hi " + name + ", <Br>");
+        stringBuilder.append("Have you forget your password to Modern Gas App, Don't worry we have provided a temporary password below, ");
+        stringBuilder.append("<Br><Br>Password : <Strong>" + tempPassword + "</Strong>");
+        stringBuilder.append("<Br>Now you may directly login to Modern Gas Account with temporary password. ");
+        stringBuilder.append("<Br><Br>Thanks & Regards, <Br> A.B. Chaudhary");
+        return stringBuilder.toString();
     }
 
     @Override
@@ -196,12 +206,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String updateAddress(AddressEntity addressEntity, Long userId) {
-        String response = "Failure";
-        UserEntity userEntity = userRepo.findById(userId).get();
-        userEntity.setAddressEntity(addressEntity);
-        UserEntity savedUserEntity = userRepo.save(userEntity);
-        if (null != savedUserEntity) {
-            response = "success";
+        String response = "FAILURE_STR";
+        Optional<UserEntity> optionalUser = userRepo.findById(userId);
+        if (optionalUser.isPresent()) {
+            UserEntity userEntity = optionalUser.get();
+            userEntity.setAddressEntity(addressEntity);
+            userRepo.save(userEntity);
+            response = SUCCESS_STR;
         }
         return response;
     }
@@ -210,7 +221,7 @@ public class UserServiceImpl implements UserService {
 	public JSONObject getAddress(Long userId) {
 		Optional<UserEntity> optional=userRepo.findById(userId);
 		JSONObject obj=new JSONObject();
-		if (optional!=null &&optional.isPresent()) {
+		if (optional.isPresent()) {
 			AddressEntity address=optional.get().getAddressEntity();
 			if (address==null) {
 				obj.put("message", "Address does not exist");
@@ -232,23 +243,16 @@ public class UserServiceImpl implements UserService {
     public GasDto getGasDetailsById(Long id, Long userId) {
         GasMaster gasMaster = gasRepo.getOne(id);
         GasDto gasDto = new GasDto();
-        if (null != gasMaster) {
-            gasDto.setId(gasMaster.getId());
-            gasDto.setName(gasMaster.getName());
-            gasDto.setAvailableCylinderType(gasMaster.getCylinderTypeMasterList());
-            gasDto.setDescription(gasMaster.getDescription());
-            gasDto.setPrice(gasMaster.getPrice());
-            gasDto.setAvailable(gasMaster.isAvaliable());
-            if (!CollectionUtils.isEmpty(gasMaster.getGasImageEntityList())) {
-                gasDto.setImageList(gasMaster.getGasImageEntityList().stream()
-                        .map(e -> e.getImageUrl()).collect(Collectors.toList()));
-            }
-
-            /* Check Order placed by user */
-
-
-            return gasDto;
+        gasDto.setId(gasMaster.getId());
+        gasDto.setName(gasMaster.getName());
+        gasDto.setAvailableCylinderType(gasMaster.getCylinderTypeMasterList());
+        gasDto.setDescription(gasMaster.getDescription());
+        gasDto.setPrice(gasMaster.getPrice());
+        gasDto.setAvailable(gasMaster.isAvaliable());
+        if (!CollectionUtils.isEmpty(gasMaster.getGasImageEntityList())) {
+            gasDto.setImageList(gasMaster.getGasImageEntityList().stream()
+                    .map(GasImageEntity::getImageUrl).collect(Collectors.toList()));
         }
-        return null;
+        return gasDto;
     }
 }

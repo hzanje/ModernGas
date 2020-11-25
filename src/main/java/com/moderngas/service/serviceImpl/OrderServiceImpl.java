@@ -14,10 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,13 +33,17 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     UserRepo userRepo;
 
+    private static final String FAILURE_STR = "Failure";
+
+    private static final String SUCCESS_STR = "Success";
+
     @Override
     public String placeOrder(OrderDto orderDto) {
-        String response = "Failure";
+        String response = FAILURE_STR;
         OrderEntity orderEntity = genericService.convertDtoToOrderEntity(orderDto);
         if (null != orderEntity) {
             orderRepo.save(orderEntity);
-            response = "Success";
+            response = SUCCESS_STR;
         }
         return response;
     }
@@ -59,11 +61,11 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public String addCart(CartDto cartDto) {
-        String response = "Failure";
+        String response = FAILURE_STR;
         CartEntity cartEntity = genericService.convertDtoToCartEntity(cartDto);
         if (null != cartEntity) {
             cartRepo.save(cartEntity);
-            response = "Success";
+            response = SUCCESS_STR;
         }
         return response;
     }
@@ -81,21 +83,21 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public String deleteOrder(Long orderId) {
-        String response = "Success";
+        String response = FAILURE_STR;
         orderRepo.deleteOrderById(orderId);
         return response;
     }
 
     @Override
     public String deleteCart(Long cartId) {
-        String response = "Success";
+        String response = SUCCESS_STR;
         cartRepo.deleteById(cartId);
         return response;
     }
 
     @Override
     public String placeOrderFromCart(Long userId) {
-        String response = "Failure";
+        String response = FAILURE_STR;
         List<CartEntity> cartEntityList = cartRepo.getCartEntitiesByUserIdOrderByUpdatedDate(userId);
         if (!CollectionUtils.isEmpty(cartEntityList)) {
             List<OrderEntity> orderEntityList = genericService.convertCartToOrderEntity(cartEntityList);
@@ -103,7 +105,7 @@ public class OrderServiceImpl implements OrderService {
 
             /* Delete Cart Entity */
             cartRepo.deleteByUserId(userId);
-            response = "Success";
+            response = SUCCESS_STR;
         }
         return response;
     }
@@ -123,11 +125,11 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public String updateOrderStatus(Long orderId, Long statusId) {
-        String response = "Failure";
+        String response = FAILURE_STR;
         OrderEntity orderEntity = orderRepo.getOrderEntitiesById(orderId);
         if (null != orderEntity) {
             /*genericService.*/
-            response = "Success";
+            response = SUCCESS_STR;
         }
         return response;
     }
