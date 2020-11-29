@@ -49,8 +49,8 @@ public class OrderEntity extends GenericEntity {
     @Column(name = "loaded_date")
     private Date loadedDate;
 
-    @Column(name = "shipped_date")
-    private Date shippedDate;
+    @Column(name = "dispatched_date")
+    private Date dispatchedDate;
 
     @Column(name = "delivered_date")
     private Date deliveredDate;

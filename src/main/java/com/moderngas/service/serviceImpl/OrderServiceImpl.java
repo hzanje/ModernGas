@@ -4,8 +4,10 @@ import com.moderngas.jpaentity.CartEntity;
 import com.moderngas.jpaentity.OrderEntity;
 import com.moderngas.jpaentity.UserEntity;
 import com.moderngas.pojo.CartDto;
+import com.moderngas.pojo.NameIdDto;
 import com.moderngas.pojo.OrderDto;
 import com.moderngas.repository.CartRepo;
+import com.moderngas.repository.GasRepo;
 import com.moderngas.repository.OrderRepo;
 import com.moderngas.repository.UserRepo;
 import com.moderngas.service.GenericService;
@@ -32,6 +34,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     UserRepo userRepo;
+
+    @Autowired
+    GasRepo gasRepo;
 
     private static final String FAILURE_STR = "Failure";
 
@@ -118,7 +123,7 @@ public class OrderServiceImpl implements OrderService {
         orderDto.setAddressDto(genericService.convertAddressEntityToDto(userEntity.getAddressEntity()));
         orderDto.setOrderedOnDate(orderEntity.getOrderDate());
         orderDto.setLoadedOnDate(orderEntity.getLoadedDate());
-        orderDto.setShippedOnDate(orderEntity.getShippedDate());
+        orderDto.setShippedOnDate(orderEntity.getDispatchedDate());
         orderDto.setDeliveredOnDate(orderEntity.getDeliveredDate());
         return orderDto;
     }
@@ -128,9 +133,20 @@ public class OrderServiceImpl implements OrderService {
         String response = FAILURE_STR;
         OrderEntity orderEntity = orderRepo.getOrderEntitiesById(orderId);
         if (null != orderEntity) {
-            /*genericService.*/
+            orderEntity = genericService.changeOrderStatus(orderEntity, statusId);
+            orderRepo.save(orderEntity);
             response = SUCCESS_STR;
         }
         return response;
+    }
+
+    @Override
+    public List<NameIdDto> getOrderStatusList() {
+        return gasRepo.getAllStatus().stream().map(s -> {
+            NameIdDto nameIdDto = new NameIdDto();
+            nameIdDto.setId(s.getId());
+            nameIdDto.setName(s.getStatus());
+            return nameIdDto;
+        }).collect(Collectors.toList());
     }
 }

@@ -57,4 +57,6 @@ public interface GenericService {
     CartDto convertCartEntityToDto(CartEntity cartEntity);
 
     List<OrderEntity> convertCartToOrderEntity(List<CartEntity> cartEntityList);
+
+    OrderEntity changeOrderStatus(OrderEntity orderEntity, Long statusId);
 }

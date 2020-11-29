@@ -4,6 +4,7 @@ import com.moderngas.jpaentity.AddressEntity;
 import com.moderngas.jpaentity.CartEntity;
 import com.moderngas.jpaentity.CategoryMaster;
 import com.moderngas.jpaentity.OrderEntity;
+import com.moderngas.jpaentity.StatusMaster;
 import com.moderngas.jpaentity.UserEntity;
 import com.moderngas.pojo.AddressDto;
 import com.moderngas.pojo.CartDto;
@@ -231,5 +232,33 @@ public class GenericServiceImpl implements GenericService {
             orderEntityList.add(orderEntity);
         }
         return orderEntityList;
+    }
+
+    @Override
+    public OrderEntity changeOrderStatus(OrderEntity orderEntity, Long statusId) {
+        int status = Math.toIntExact(statusId);
+        StatusMaster statusMaster = gasRepo.getStatusById(statusId);
+        if (null != orderEntity) {
+            switch (status) {
+                case 1 : orderEntity.setOrderDate(new Date());
+                    break;
+
+                case 2 : orderEntity.setLoadedDate(new Date());
+                    break;
+
+                case 3 : orderEntity.setDispatchedDate(new Date());
+                    break;
+
+                case 4 : orderEntity.setDeliveredDate(new Date());
+                    break;
+
+                case 5 : orderEntity.setActiveFlag(false);
+                    break;
+
+                default: break;
+            }
+            orderEntity.setStatusMaster(statusMaster);
+        }
+        return orderEntity;
     }
 }

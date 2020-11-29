@@ -2,9 +2,9 @@ package com.moderngas.service;
 
 
 import com.moderngas.pojo.CartDto;
+import com.moderngas.pojo.NameIdDto;
 import com.moderngas.pojo.OrderDto;
 
-import java.text.ParseException;
 import java.util.List;
 
 public interface OrderService {
@@ -26,4 +26,7 @@ public interface OrderService {
     OrderDto getOrderDetailsById(Long orderId);
 
     String updateOrderStatus(Long orderId, Long statusId);
+
+    List<NameIdDto> getOrderStatusList();
+
 }

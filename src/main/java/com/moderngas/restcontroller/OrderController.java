@@ -85,7 +85,7 @@ public class OrderController {
     }
 
     @GetMapping("/getOrderStatusList")
-    public NameIdDto getOrderStatusList() {
-        return new NameIdDto();
+    public List<NameIdDto> getOrderStatusList() {
+        return orderService.getOrderStatusList();
     }
 }
