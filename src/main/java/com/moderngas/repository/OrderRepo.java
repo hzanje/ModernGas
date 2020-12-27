@@ -14,10 +14,17 @@ import java.util.List;
 @Transactional
 public interface OrderRepo extends JpaRepository<OrderEntity, Long> {
 
-    List<OrderEntity> getOrderEntitiesByUserIdAndActiveFlagTrueOrderByUpdatedDate(Long userId);
+    @Query(value = QUERIES.ORDER_ENTRIES_BY_USER_ID)
+    List<OrderEntity> getOrderEntitiesByUserId(Long userId);
 
     OrderEntity getOrderEntitiesById(Long id);
 
     @Query(" UPDATE OrderEntity SET activeFlag = 0 where id = :id")
     void deleteOrderById(@Param("id") Long orderId);
+
+    class QUERIES {
+
+        private static final String ORDER_ENTRIES_BY_USER_ID = "FROM OrderEntity WHERE userId = :userId ORDER BY updatedDate ";
+
+    }
 }

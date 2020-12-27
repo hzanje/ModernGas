@@ -56,7 +56,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public List<OrderDto> getOrderListByUser(Long userId) {
         List<OrderDto> orderDtoList = new ArrayList<>();
-        List<OrderEntity> orderEntityList = orderRepo.getOrderEntitiesByUserIdAndActiveFlagTrueOrderByUpdatedDate(userId);
+        List<OrderEntity> orderEntityList = orderRepo.getOrderEntitiesByUserId(userId);
         if (!CollectionUtils.isEmpty(orderEntityList)) {
             orderDtoList = orderEntityList.stream()
                     .map(e -> genericService.convertOrderEntityToDto(e)).collect(Collectors.toList());
