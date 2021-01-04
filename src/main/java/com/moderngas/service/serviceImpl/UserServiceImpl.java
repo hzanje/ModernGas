@@ -56,9 +56,6 @@ public class UserServiceImpl implements UserService {
         /* Add new Client to DataBase */
         String response = Constants.FAILURE_STR;
         UserEntity userEntity = genericService.convertDtoToUserData(userEntityDto);
-        userEntity.setActiveFlag(true);
-        userEntity.setCreatedDate(new Date());
-        userEntity.setUpdatedDate(new Date());
         userEntity = userRepo.save(userEntity);
         if (userEntity.getId() != null) {
             response = Constants.SUCCESS_STR;
@@ -71,7 +68,6 @@ public class UserServiceImpl implements UserService {
         Optional<UserEntity> user=userRepo.findByMobileNumber(userEntity.getMobileNumber());
         if(user.isPresent()) {
         	UserEntity tempUser=user.get();
-        	tempUser.setUpdatedDate(new Date());
         	tempUser.setName(userEntity.getName());
         	tempUser.setEmail(userEntity.getEmail());
         	tempUser.setCompanyName(userEntity.getCompanyName());

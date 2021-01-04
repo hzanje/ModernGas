@@ -144,9 +144,6 @@ public class GenericServiceImpl implements GenericService {
         OrderEntity orderEntity = null;
         if (null != orderDto) {
             orderEntity = new OrderEntity();
-            orderEntity.setActiveFlag(true);
-            orderEntity.setCreatedDate(new Date());
-            orderEntity.setUpdatedDate(new Date());
             orderEntity.setCylinderType(orderDto.getCylinderType());
             orderEntity.setUserId(orderDto.getUserId());
             orderEntity.setStatusMaster(statusRepo.getStatusById(orderDto.getStatusId()));
@@ -184,9 +181,6 @@ public class GenericServiceImpl implements GenericService {
         if (null != cartDto) {
             cartEntity = new CartEntity();
             cartEntity.setId(cartDto.getId());
-            cartEntity.setActiveFlag(true);
-            cartEntity.setCreatedDate(new Date());
-            cartEntity.setUpdatedDate(new Date());
             cartEntity.setCylinderType(cartDto.getCylinderType());
             cartEntity.setQuantity(cartDto.getQuantity());
             cartEntity.setUserId(cartDto.getUserId());
@@ -222,9 +216,6 @@ public class GenericServiceImpl implements GenericService {
         List<OrderEntity> orderEntityList = new ArrayList<>();
         for (CartEntity cartEntity : cartEntityList) {
             OrderEntity orderEntity = new OrderEntity();
-            orderEntity.setActiveFlag(true);
-            orderEntity.setCreatedDate(new Date());
-            orderEntity.setUpdatedDate(new Date());
             orderEntity.setCylinderType(cartEntity.getCylinderType());
             orderEntity.setUserId(cartEntity.getUserId());
             orderEntity.setStatusMaster(statusRepo.getStatusById(1L));
