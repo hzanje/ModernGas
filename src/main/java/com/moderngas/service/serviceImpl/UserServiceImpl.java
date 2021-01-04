@@ -1,14 +1,17 @@
 package com.moderngas.service.serviceImpl;
 
+import com.moderngas.constants.Constants;
+import com.moderngas.constants.ExceptionConstants;
+import com.moderngas.exception.BadRequestException;
 import com.moderngas.jpaentity.AddressEntity;
 import com.moderngas.jpaentity.CategoryMaster;
 import com.moderngas.jpaentity.GasImageEntity;
 import com.moderngas.jpaentity.GasMaster;
 import com.moderngas.jpaentity.UserEntity;
-import com.moderngas.pojo.GasDto;
+import com.moderngas.pojo.user.GasDto;
 import com.moderngas.pojo.NameIdDto;
-import com.moderngas.pojo.UserDashboardDto;
-import com.moderngas.pojo.UserEntityDto;
+import com.moderngas.pojo.user.UserDashboardDto;
+import com.moderngas.pojo.user.UserEntityDto;
 import com.moderngas.repository.GasRepo;
 import com.moderngas.repository.UserRepo;
 import com.moderngas.service.EmailService;
@@ -18,6 +21,7 @@ import com.moderngas.service.UserService;
 import net.minidev.json.JSONObject;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.parameters.P;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -46,27 +50,24 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private GasRepo gasRepo;
 
-    private static final String FAILURE_STR = "Failure";
-
-    private static final String SUCCESS_STR = "Success";
 
     @Override
     public String addUser(UserEntityDto userEntityDto) {
         /* Add new Client to DataBase */
-        String response = FAILURE_STR;
+        String response = Constants.FAILURE_STR;
         UserEntity userEntity = genericService.convertDtoToUserData(userEntityDto);
         userEntity.setActiveFlag(true);
         userEntity.setCreatedDate(new Date());
         userEntity.setUpdatedDate(new Date());
         userEntity = userRepo.save(userEntity);
         if (userEntity.getId() != null) {
-            response = SUCCESS_STR;
+            response = Constants.SUCCESS_STR;
         }
         return response;
     }
 
     public String updateUser(UserEntity userEntity) {
-        String response = FAILURE_STR;
+        String response = Constants.FAILURE_STR;
         Optional<UserEntity> user=userRepo.findByMobileNumber(userEntity.getMobileNumber());
         if(user.isPresent()) {
         	UserEntity tempUser=user.get();
@@ -75,7 +76,7 @@ public class UserServiceImpl implements UserService {
         	tempUser.setEmail(userEntity.getEmail());
         	tempUser.setCompanyName(userEntity.getCompanyName());
             userRepo.save(tempUser);
-            response = SUCCESS_STR;
+            response = Constants.SUCCESS_STR;
         }
         return response;
     }
@@ -93,16 +94,19 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserEntityDto getUserById(Long userId) {
-        UserEntity userEntity = userRepo.getOne(userId);
+        UserEntity userEntity = userRepo.findById(userId).orElse(null);
+        if (null == userEntity) {
+            throw new BadRequestException(ExceptionConstants.INVALID_USER);
+        }
         return genericService.convertUserDataToDto(userEntity);
     }
 
     @Override
     public String checkUserExist(Long mobileNumber) {
-        String result = FAILURE_STR;
+        String result = Constants.FAILURE_STR;
         Optional<UserEntity> userEntity = userRepo.findByMobileNumber(mobileNumber);
         if (userEntity.isPresent()) {
-            result = SUCCESS_STR;
+            result = Constants.SUCCESS_STR;
         }
         return result;
     }
@@ -118,7 +122,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String changePassword(Long username, String oldPassword, String newPassword) {
-        String result = FAILURE_STR;
+        String result = Constants.FAILURE_STR;
         UserEntity userEntity;
         Optional<UserEntity> optionalUserEntity = userRepo.findByMobileNumber(username);
         if (optionalUserEntity.isPresent()) {
@@ -133,10 +137,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String forgetPassword(Long userName) {
-        String result = FAILURE_STR;
+        String result = Constants.FAILURE_STR;
         /* Check if User Exits */
         Optional<UserEntity> entity=userRepo.findByMobileNumber(userName);
-        if(entity.isPresent()) {
+        if(!entity.isPresent()) {
+            throw new BadRequestException(ExceptionConstants.INVALID_USER);
+        }
         UserEntity userEntity = entity.get();
         try {
             if (null != userEntity && null != userEntity.getEmail()) {
@@ -153,9 +159,6 @@ public class UserServiceImpl implements UserService {
             }
         } catch (Exception e) {
             e.printStackTrace();
-        }
-        }else {
-        	result="User does not exist";
         }
         return result;
     }
@@ -190,18 +193,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<NameIdDto> getListByCategoryId(Long id) {
-        List<NameIdDto> nameIdDtoList = new ArrayList<>();
-        List<GasMaster> gasMasterList = gasRepo.getGasMasterByCategoryMaster_Id(id);
-        if (!CollectionUtils.isEmpty(gasMasterList)) {
-            for (GasMaster gasMaster : gasMasterList) {
-                NameIdDto nameIdDto = new NameIdDto();
-                nameIdDto.setId(gasMaster.getId());
-                nameIdDto.setName(gasMaster.getName());
-                nameIdDtoList.add(nameIdDto);
-            }
-        }
-        return nameIdDtoList;
+    public List<NameIdDto> getListByCategoryId(Long categoryId) {
+        return gasRepo.getGasMasterByCategoryId(categoryId);
     }
 
     @Override
@@ -212,7 +205,7 @@ public class UserServiceImpl implements UserService {
             UserEntity userEntity = optionalUser.get();
             userEntity.setAddressEntity(addressEntity);
             userRepo.save(userEntity);
-            response = SUCCESS_STR;
+            response = Constants.SUCCESS_STR;
         }
         return response;
     }

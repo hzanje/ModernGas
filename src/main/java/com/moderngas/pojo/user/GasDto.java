@@ -1,4 +1,4 @@
-package com.moderngas.pojo;
+package com.moderngas.pojo.user;
 
 import com.moderngas.jpaentity.CylinderTypeMaster;
 import lombok.Data;

@@ -1,4 +1,4 @@
-package com.moderngas.pojo;
+package com.moderngas.pojo.user;
 
 import lombok.Data;
 
@@ -40,4 +40,6 @@ public class OrderDto {
     private Date deliveredOnDate;
 
     private AddressDto addressDto;
+
+
 }

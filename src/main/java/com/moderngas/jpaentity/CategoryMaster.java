@@ -8,7 +8,7 @@ import javax.persistence.Table;
 @Entity
 @Data
 @Table(name = "category_master")
-public class CategoryMaster extends GenericEntity {
+public class CategoryMaster extends BaseEntity {
 
     private String name;
 }

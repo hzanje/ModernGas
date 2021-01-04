@@ -1,9 +1,11 @@
 package com.moderngas.service;
 
 
-import com.moderngas.pojo.CartDto;
+import com.moderngas.pojo.user.CartDto;
 import com.moderngas.pojo.NameIdDto;
-import com.moderngas.pojo.OrderDto;
+import com.moderngas.pojo.user.OrderDto;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -29,4 +31,5 @@ public interface OrderService {
 
     List<NameIdDto> getOrderStatusList();
 
+    Page<com.moderngas.pojo.admin.OrderDto> getAllOrderListForAdmin(Pageable pageable);
 }

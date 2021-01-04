@@ -8,7 +8,7 @@ import javax.persistence.*;
 @Data
 @NoArgsConstructor
 @Table(name = "user")
-public class UserEntity extends GenericEntity {
+public class UserEntity extends BaseEntity {
 
     @Column(name = "name")
     private String name;

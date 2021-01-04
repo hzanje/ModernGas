@@ -2,6 +2,10 @@ package com.moderngas.restcontroller;
 
 import com.moderngas.pojo.*;
 import com.moderngas.pojo.ResponseStatus;
+import com.moderngas.pojo.user.AddressDto;
+import com.moderngas.pojo.user.GasDto;
+import com.moderngas.pojo.user.UserDashboardDto;
+import com.moderngas.pojo.user.UserEntityDto;
 import com.moderngas.service.GenericService;
 import com.moderngas.service.UserService;
 
@@ -10,7 +14,13 @@ import net.minidev.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -20,10 +30,10 @@ import java.util.List;
 public class UserController {
 
     @Autowired
-    UserService userService;
+    private UserService userService;
 
     @Autowired
-    GenericService genericService;
+    private GenericService genericService;
 
     @GetMapping(value = "/getAllClient")
     public List<UserEntityDto> getAllClient() {

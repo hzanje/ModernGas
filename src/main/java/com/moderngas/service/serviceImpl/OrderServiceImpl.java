@@ -1,18 +1,26 @@
 package com.moderngas.service.serviceImpl;
 
+import com.moderngas.constants.Constants;
+import com.moderngas.constants.ExceptionConstants;
+import com.moderngas.exception.BadRequestException;
 import com.moderngas.jpaentity.CartEntity;
 import com.moderngas.jpaentity.OrderEntity;
+import com.moderngas.jpaentity.StatusMaster;
 import com.moderngas.jpaentity.UserEntity;
-import com.moderngas.pojo.CartDto;
+import com.moderngas.pojo.user.CartDto;
 import com.moderngas.pojo.NameIdDto;
-import com.moderngas.pojo.OrderDto;
+import com.moderngas.pojo.user.OrderDto;
 import com.moderngas.repository.CartRepo;
 import com.moderngas.repository.GasRepo;
 import com.moderngas.repository.OrderRepo;
+import com.moderngas.repository.StatusRepo;
 import com.moderngas.repository.UserRepo;
 import com.moderngas.service.GenericService;
 import com.moderngas.service.OrderService;
+import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -24,37 +32,40 @@ import java.util.stream.Collectors;
 public class OrderServiceImpl implements OrderService {
 
     @Autowired
-    GenericService genericService;
+    private GenericService genericService;
 
     @Autowired
-    OrderRepo orderRepo;
+    private OrderRepo orderRepo;
 
     @Autowired
-    CartRepo cartRepo;
+    private CartRepo cartRepo;
 
     @Autowired
-    UserRepo userRepo;
+    private UserRepo userRepo;
 
     @Autowired
-    GasRepo gasRepo;
+    private GasRepo gasRepo;
 
-    private static final String FAILURE_STR = "Failure";
-
-    private static final String SUCCESS_STR = "Success";
+    @Autowired
+    private StatusRepo statusRepo;
 
     @Override
     public String placeOrder(OrderDto orderDto) {
-        String response = FAILURE_STR;
+        String response = Constants.FAILURE_STR;
         OrderEntity orderEntity = genericService.convertDtoToOrderEntity(orderDto);
         if (null != orderEntity) {
             orderRepo.save(orderEntity);
-            response = SUCCESS_STR;
+            response = Constants.SUCCESS_STR;
         }
         return response;
     }
 
     @Override
     public List<OrderDto> getOrderListByUser(Long userId) {
+        UserEntity user = userRepo.findById(userId).orElse(null);
+        if (null == user) {
+            throw new BadRequestException(ExceptionConstants.INVALID_USER);
+        }
         List<OrderDto> orderDtoList = new ArrayList<>();
         List<OrderEntity> orderEntityList = orderRepo.getOrderEntitiesByUserId(userId);
         if (!CollectionUtils.isEmpty(orderEntityList)) {
@@ -66,17 +77,21 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public String addCart(CartDto cartDto) {
-        String response = FAILURE_STR;
+        String response = Constants.FAILURE_STR;
         CartEntity cartEntity = genericService.convertDtoToCartEntity(cartDto);
         if (null != cartEntity) {
             cartRepo.save(cartEntity);
-            response = SUCCESS_STR;
+            response = Constants.SUCCESS_STR;
         }
         return response;
     }
 
     @Override
     public List<CartDto> getCartByUser(Long userId) {
+        UserEntity user = userRepo.findById(userId).orElse(null);
+        if (null == user) {
+            throw new BadRequestException(ExceptionConstants.INVALID_USER);
+        }
         List<CartDto> cartDtoList = new ArrayList<>();
         List<CartEntity> cartEntityList = cartRepo.getCartEntitiesByUserIdOrderByUpdatedDate(userId);
         if (!CollectionUtils.isEmpty(cartEntityList)) {
@@ -88,35 +103,47 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public String deleteOrder(Long orderId) {
-        String response = FAILURE_STR;
+        OrderEntity order = orderRepo.findById(orderId).orElse(null);
+        if (null == order) {
+            throw new BadRequestException(ExceptionConstants.INVALID_ORDER);
+        }
         orderRepo.deleteOrderById(orderId);
-        return response;
+        return Constants.SUCCESS_STR;
     }
 
     @Override
     public String deleteCart(Long cartId) {
-        String response = SUCCESS_STR;
+        CartEntity cart = cartRepo.findById(cartId).orElse(null);
+        if (null == cart) {
+            throw new BadRequestException(ExceptionConstants.INVALID_CART);
+        }
         cartRepo.deleteById(cartId);
-        return response;
+        return Constants.SUCCESS_STR;
     }
 
     @Override
     public String placeOrderFromCart(Long userId) {
-        String response = FAILURE_STR;
+        UserEntity user = userRepo.findById(userId).orElse(null);
+        if (null == user) {
+            throw new BadRequestException(ExceptionConstants.INVALID_USER);
+        }
+        String response = Constants.FAILURE_STR;
         List<CartEntity> cartEntityList = cartRepo.getCartEntitiesByUserIdOrderByUpdatedDate(userId);
         if (!CollectionUtils.isEmpty(cartEntityList)) {
             List<OrderEntity> orderEntityList = genericService.convertCartToOrderEntity(cartEntityList);
             orderRepo.saveAll(orderEntityList);
-
-            /* Delete Cart Entity */
             cartRepo.deleteByUserId(userId);
-            response = SUCCESS_STR;
+            response = Constants.SUCCESS_STR;
         }
         return response;
     }
 
     @Override
     public OrderDto getOrderDetailsById(Long orderId) {
+        OrderEntity order = orderRepo.findById(orderId).orElse(null);
+        if (null == order) {
+            throw new BadRequestException(ExceptionConstants.INVALID_ORDER);
+        }
         OrderEntity orderEntity = orderRepo.getOrderEntitiesById(orderId);
         UserEntity userEntity = userRepo.getOne(orderEntity.getUserId());
         OrderDto orderDto = genericService.convertOrderEntityToDto(orderEntity);
@@ -130,23 +157,31 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public String updateOrderStatus(Long orderId, Long statusId) {
-        String response = FAILURE_STR;
+        OrderEntity order = orderRepo.findById(orderId).orElse(null);
+        if (null != order) {
+            throw new BadRequestException(ExceptionConstants.INVALID_ORDER);
+        }
+        StatusMaster statusMaster = statusRepo.findById(statusId).orElse(null);
+        if (null == statusMaster) {
+            throw new BadRequestException(ExceptionConstants.INVALID_STATUS);
+        }
+        String response = Constants.FAILURE_STR;
         OrderEntity orderEntity = orderRepo.getOrderEntitiesById(orderId);
         if (null != orderEntity) {
             orderEntity = genericService.changeOrderStatus(orderEntity, statusId);
             orderRepo.save(orderEntity);
-            response = SUCCESS_STR;
+            response = Constants.SUCCESS_STR;
         }
         return response;
     }
 
     @Override
     public List<NameIdDto> getOrderStatusList() {
-        return gasRepo.getAllStatus().stream().map(s -> {
-            NameIdDto nameIdDto = new NameIdDto();
-            nameIdDto.setId(s.getId());
-            nameIdDto.setName(s.getStatus());
-            return nameIdDto;
-        }).collect(Collectors.toList());
+        return statusRepo.getAllActiveStatus();
+    }
+
+    @Override
+    public Page<com.moderngas.pojo.admin.OrderDto> getAllOrderListForAdmin(Pageable pageable) {
+        return orderRepo.getAllOrderListForAdmin(pageable);
     }
 }

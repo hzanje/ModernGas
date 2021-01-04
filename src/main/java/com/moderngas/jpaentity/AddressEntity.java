@@ -11,7 +11,7 @@ import javax.persistence.Table;
 @Data
 @NoArgsConstructor
 @Table(name = "address")
-public class AddressEntity extends GenericEntity {
+public class AddressEntity extends BaseEntity {
 
     @Column(name = "pincode")
     private int pincode;

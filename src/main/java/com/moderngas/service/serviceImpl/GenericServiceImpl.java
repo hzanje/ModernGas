@@ -6,12 +6,13 @@ import com.moderngas.jpaentity.CategoryMaster;
 import com.moderngas.jpaentity.OrderEntity;
 import com.moderngas.jpaentity.StatusMaster;
 import com.moderngas.jpaentity.UserEntity;
-import com.moderngas.pojo.AddressDto;
-import com.moderngas.pojo.CartDto;
-import com.moderngas.pojo.OrderDto;
-import com.moderngas.pojo.UserDashboardDto;
-import com.moderngas.pojo.UserEntityDto;
+import com.moderngas.pojo.user.AddressDto;
+import com.moderngas.pojo.user.CartDto;
+import com.moderngas.pojo.user.OrderDto;
+import com.moderngas.pojo.user.UserDashboardDto;
+import com.moderngas.pojo.user.UserEntityDto;
 import com.moderngas.repository.GasRepo;
+import com.moderngas.repository.StatusRepo;
 import com.moderngas.service.GenericService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -27,10 +28,13 @@ import java.util.Random;
 public class GenericServiceImpl implements GenericService {
 
     @Autowired
-    PasswordEncoder passwordEncoder;
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
-    GasRepo gasRepo;
+    private GasRepo gasRepo;
+
+    @Autowired
+    private StatusRepo statusRepo;
 
     @Override
     public UserEntity convertDtoToUserData(UserEntityDto userEntityDto) {
@@ -145,7 +149,7 @@ public class GenericServiceImpl implements GenericService {
             orderEntity.setUpdatedDate(new Date());
             orderEntity.setCylinderType(orderDto.getCylinderType());
             orderEntity.setUserId(orderDto.getUserId());
-            orderEntity.setStatusMaster(gasRepo.getStatusById(orderDto.getStatusId()));
+            orderEntity.setStatusMaster(statusRepo.getStatusById(orderDto.getStatusId()));
             orderEntity.setGasMaster(gasRepo.getOne(orderDto.getGasId()));
             orderEntity.setRefill(orderDto.isRefill());
             orderEntity.setRefillCount(orderDto.getRefillCount());
@@ -166,7 +170,7 @@ public class GenericServiceImpl implements GenericService {
             orderDto.setPrice(orderEntity.getPrice());
             orderDto.setCylinderType(orderEntity.getCylinderType());
             orderDto.setRefill(orderEntity.isRefill());
-            orderDto.setStatusName(orderEntity.getStatusMaster().getStatus());
+            orderDto.setStatusName(orderEntity.getStatusMaster().getName());
             orderDto.setStatusId(orderEntity.getStatusMaster().getId());
             orderDto.setUserId(orderDto.getUserId());
             orderDto.setGasId(orderDto.getGasId());
@@ -223,7 +227,7 @@ public class GenericServiceImpl implements GenericService {
             orderEntity.setUpdatedDate(new Date());
             orderEntity.setCylinderType(cartEntity.getCylinderType());
             orderEntity.setUserId(cartEntity.getUserId());
-            orderEntity.setStatusMaster(gasRepo.getStatusById(1L));
+            orderEntity.setStatusMaster(statusRepo.getStatusById(1L));
             orderEntity.setGasMaster(cartEntity.getGasMaster());
             orderEntity.setRefill(cartEntity.isRefill());
             orderEntity.setRefillCount(cartEntity.getRefillCount());
@@ -236,23 +240,22 @@ public class GenericServiceImpl implements GenericService {
 
     @Override
     public OrderEntity changeOrderStatus(OrderEntity orderEntity, Long statusId) {
-        int status = Math.toIntExact(statusId);
-        StatusMaster statusMaster = gasRepo.getStatusById(statusId);
-        if (null != orderEntity) {
-            switch (status) {
-                case 1 : orderEntity.setOrderDate(new Date());
+        StatusMaster statusMaster = statusRepo.getStatusById(statusId);
+        if (null != statusMaster.getName()) {
+            switch (statusMaster.getName()) {
+                case "Ordered" : orderEntity.setOrderDate(new Date());
                     break;
 
-                case 2 : orderEntity.setLoadedDate(new Date());
+                case "Loaded" : orderEntity.setLoadedDate(new Date());
                     break;
 
-                case 3 : orderEntity.setDispatchedDate(new Date());
+                case "Dispatched" : orderEntity.setDispatchedDate(new Date());
                     break;
 
-                case 4 : orderEntity.setDeliveredDate(new Date());
+                case "Delivered" : orderEntity.setDeliveredDate(new Date());
                     break;
 
-                case 5 : orderEntity.setActiveFlag(false);
+                case "Cancelled" : orderEntity.setActiveFlag(false);
                     break;
 
                 default: break;

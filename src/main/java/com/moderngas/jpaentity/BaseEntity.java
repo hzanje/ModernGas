@@ -10,7 +10,7 @@ import java.util.Date;
 
 @Data
 @MappedSuperclass
-public class GenericEntity implements Serializable {
+public class BaseEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
