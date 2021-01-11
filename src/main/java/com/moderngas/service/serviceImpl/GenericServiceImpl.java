@@ -14,6 +14,7 @@ import com.moderngas.pojo.user.UserEntityDto;
 import com.moderngas.repository.GasRepo;
 import com.moderngas.repository.StatusRepo;
 import com.moderngas.service.GenericService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
+@Slf4j
 @Service
 public class GenericServiceImpl implements GenericService {
 
@@ -74,6 +76,7 @@ public class GenericServiceImpl implements GenericService {
 
     @Override
     public String generateRandomPassword() {
+        log.info("GenericService >> Generating Random Password");
         String capitalLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         String smallLetters = "abcdefghijklmnopqrstuvwxyz";
         String specialCharacters = "!@#$*%";
@@ -93,6 +96,7 @@ public class GenericServiceImpl implements GenericService {
         for(int i = 2; i< 6 ; i++) {
             password[i] = combinedChars.charAt(random.nextInt(combinedChars.length()));
         }
+        log.info("GenericService >> Random Password is : {}", new String(password));
         return new String(password);
     }
 
@@ -231,6 +235,7 @@ public class GenericServiceImpl implements GenericService {
 
     @Override
     public OrderEntity changeOrderStatus(OrderEntity orderEntity, Long statusId) {
+        log.info("GenericService >> Changes Status: {} for User: {}", statusId, orderEntity.getUserId());
         StatusMaster statusMaster = statusRepo.getStatusById(statusId);
         if (null != statusMaster.getName()) {
             switch (statusMaster.getName()) {

@@ -1,6 +1,7 @@
 package com.moderngas.service.serviceImpl;
 
 import com.moderngas.service.EmailService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailException;
@@ -16,6 +17,7 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
+@Slf4j
 @Service
 public class EmailServiceImpl implements EmailService {
 
@@ -29,6 +31,7 @@ public class EmailServiceImpl implements EmailService {
     @Override
     public void sendMail(String to, String subject, String body) throws MessagingException {
         try {
+            log.info("Sending mail to {}", to);
             MimeMessage mimeMessage = javaMailSender.createMimeMessage();
             /*MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED,
                     StandardCharsets.UTF_8.name());*/

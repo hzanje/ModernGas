@@ -6,8 +6,6 @@ import com.moderngas.pojo.user.OrderDto;
 import com.moderngas.pojo.ResponseStatus;
 import com.moderngas.service.OrderService;
 import com.moderngas.service.UserService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,8 +27,6 @@ public class OrderController {
 
     @Autowired
     OrderService orderService;
-
-    private static final Logger LOG = LoggerFactory.getLogger(OrderController.class);
 
     @PostMapping("/placeOrder")
     public ResponseEntity<ResponseStatus> placeOrder(@RequestBody OrderDto orderDto) {

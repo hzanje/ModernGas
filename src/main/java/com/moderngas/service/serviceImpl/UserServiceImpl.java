@@ -18,20 +18,20 @@ import com.moderngas.service.EmailService;
 import com.moderngas.service.GenericService;
 import com.moderngas.service.UserService;
 
+import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONObject;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.parameters.P;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class UserServiceImpl implements UserService {
 
@@ -53,6 +53,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String addUser(UserEntityDto userEntityDto) {
+        log.info("UserService >> Create New User");
         /* Add new Client to DataBase */
         String response = Constants.FAILURE_STR;
         UserEntity userEntity = genericService.convertDtoToUserData(userEntityDto);
@@ -64,6 +65,7 @@ public class UserServiceImpl implements UserService {
     }
 
     public String updateUser(UserEntity userEntity) {
+        log.info("UserService >> Update User");
         String response = Constants.FAILURE_STR;
         Optional<UserEntity> user=userRepo.findByMobileNumber(userEntity.getMobileNumber());
         if(user.isPresent()) {
@@ -118,6 +120,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String changePassword(Long username, String oldPassword, String newPassword) {
+        log.info("UserService >> Changes password for User: {}", username);
         String result = Constants.FAILURE_STR;
         UserEntity userEntity;
         Optional<UserEntity> optionalUserEntity = userRepo.findByMobileNumber(username);
@@ -133,6 +136,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String forgetPassword(Long userName) {
+        log.info("UserService >> Forget Password by User: {}", userName);
         String result = Constants.FAILURE_STR;
         /* Check if User Exits */
         Optional<UserEntity> entity=userRepo.findByMobileNumber(userName);
@@ -195,7 +199,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String updateAddress(AddressEntity addressEntity, Long userId) {
-        String response = "FAILURE_STR";
+        String response = Constants.FAILURE_STR;
         Optional<UserEntity> optionalUser = userRepo.findById(userId);
         if (optionalUser.isPresent()) {
             UserEntity userEntity = optionalUser.get();

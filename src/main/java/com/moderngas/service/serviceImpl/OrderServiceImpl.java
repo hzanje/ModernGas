@@ -17,7 +17,7 @@ import com.moderngas.repository.StatusRepo;
 import com.moderngas.repository.UserRepo;
 import com.moderngas.service.GenericService;
 import com.moderngas.service.OrderService;
-import org.apache.catalina.User;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class OrderServiceImpl implements OrderService {
 
@@ -51,6 +52,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public String placeOrder(OrderDto orderDto) {
+        log.info("OrderService >> Place Order By User: {}", orderDto.getUserId());
         String response = Constants.FAILURE_STR;
         OrderEntity orderEntity = genericService.convertDtoToOrderEntity(orderDto);
         if (null != orderEntity) {
@@ -77,6 +79,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public String addCart(CartDto cartDto) {
+        log.info("OrderService >> Add Cart by User: {}", cartDto.getUserId());
         String response = Constants.FAILURE_STR;
         CartEntity cartEntity = genericService.convertDtoToCartEntity(cartDto);
         if (null != cartEntity) {
@@ -103,6 +106,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public String deleteOrder(Long orderId) {
+        log.info("OrderService >> Delete Order {}", orderId);
         OrderEntity order = orderRepo.findById(orderId).orElse(null);
         if (null == order) {
             throw new BadRequestException(ExceptionConstants.INVALID_ORDER);
@@ -113,6 +117,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public String deleteCart(Long cartId) {
+        log.info("OrderService >> Delete Cart {}", cartId);
         CartEntity cart = cartRepo.findById(cartId).orElse(null);
         if (null == cart) {
             throw new BadRequestException(ExceptionConstants.INVALID_CART);
@@ -123,6 +128,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public String placeOrderFromCart(Long userId) {
+        log.info("OrderService >> Place Order From Cart By User: {}", userId);
         UserEntity user = userRepo.findById(userId).orElse(null);
         if (null == user) {
             throw new BadRequestException(ExceptionConstants.INVALID_USER);
@@ -157,8 +163,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public String updateOrderStatus(Long orderId, Long statusId) {
+        log.info("OrderService >>");
         OrderEntity order = orderRepo.findById(orderId).orElse(null);
-        if (null != order) {
+        if (null == order) {
             throw new BadRequestException(ExceptionConstants.INVALID_ORDER);
         }
         StatusMaster statusMaster = statusRepo.findById(statusId).orElse(null);
