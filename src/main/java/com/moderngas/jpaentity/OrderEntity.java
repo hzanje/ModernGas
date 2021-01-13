@@ -1,10 +1,13 @@
 package com.moderngas.jpaentity;
 
+import com.moderngas.enums.OrderStatus;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
@@ -20,7 +23,7 @@ public class OrderEntity extends BaseEntity {
     private int quantity;
 
     @Column(name = "cylinder_type")
-    private String cylinderType;
+    private Long cylinderType;
 
     @Column(name = "is_refill", columnDefinition = "tinyint(1) DEFAULT 0" )
     private boolean isRefill;
@@ -31,22 +34,15 @@ public class OrderEntity extends BaseEntity {
     @Column(name = "user_id")
     private Long userId;
 
-    @OneToOne
-    @JoinColumn(name = "status_id", referencedColumnName = "id")
-    private StatusMaster statusMaster;
+    @Enumerated(EnumType.ORDINAL)
+    private OrderStatus orderStatus;
 
     @OneToOne
     @JoinColumn(name = "gas_id", referencedColumnName = "id")
     private GasMaster gasMaster;
 
-    @Column(name = "order_date")
-    private Date orderDate;
-
     @Column(name = "loaded_date")
     private Date loadedDate;
-
-    @Column(name = "dispatched_date")
-    private Date dispatchedDate;
 
     @Column(name = "delivered_date")
     private Date deliveredDate;

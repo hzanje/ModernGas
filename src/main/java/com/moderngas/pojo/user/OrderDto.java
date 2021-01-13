@@ -9,7 +9,7 @@ public class OrderDto {
 
     private Long id;
 
-    private String cylinderType;
+    private Long cylinderType;
 
     private boolean isRefill;
 
@@ -29,7 +29,9 @@ public class OrderDto {
 
     private int price;
 
-    private Long statusId;
+    private String status;
+
+    private String userName;
 
     private Date orderedOnDate;
 

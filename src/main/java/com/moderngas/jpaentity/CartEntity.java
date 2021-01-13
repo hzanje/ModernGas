@@ -16,7 +16,7 @@ import javax.persistence.Table;
 public class CartEntity extends BaseEntity {
 
     @Column(name = "cylinder_type")
-    private String cylinderType;
+    private Long cylinderType;
 
     @Column(name = "is_refill", columnDefinition = "tinyint(1) DEFAULT 1")
     private boolean isRefill;

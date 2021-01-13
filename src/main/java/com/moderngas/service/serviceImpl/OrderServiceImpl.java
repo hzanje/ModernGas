@@ -2,10 +2,10 @@ package com.moderngas.service.serviceImpl;
 
 import com.moderngas.constants.Constants;
 import com.moderngas.constants.ExceptionConstants;
+import com.moderngas.enums.OrderStatus;
 import com.moderngas.exception.BadRequestException;
 import com.moderngas.jpaentity.CartEntity;
 import com.moderngas.jpaentity.OrderEntity;
-import com.moderngas.jpaentity.StatusMaster;
 import com.moderngas.jpaentity.UserEntity;
 import com.moderngas.pojo.user.CartDto;
 import com.moderngas.pojo.NameIdDto;
@@ -13,7 +13,6 @@ import com.moderngas.pojo.user.OrderDto;
 import com.moderngas.repository.CartRepo;
 import com.moderngas.repository.GasRepo;
 import com.moderngas.repository.OrderRepo;
-import com.moderngas.repository.StatusRepo;
 import com.moderngas.repository.UserRepo;
 import com.moderngas.service.GenericService;
 import com.moderngas.service.OrderService;
@@ -46,9 +45,6 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private GasRepo gasRepo;
-
-    @Autowired
-    private StatusRepo statusRepo;
 
     @Override
     public String placeOrder(OrderDto orderDto) {
@@ -154,28 +150,27 @@ public class OrderServiceImpl implements OrderService {
         UserEntity userEntity = userRepo.getOne(orderEntity.getUserId());
         OrderDto orderDto = genericService.convertOrderEntityToDto(orderEntity);
         orderDto.setAddressDto(genericService.convertAddressEntityToDto(userEntity.getAddressEntity()));
-        orderDto.setOrderedOnDate(orderEntity.getOrderDate());
+        orderDto.setUserName(userEntity.getName());
+        orderDto.setOrderedOnDate(orderEntity.getCreatedDate());
         orderDto.setLoadedOnDate(orderEntity.getLoadedDate());
-        orderDto.setShippedOnDate(orderEntity.getDispatchedDate());
-        orderDto.setDeliveredOnDate(orderEntity.getDeliveredDate());
         return orderDto;
     }
 
     @Override
-    public String updateOrderStatus(Long orderId, Long statusId) {
+    public String updateOrderStatus(Long orderId, Long statusId) throws Exception {
         log.info("OrderService >>");
         OrderEntity order = orderRepo.findById(orderId).orElse(null);
         if (null == order) {
             throw new BadRequestException(ExceptionConstants.INVALID_ORDER);
         }
-        StatusMaster statusMaster = statusRepo.findById(statusId).orElse(null);
-        if (null == statusMaster) {
+        OrderStatus orderStatus = OrderStatus.getByOrdinal(statusId.intValue());
+        if (null == orderStatus) {
             throw new BadRequestException(ExceptionConstants.INVALID_STATUS);
         }
         String response = Constants.FAILURE_STR;
         OrderEntity orderEntity = orderRepo.getOrderEntitiesById(orderId);
         if (null != orderEntity) {
-            orderEntity = genericService.changeOrderStatus(orderEntity, statusId);
+            orderEntity = genericService.changeOrderStatus(orderEntity, orderStatus);
             orderRepo.save(orderEntity);
             response = Constants.SUCCESS_STR;
         }
@@ -183,12 +178,9 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<NameIdDto> getOrderStatusList() {
-        return statusRepo.getAllActiveStatus();
-    }
-
-    @Override
-    public Page<com.moderngas.pojo.admin.OrderDto> getAllOrderListForAdmin(Pageable pageable) {
-        return orderRepo.getAllOrderListForAdmin(pageable);
+    public Page<com.moderngas.pojo.admin.OrderDto> getAllOrderListForAdmin(Pageable pageable, String status, Long cylinderId, String search, String quantityOrder) {
+        OrderStatus statusEnum = OrderStatus.getByStatus(status);
+        return null;
+        //return orderRepo.getAllOrderListForAdmin(pageable, statusEnum, cylinderId, search, quantityOrder);
     }
 }

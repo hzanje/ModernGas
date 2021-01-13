@@ -75,13 +75,9 @@ public class OrderController {
 
     @GetMapping("/updateOrderStatus")
     public ResponseEntity<ResponseStatus> updateOrderStatus(@RequestParam("orderId") Long orderId,
-                                                            @RequestParam("statusId") Long statusId ) {
+                                                            @RequestParam("statusId") Long statusId ) throws Exception {
         String response = orderService.updateOrderStatus(orderId, statusId);
         return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
     }
 
-    @GetMapping("/getOrderStatusList")
-    public List<NameIdDto> getOrderStatusList() {
-        return orderService.getOrderStatusList();
-    }
 }

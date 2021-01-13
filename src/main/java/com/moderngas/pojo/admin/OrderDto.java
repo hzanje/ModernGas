@@ -1,13 +1,16 @@
 package com.moderngas.pojo.admin;
 
+import com.moderngas.enums.OrderStatus;
 import lombok.Data;
+
+import java.util.Date;
 
 @Data
 public class OrderDto {
 
     private Long id;
 
-    private String cylinderType;
+    private Long cylinderType;
 
     private boolean isRefill;
 
@@ -19,13 +22,14 @@ public class OrderDto {
 
     private String categoryName;
 
-    private Long statusId;
-
     private String statusName;
 
     private int quantity;
 
-    public OrderDto(Long id, String cylinderType, boolean isRefill, Long userId, String userName, String gasName, String categoryName, Long statusId, String statusName, int quantity) {
+    private Date orderDate;
+
+
+    public OrderDto(Long id, Long cylinderType, boolean isRefill, Long userId, String userName, String gasName, String categoryName, OrderStatus status, int quantity, Date orderDate) {
         this.id = id;
         this.cylinderType = cylinderType;
         this.isRefill = isRefill;
@@ -33,8 +37,8 @@ public class OrderDto {
         this.userName = userName;
         this.gasName = gasName;
         this.categoryName = categoryName;
-        this.statusId = statusId;
-        this.statusName = statusName;
+        this.statusName = status.getName();
         this.quantity = quantity;
+        this.orderDate = orderDate;
     }
 }

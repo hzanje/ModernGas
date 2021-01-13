@@ -1,5 +1,6 @@
 package com.moderngas.service;
 
+import com.moderngas.enums.OrderStatus;
 import com.moderngas.jpaentity.AddressEntity;
 import com.moderngas.jpaentity.CartEntity;
 import com.moderngas.jpaentity.CategoryMaster;
@@ -39,5 +40,5 @@ public interface GenericService {
 
     List<OrderEntity> convertCartToOrderEntity(List<CartEntity> cartEntityList);
 
-    OrderEntity changeOrderStatus(OrderEntity orderEntity, Long statusId);
+    OrderEntity changeOrderStatus(OrderEntity orderEntity, OrderStatus orderStatus);
 }

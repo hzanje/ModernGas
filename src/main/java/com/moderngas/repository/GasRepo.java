@@ -3,7 +3,6 @@ package com.moderngas.repository;
 
 import com.moderngas.jpaentity.CategoryMaster;
 import com.moderngas.jpaentity.GasMaster;
-import com.moderngas.jpaentity.StatusMaster;
 import com.moderngas.pojo.NameIdDto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

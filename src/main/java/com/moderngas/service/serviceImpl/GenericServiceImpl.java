@@ -1,10 +1,10 @@
 package com.moderngas.service.serviceImpl;
 
+import com.moderngas.enums.OrderStatus;
 import com.moderngas.jpaentity.AddressEntity;
 import com.moderngas.jpaentity.CartEntity;
 import com.moderngas.jpaentity.CategoryMaster;
 import com.moderngas.jpaentity.OrderEntity;
-import com.moderngas.jpaentity.StatusMaster;
 import com.moderngas.jpaentity.UserEntity;
 import com.moderngas.pojo.user.AddressDto;
 import com.moderngas.pojo.user.CartDto;
@@ -12,7 +12,6 @@ import com.moderngas.pojo.user.OrderDto;
 import com.moderngas.pojo.user.UserDashboardDto;
 import com.moderngas.pojo.user.UserEntityDto;
 import com.moderngas.repository.GasRepo;
-import com.moderngas.repository.StatusRepo;
 import com.moderngas.service.GenericService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,9 +33,6 @@ public class GenericServiceImpl implements GenericService {
 
     @Autowired
     private GasRepo gasRepo;
-
-    @Autowired
-    private StatusRepo statusRepo;
 
     @Override
     public UserEntity convertDtoToUserData(UserEntityDto userEntityDto) {
@@ -150,11 +146,10 @@ public class GenericServiceImpl implements GenericService {
             orderEntity = new OrderEntity();
             orderEntity.setCylinderType(orderDto.getCylinderType());
             orderEntity.setUserId(orderDto.getUserId());
-            orderEntity.setStatusMaster(statusRepo.getStatusById(orderDto.getStatusId()));
+            orderEntity.setOrderStatus(OrderStatus.getByStatus(orderDto.getStatus()));
             orderEntity.setGasMaster(gasRepo.getOne(orderDto.getGasId()));
             orderEntity.setRefill(orderDto.isRefill());
             orderEntity.setRefillCount(orderDto.getRefillCount());
-            orderEntity.setOrderDate(new Date());
         }
         return orderEntity;
     }
@@ -171,8 +166,7 @@ public class GenericServiceImpl implements GenericService {
             orderDto.setPrice(orderEntity.getPrice());
             orderDto.setCylinderType(orderEntity.getCylinderType());
             orderDto.setRefill(orderEntity.isRefill());
-            orderDto.setStatusName(orderEntity.getStatusMaster().getName());
-            orderDto.setStatusId(orderEntity.getStatusMaster().getId());
+            orderDto.setStatusName(orderEntity.getOrderStatus().getName());
             orderDto.setUserId(orderDto.getUserId());
             orderDto.setGasId(orderDto.getGasId());
         }
@@ -222,41 +216,34 @@ public class GenericServiceImpl implements GenericService {
             OrderEntity orderEntity = new OrderEntity();
             orderEntity.setCylinderType(cartEntity.getCylinderType());
             orderEntity.setUserId(cartEntity.getUserId());
-            orderEntity.setStatusMaster(statusRepo.getStatusById(1L));
+            orderEntity.setOrderStatus(OrderStatus.getByStatus("Ordered"));
             orderEntity.setGasMaster(cartEntity.getGasMaster());
             orderEntity.setRefill(cartEntity.isRefill());
             orderEntity.setRefillCount(cartEntity.getRefillCount());
             orderEntity.setQuantity(cartEntity.getQuantity());
-            orderEntity.setOrderDate(new Date());
             orderEntityList.add(orderEntity);
         }
         return orderEntityList;
     }
 
     @Override
-    public OrderEntity changeOrderStatus(OrderEntity orderEntity, Long statusId) {
-        log.info("GenericService >> Changes Status: {} for User: {}", statusId, orderEntity.getUserId());
-        StatusMaster statusMaster = statusRepo.getStatusById(statusId);
-        if (null != statusMaster.getName()) {
-            switch (statusMaster.getName()) {
-                case "Ordered" : orderEntity.setOrderDate(new Date());
+    public OrderEntity changeOrderStatus(OrderEntity orderEntity, OrderStatus orderStatus) {
+        log.info("GenericService >> Changes Status: {} for User: {}", orderStatus.getName(), orderEntity.getUserId());
+        if (null != orderStatus) {
+            switch (orderStatus) {
+
+                case ORDER_STATUS_LOADED: orderEntity.setLoadedDate(new Date());
                     break;
 
-                case "Loaded" : orderEntity.setLoadedDate(new Date());
+                case ORDER_STATUS_DEVLIVERED: orderEntity.setDeliveredDate(new Date());
                     break;
 
-                case "Dispatched" : orderEntity.setDispatchedDate(new Date());
-                    break;
-
-                case "Delivered" : orderEntity.setDeliveredDate(new Date());
-                    break;
-
-                case "Cancelled" : orderEntity.setActiveFlag(false);
+                case ORDER_STATUS_CANCELLED: orderEntity.setActiveFlag(false);
                     break;
 
                 default: break;
             }
-            orderEntity.setStatusMaster(statusMaster);
+            orderEntity.setOrderStatus(orderStatus);
         }
         return orderEntity;
     }

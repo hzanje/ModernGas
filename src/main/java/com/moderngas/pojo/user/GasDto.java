@@ -13,7 +13,7 @@ public class GasDto {
 
     private String Name;
 
-    private String cylinderType;
+    private Long cylinderType;
 
     private boolean isRefill;
 

@@ -27,9 +27,7 @@ public interface OrderService {
 
     OrderDto getOrderDetailsById(Long orderId);
 
-    String updateOrderStatus(Long orderId, Long statusId);
+    String updateOrderStatus(Long orderId, Long statusId) throws Exception;
 
-    List<NameIdDto> getOrderStatusList();
-
-    Page<com.moderngas.pojo.admin.OrderDto> getAllOrderListForAdmin(Pageable pageable);
+    Page<com.moderngas.pojo.admin.OrderDto> getAllOrderListForAdmin(Pageable pageable, String status, Long cylinderId, String search, String quantityOrder);
 }
