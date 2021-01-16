@@ -25,28 +25,24 @@ public class GenericController {
     @Autowired
     UserDetailsServiceImpl userDetailsService;
 
-    @ResponseBody
     @GetMapping(value = "/checkUserExist")
     public ResponseEntity<ResponseStatus> checkUserExist(@RequestParam("mobileNumber") Long mobileNumber) {
         String response = userService.checkUserExist(mobileNumber);
         return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
     }
 
-    @ResponseBody
     @PostMapping(value = "/addUser")
     public ResponseEntity<ResponseStatus> addUser(@RequestBody UserEntityDto userEntityDto) {
         String response = userService.addUser(userEntityDto);
         return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
     }
 
-    @ResponseBody
     @GetMapping(value = "/forgetPassword")
     public ResponseEntity<ResponseStatus> forgetPassword(@RequestParam("userName") Long userName) {
         String response = userService.forgetPassword(userName);
         return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
     }
 
-    @ResponseBody
     @PostMapping(value = "/refreshToken")
     public ResponseEntity<ResponseStatus> refreshToken(@RequestParam("existingToken") String existingToken) {
         String response = userService.refreshToken(existingToken);

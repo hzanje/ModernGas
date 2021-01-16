@@ -23,10 +23,7 @@ import java.util.List;
 public class OrderController {
 
     @Autowired
-    UserService userService;
-
-    @Autowired
-    OrderService orderService;
+    private OrderService orderService;
 
     @PostMapping("/placeOrder")
     public ResponseEntity<ResponseStatus> placeOrder(@RequestBody OrderDto orderDto) {

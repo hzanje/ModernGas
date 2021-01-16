@@ -40,4 +40,5 @@ public interface UserService {
     List<NameIdDto> getListByCategoryId(Long categoryId);
 
     GasDto getGasDetailsById(Long id, Long userId);
+
 }

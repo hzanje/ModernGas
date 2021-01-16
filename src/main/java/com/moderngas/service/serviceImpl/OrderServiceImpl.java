@@ -180,7 +180,6 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public Page<com.moderngas.pojo.admin.OrderDto> getAllOrderListForAdmin(Pageable pageable, String status, Long cylinderId, String search, String quantityOrder) {
         OrderStatus statusEnum = OrderStatus.getByStatus(status);
-        return null;
-        //return orderRepo.getAllOrderListForAdmin(pageable, statusEnum, cylinderId, search, quantityOrder);
+        return orderRepo.getAllOrderListForAdmin(pageable, statusEnum, cylinderId, search, quantityOrder);
     }
 }

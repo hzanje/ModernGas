@@ -10,7 +10,7 @@ public class OrderDto {
 
     private Long id;
 
-    private Long cylinderType;
+    private String cylinderType;
 
     private boolean isRefill;
 
@@ -28,8 +28,7 @@ public class OrderDto {
 
     private Date orderDate;
 
-
-    public OrderDto(Long id, Long cylinderType, boolean isRefill, Long userId, String userName, String gasName, String categoryName, OrderStatus status, int quantity, Date orderDate) {
+    public OrderDto(Long id, String cylinderType, boolean isRefill, Long userId, String userName, String gasName, String categoryName, OrderStatus status, int quantity, Date orderDate) throws Exception {
         this.id = id;
         this.cylinderType = cylinderType;
         this.isRefill = isRefill;

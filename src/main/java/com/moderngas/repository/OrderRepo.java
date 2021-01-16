@@ -25,12 +25,12 @@ public interface OrderRepo extends JpaRepository<OrderEntity, Long> {
     @Query(" UPDATE OrderEntity SET activeFlag = 0 where id = :id")
     void deleteOrderById(@Param("id") Long orderId);
 
-    /*@Query(value = QUERIES.ALL_ORDER_LIST_HEADER_FOR_ADMIN, countQuery = QUERIES.ALL_ORDER_LIST_FOR_ADMIN_COUNT)
+    @Query(value = QUERIES.ALL_ORDER_LIST_HEADER_FOR_ADMIN, countQuery = QUERIES.ALL_ORDER_LIST_FOR_ADMIN_COUNT)
     Page<OrderDto> getAllOrderListForAdmin(Pageable pageable,
                                            @Param("status") OrderStatus status,
                                            @Param("cylinderId") Long cylinderId,
                                            @Param("search") String search,
-                                           @Param("quantityOrder") String quantityOrder);*/
+                                           @Param("quantityOrder") String quantityOrder);
 
     class QUERIES {
 

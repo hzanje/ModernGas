@@ -34,7 +34,8 @@ public class OrderEntity extends BaseEntity {
     @Column(name = "user_id")
     private Long userId;
 
-    @Enumerated(EnumType.ORDINAL)
+    @Column(name = "status_id")
+    @Enumerated
     private OrderStatus orderStatus;
 
     @OneToOne

@@ -1,13 +1,16 @@
 package com.moderngas.restcontroller;
 
+import com.moderngas.pojo.ResponseStatus;
+import com.moderngas.pojo.admin.CylinderCodeStatusDto;
 import com.moderngas.pojo.admin.OrderDto;
+import com.moderngas.pojo.user.UserEntityDto;
 import com.moderngas.service.OrderService;
+import com.moderngas.service.UserService;
+import com.moderngas.service.InventoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
@@ -17,6 +20,9 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,10 +33,16 @@ import org.springframework.web.bind.annotation.RestController;
 public class AdminController {
 
     @Autowired
-    OrderService orderService;
+    private OrderService orderService;
+
+    @Autowired
+    private InventoryService inventoryService;
+
+    @Autowired
+    private UserService userService;
 
     @GetMapping("/order")
-    HttpEntity<PagedModel<EntityModel<OrderDto>>> getAllOrderList(PagedResourcesAssembler<OrderDto> assembler,
+    public HttpEntity<PagedModel<EntityModel<OrderDto>>> getAllOrderList(PagedResourcesAssembler<OrderDto> assembler,
                @RequestParam(value = "size",defaultValue = "0") Integer size,
                @RequestParam(value = "page", defaultValue = "0") Integer page,
                @RequestParam(value = "status", required = false) String status,
@@ -45,6 +57,21 @@ public class AdminController {
         PagedModel<EntityModel<OrderDto>> model = assembler.toModel(orderDtoList, link);
         return new ResponseEntity<>(model, HttpStatus.OK);
     }
+
+    @PostMapping("/addCylinder/{id}")
+    public ResponseEntity<ResponseStatus> addCylinder(@PathVariable("id") Long userId,
+                                                      @RequestBody CylinderCodeStatusDto cylinderCodeStatusDto) {
+        String response = inventoryService.addCylinder(userId, cylinderCodeStatusDto);
+        return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
+    }
+
+    @PostMapping(value = "/addEmployee")
+    public ResponseEntity<ResponseStatus> addEmployee(@RequestBody UserEntityDto userEntityDto) {
+        String response = userService.addUser(userEntityDto);
+        return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
+    }
+
+
 
 }
 
