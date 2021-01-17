@@ -3,6 +3,7 @@ package com.moderngas.service.serviceImpl;
 import com.moderngas.enums.CylinderStatus;
 import com.moderngas.enums.CylinderType;
 import com.moderngas.enums.OrderStatus;
+import com.moderngas.pojo.NameIdDto;
 import com.moderngas.service.MasterService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -15,10 +16,10 @@ import java.util.List;
 public class MasterServiceImpl implements MasterService {
 
     @Override
-    public List<String> getOrderStatus() {
-        List<String> orderStatusList = new ArrayList<>();
+    public List<NameIdDto> getOrderStatus() {
+        List<NameIdDto> orderStatusList = new ArrayList<>();
         for (OrderStatus orderStatus : OrderStatus.values()) {
-            orderStatusList.add(orderStatus.getName());
+            orderStatusList.add(new NameIdDto((long) orderStatus.ordinal(), orderStatus.getName()));
         }
         return orderStatusList;
     }

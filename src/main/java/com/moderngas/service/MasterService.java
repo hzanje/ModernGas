@@ -1,10 +1,12 @@
 package com.moderngas.service;
 
+import com.moderngas.pojo.NameIdDto;
+
 import java.util.List;
 
 public interface MasterService {
 
-    List<String> getOrderStatus();
+    List<NameIdDto> getOrderStatus();
 
     List<String> getCylinderStatus();
 

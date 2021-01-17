@@ -1,5 +1,6 @@
 package com.moderngas.restcontroller;
 
+import com.moderngas.pojo.NameIdDto;
 import com.moderngas.service.MasterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,7 +17,7 @@ public class MasterController {
     private MasterService masterService;
 
     @GetMapping("/order-status")
-    public List<String> getOrderStatus() {
+    public List<NameIdDto> getOrderStatus() {
         return masterService.getOrderStatus();
     }
 

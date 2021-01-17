@@ -31,6 +31,8 @@ public class OrderDto {
 
     private String userName;
 
+    private Date orderedOnDate;
+
     private Date loadedOnDate;
 
     private Date deliveredOnDate;

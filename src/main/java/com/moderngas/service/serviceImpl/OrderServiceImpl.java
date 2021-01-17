@@ -151,7 +151,9 @@ public class OrderServiceImpl implements OrderService {
         OrderDto orderDto = genericService.convertOrderEntityToDto(orderEntity);
         orderDto.setAddressDto(genericService.convertAddressEntityToDto(userEntity.getAddressEntity()));
         orderDto.setUserName(userEntity.getName());
+        orderDto.setOrderedOnDate(orderEntity.getCreatedDate());
         orderDto.setLoadedOnDate(orderEntity.getLoadedDate());
+        orderDto.setDeliveredOnDate(orderEntity.getDeliveredDate());
         return orderDto;
     }
 
