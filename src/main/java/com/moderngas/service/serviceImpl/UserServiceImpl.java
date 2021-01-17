@@ -2,6 +2,7 @@ package com.moderngas.service.serviceImpl;
 
 import com.moderngas.constants.Constants;
 import com.moderngas.constants.ExceptionConstants;
+import com.moderngas.enums.CylinderType;
 import com.moderngas.exception.BadRequestException;
 import com.moderngas.jpaentity.AddressEntity;
 import com.moderngas.jpaentity.CategoryMaster;
@@ -56,6 +57,7 @@ public class UserServiceImpl implements UserService {
         log.info("UserService >> Create New User");
         /* Add new Client to DataBase */
         String response = Constants.FAILURE_STR;
+
         UserEntity userEntity = genericService.convertDtoToUserData(userEntityDto);
         userEntity = userRepo.save(userEntity);
         if (userEntity.getId() != null) {
@@ -233,12 +235,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public GasDto getGasDetailsById(Long id, Long userId) {
-        GasMaster gasMaster = gasRepo.getOne(id);
+    public GasDto getGasDetailsById(Long id) {
+        GasMaster gasMaster = gasRepo.findById(id).orElse(null);
+        if (null == gasMaster) {
+            throw new BadRequestException(ExceptionConstants.INVALID_GAS);
+        }
         GasDto gasDto = new GasDto();
         gasDto.setId(gasMaster.getId());
         gasDto.setName(gasMaster.getName());
-        gasDto.setAvailableCylinderType(gasMaster.getCylinderTypeMasterList());
+        gasDto.setAvailableCylinderType(CylinderType.getCylinderTypeList());
         gasDto.setDescription(gasMaster.getDescription());
         gasDto.setPrice(gasMaster.getPrice());
         gasDto.setAvailable(gasMaster.isAvaliable());

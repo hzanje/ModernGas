@@ -9,7 +9,7 @@ public class OrderDto {
 
     private Long id;
 
-    private Long cylinderType;
+    private String cylinderType;
 
     private boolean isRefill;
 

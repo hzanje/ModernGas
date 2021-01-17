@@ -2,6 +2,7 @@ package com.moderngas.service.serviceImpl;
 
 import com.moderngas.constants.Constants;
 import com.moderngas.constants.ExceptionConstants;
+import com.moderngas.enums.CylinderType;
 import com.moderngas.enums.OrderStatus;
 import com.moderngas.exception.BadRequestException;
 import com.moderngas.jpaentity.CartEntity;
@@ -16,6 +17,7 @@ import com.moderngas.repository.OrderRepo;
 import com.moderngas.repository.UserRepo;
 import com.moderngas.service.GenericService;
 import com.moderngas.service.OrderService;
+import javafx.scene.shape.Cylinder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -178,8 +180,9 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Page<com.moderngas.pojo.admin.OrderDto> getAllOrderListForAdmin(Pageable pageable, String status, Long cylinderId, String search, String quantityOrder) {
+    public Page<com.moderngas.pojo.admin.OrderDto> getAllOrderListForAdmin(Pageable pageable, String status, String cylinderType, String search, String quantityOrder) {
         OrderStatus statusEnum = OrderStatus.getByStatus(status);
-        return orderRepo.getAllOrderListForAdmin(pageable, statusEnum, cylinderId, search, quantityOrder);
+        CylinderType cylinderTypeEnum = CylinderType.getByStatus(cylinderType);
+        return orderRepo.getAllOrderListForAdmin(pageable, statusEnum, cylinderTypeEnum, search, quantityOrder);
     }
 }

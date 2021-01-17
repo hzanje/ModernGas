@@ -1,5 +1,6 @@
 package com.moderngas.pojo.admin;
 
+import com.moderngas.enums.CylinderType;
 import com.moderngas.enums.OrderStatus;
 import lombok.Data;
 
@@ -28,9 +29,9 @@ public class OrderDto {
 
     private Date orderDate;
 
-    public OrderDto(Long id, String cylinderType, boolean isRefill, Long userId, String userName, String gasName, String categoryName, OrderStatus status, int quantity, Date orderDate) throws Exception {
+    public OrderDto(Long id, CylinderType cylinderType, boolean isRefill, Long userId, String userName, String gasName, String categoryName, OrderStatus status, int quantity, Date orderDate) throws Exception {
         this.id = id;
-        this.cylinderType = cylinderType;
+        this.cylinderType = cylinderType.getName();
         this.isRefill = isRefill;
         this.userId = userId;
         this.userName = userName;

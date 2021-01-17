@@ -69,8 +69,8 @@ public class UserController {
     }
 
     @GetMapping(value = "/getGasDetailsById")
-    public GasDto getGasDetailsById(@RequestParam("id") Long id, @RequestParam("userId") Long userId) {
-        return userService.getGasDetailsById(id, userId);
+    public GasDto getGasDetailsById(@RequestParam("id") Long id) {
+        return userService.getGasDetailsById(id);
     }
     
     @PostMapping(value = "/updateUser")

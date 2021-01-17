@@ -1,5 +1,6 @@
 package com.moderngas.jpaentity;
 
+import com.moderngas.enums.CylinderType;
 import com.moderngas.enums.OrderStatus;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -22,9 +23,6 @@ public class OrderEntity extends BaseEntity {
     @Column(name = "quantity")
     private int quantity;
 
-    @Column(name = "cylinder_type")
-    private Long cylinderType;
-
     @Column(name = "is_refill", columnDefinition = "tinyint(1) DEFAULT 0" )
     private boolean isRefill;
 
@@ -35,8 +33,12 @@ public class OrderEntity extends BaseEntity {
     private Long userId;
 
     @Column(name = "status_id")
-    @Enumerated
+    @Enumerated(EnumType.ORDINAL)
     private OrderStatus orderStatus;
+
+    @Column(name = "cylinder_type")
+    @Enumerated(EnumType.ORDINAL)
+    private CylinderType cylinderType;
 
     @OneToOne
     @JoinColumn(name = "gas_id", referencedColumnName = "id")

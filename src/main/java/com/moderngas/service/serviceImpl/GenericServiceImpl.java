@@ -1,5 +1,6 @@
 package com.moderngas.service.serviceImpl;
 
+import com.moderngas.enums.CylinderType;
 import com.moderngas.enums.OrderStatus;
 import com.moderngas.jpaentity.AddressEntity;
 import com.moderngas.jpaentity.CartEntity;
@@ -144,7 +145,7 @@ public class GenericServiceImpl implements GenericService {
         OrderEntity orderEntity = null;
         if (null != orderDto) {
             orderEntity = new OrderEntity();
-            orderEntity.setCylinderType(orderDto.getCylinderType());
+            orderEntity.setCylinderType(CylinderType.getByStatus(orderDto.getCylinderType()));
             orderEntity.setUserId(orderDto.getUserId());
             orderEntity.setOrderStatus(OrderStatus.getByStatus(orderDto.getStatus()));
             orderEntity.setGasMaster(gasRepo.getOne(orderDto.getGasId()));
@@ -164,7 +165,7 @@ public class GenericServiceImpl implements GenericService {
             orderDto.setCategoryName(orderEntity.getGasMaster().getCategoryMaster().getName());
             orderDto.setQuantity(orderEntity.getQuantity());
             orderDto.setPrice(orderEntity.getPrice());
-            orderDto.setCylinderType(orderEntity.getCylinderType());
+            orderDto.setCylinderType(orderEntity.getCylinderType().getName());
             orderDto.setRefill(orderEntity.isRefill());
             orderDto.setStatusName(orderEntity.getOrderStatus().getName());
             orderDto.setUserId(orderDto.getUserId());
@@ -179,7 +180,7 @@ public class GenericServiceImpl implements GenericService {
         if (null != cartDto) {
             cartEntity = new CartEntity();
             cartEntity.setId(cartDto.getId());
-            cartEntity.setCylinderType(cartDto.getCylinderType());
+            cartEntity.setCylinderType(CylinderType.getByStatus(cartDto.getCylinderType()));
             cartEntity.setQuantity(cartDto.getQuantity());
             cartEntity.setUserId(cartDto.getUserId());
             cartEntity.setPrice(cartDto.getPrice());
@@ -195,7 +196,7 @@ public class GenericServiceImpl implements GenericService {
         if (null != cartEntity) {
             cartDto = new CartDto();
             cartDto.setId(cartEntity.getId());
-            cartDto.setCylinderType(cartEntity.getCylinderType());
+            cartDto.setCylinderType(cartEntity.getCylinderType().getName());
             cartDto.setQuantity(cartEntity.getQuantity());
             cartDto.setUserId(cartEntity.getUserId());
             cartDto.setPrice(cartEntity.getPrice());

@@ -46,13 +46,13 @@ public class AdminController {
                @RequestParam(value = "size",defaultValue = "0") Integer size,
                @RequestParam(value = "page", defaultValue = "0") Integer page,
                @RequestParam(value = "status", required = false) String status,
-               @RequestParam(value = "cylinder", required = false) Long cylinderId,
+               @RequestParam(value = "cylinder", required = false) String cylinderType,
                @RequestParam(value = "search", required = false) String search,
                @RequestParam(value = "quantityOrder", required = false) String quantityOrder) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<OrderDto> orderDtoList = orderService.getAllOrderListForAdmin(pageable, status, cylinderId, search, quantityOrder);
+        Page<OrderDto> orderDtoList = orderService.getAllOrderListForAdmin(pageable, status, cylinderType, search, quantityOrder);
         Link link = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(AdminController.class)
-                .getAllOrderList(assembler, size, page, status, cylinderId, search, quantityOrder)).withSelfRel();
+                .getAllOrderList(assembler, size, page, status, cylinderType, search, quantityOrder)).withSelfRel();
 
         PagedModel<EntityModel<OrderDto>> model = assembler.toModel(orderDtoList, link);
         return new ResponseEntity<>(model, HttpStatus.OK);

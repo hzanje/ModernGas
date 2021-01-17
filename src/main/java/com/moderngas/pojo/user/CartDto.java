@@ -7,7 +7,7 @@ public class CartDto {
 
     private Long id;
 
-    private Long cylinderType;
+    private String cylinderType;
 
     private Long userId;
 

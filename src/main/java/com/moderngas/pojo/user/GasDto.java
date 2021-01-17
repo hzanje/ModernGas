@@ -1,10 +1,9 @@
 package com.moderngas.pojo.user;
 
-import com.moderngas.jpaentity.CylinderTypeMaster;
+import com.moderngas.pojo.CylinderTypeDto;
 import lombok.Data;
 
 import java.util.List;
-import java.util.Set;
 
 @Data
 public class GasDto {
@@ -25,7 +24,7 @@ public class GasDto {
 
     private List<String> imageList;
 
-    private Set<CylinderTypeMaster> availableCylinderType;
+    private List<CylinderTypeDto> availableCylinderType;
 
-    private Set<CylinderTypeMaster> purchasedCylinderType;
+    private List<CylinderTypeDto> purchasedCylinderType;
 }

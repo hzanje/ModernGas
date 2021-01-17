@@ -34,9 +34,5 @@ public class GasMaster extends BaseEntity {
     , inverseJoinColumns = {@JoinColumn(name = "image_id")})
     private Set<GasImageEntity> gasImageEntityList;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinTable(name = "gas_cylinder_mapping", joinColumns = {@JoinColumn(name = "gas_id")}
-            , inverseJoinColumns = {@JoinColumn(name = "cylinder_id")})
-    private Set<CylinderTypeMaster> cylinderTypeMasterList;
 
 }
