@@ -19,9 +19,7 @@ public class OrderDto {
 
     private String gasName;
 
-    private String categoryName;
-
-    private String statusName;
+    private String category;
 
     private int quantity;
 
@@ -33,11 +31,7 @@ public class OrderDto {
 
     private String userName;
 
-    private Date orderedOnDate;
-
     private Date loadedOnDate;
-
-    private Date shippedOnDate;
 
     private Date deliveredOnDate;
 

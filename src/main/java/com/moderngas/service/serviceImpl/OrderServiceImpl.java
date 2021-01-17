@@ -9,7 +9,6 @@ import com.moderngas.jpaentity.CartEntity;
 import com.moderngas.jpaentity.OrderEntity;
 import com.moderngas.jpaentity.UserEntity;
 import com.moderngas.pojo.user.CartDto;
-import com.moderngas.pojo.NameIdDto;
 import com.moderngas.pojo.user.OrderDto;
 import com.moderngas.repository.CartRepo;
 import com.moderngas.repository.GasRepo;
@@ -17,7 +16,6 @@ import com.moderngas.repository.OrderRepo;
 import com.moderngas.repository.UserRepo;
 import com.moderngas.service.GenericService;
 import com.moderngas.service.OrderService;
-import javafx.scene.shape.Cylinder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -149,11 +147,10 @@ public class OrderServiceImpl implements OrderService {
             throw new BadRequestException(ExceptionConstants.INVALID_ORDER);
         }
         OrderEntity orderEntity = orderRepo.getOrderEntitiesById(orderId);
-        UserEntity userEntity = userRepo.getOne(orderEntity.getUserId());
+        UserEntity userEntity = userRepo.findById(orderEntity.getUserId()).orElse(null);
         OrderDto orderDto = genericService.convertOrderEntityToDto(orderEntity);
         orderDto.setAddressDto(genericService.convertAddressEntityToDto(userEntity.getAddressEntity()));
         orderDto.setUserName(userEntity.getName());
-        orderDto.setOrderedOnDate(orderEntity.getCreatedDate());
         orderDto.setLoadedOnDate(orderEntity.getLoadedDate());
         return orderDto;
     }

@@ -162,14 +162,14 @@ public class GenericServiceImpl implements GenericService {
             orderDto = new OrderDto();
             orderDto.setId(orderEntity.getId());
             orderDto.setGasName(orderEntity.getGasMaster().getName());
-            orderDto.setCategoryName(orderEntity.getGasMaster().getCategoryMaster().getName());
+            orderDto.setCategory(orderEntity.getGasMaster().getCategoryMaster().getName());
             orderDto.setQuantity(orderEntity.getQuantity());
             orderDto.setPrice(orderEntity.getPrice());
             orderDto.setCylinderType(orderEntity.getCylinderType().getName());
             orderDto.setRefill(orderEntity.isRefill());
-            orderDto.setStatusName(orderEntity.getOrderStatus().getName());
-            orderDto.setUserId(orderDto.getUserId());
-            orderDto.setGasId(orderDto.getGasId());
+            orderDto.setStatus(orderEntity.getOrderStatus().getName());
+            orderDto.setUserId(orderEntity.getUserId());
+            orderDto.setGasId(orderEntity.getGasMaster().getId());
         }
         return orderDto;
     }
@@ -240,6 +240,7 @@ public class GenericServiceImpl implements GenericService {
                     break;
 
                 case ORDER_STATUS_CANCELLED: orderEntity.setActiveFlag(false);
+                /* Add cancel date in DB for records */
                     break;
 
                 default: break;

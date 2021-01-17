@@ -1,6 +1,7 @@
 package com.moderngas.service.serviceImpl;
 
 import com.moderngas.enums.CylinderStatus;
+import com.moderngas.enums.CylinderType;
 import com.moderngas.enums.OrderStatus;
 import com.moderngas.service.MasterService;
 import lombok.extern.slf4j.Slf4j;
@@ -29,5 +30,14 @@ public class MasterServiceImpl implements MasterService {
             cylinderStatusList.add(cylinderStatus.getName());
         }
         return cylinderStatusList;
+    }
+
+    @Override
+    public List<String> getCylinderType() {
+        List<String> cylinderTypeList = new ArrayList<>();
+        for (CylinderType cylinderType : CylinderType.values()) {
+            cylinderTypeList.add(cylinderType.getName());
+        }
+        return cylinderTypeList;
     }
 }

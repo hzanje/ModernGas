@@ -20,8 +20,13 @@ public class MasterController {
         return masterService.getOrderStatus();
     }
 
-    @GetMapping("cylinder-status")
+    @GetMapping("/cylinder-status")
     public List<String> getCylinderStatus() {
         return masterService.getCylinderStatus();
+    }
+
+    @GetMapping("/cylinder-type")
+    public List<String> getCylinderType() {
+        return masterService.getCylinderType();
     }
 }

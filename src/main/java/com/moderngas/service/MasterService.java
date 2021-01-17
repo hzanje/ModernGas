@@ -7,4 +7,7 @@ public interface MasterService {
     List<String> getOrderStatus();
 
     List<String> getCylinderStatus();
+
+    List<String> getCylinderType();
+
 }
