@@ -243,7 +243,7 @@ public class UserServiceImpl implements UserService {
         GasDto gasDto = new GasDto();
         gasDto.setId(gasMaster.getId());
         gasDto.setName(gasMaster.getName());
-        gasDto.setAvailableCylinderType(CylinderType.getCylinderTypeList());
+        gasDto.setAvailableCylinderType(CylinderType.getCylinderTypeDtoList());
         gasDto.setDescription(gasMaster.getDescription());
         gasDto.setPrice(gasMaster.getPrice());
         gasDto.setAvailable(gasMaster.isAvaliable());

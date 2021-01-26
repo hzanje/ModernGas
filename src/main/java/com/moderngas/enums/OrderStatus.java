@@ -2,6 +2,9 @@ package com.moderngas.enums;
 
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public enum OrderStatus {
 
     ORDER_STATUS_CREATED("Ordered"),
@@ -46,5 +49,13 @@ public enum OrderStatus {
             throw new Exception(String.format("%d is not a valid User Type", ord));
         }
         return OrderStatus.values()[ord];
+    }
+
+    public static List<OrderStatus> getOrderStatusList() {
+        List<OrderStatus> orderStatusList = new ArrayList<>();
+        for (OrderStatus orderStatus : OrderStatus.values()) {
+            orderStatusList.add(orderStatus);
+        }
+        return orderStatusList;
     }
 }

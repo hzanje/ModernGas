@@ -57,12 +57,19 @@ public enum CylinderType {
         return CylinderType.values()[ord];
     }
 
-    public static List<CylinderTypeDto> getCylinderTypeList() {
+    public static List<CylinderTypeDto> getCylinderTypeDtoList() {
         List<CylinderTypeDto> cylinderTypeDtoList = new ArrayList<>();
         for (CylinderType cylinderType : CylinderType.values()) {
             cylinderTypeDtoList.add(new CylinderTypeDto(cylinderType.getName(), cylinderType.getDescription()));
         }
-
         return cylinderTypeDtoList;
+    }
+
+    public static List<CylinderType> getCylinderTypeList() {
+        List<CylinderType> cylinderTypeList = new ArrayList<>();
+        for (CylinderType cylinderType : CylinderType.values()) {
+            cylinderTypeList.add(cylinderType);
+        }
+        return cylinderTypeList;
     }
 }

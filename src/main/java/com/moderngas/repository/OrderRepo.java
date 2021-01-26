@@ -28,8 +28,8 @@ public interface OrderRepo extends JpaRepository<OrderEntity, Long> {
 
     @Query(value = QUERIES.ALL_ORDER_LIST_HEADER_FOR_ADMIN, countQuery = QUERIES.ALL_ORDER_LIST_FOR_ADMIN_COUNT)
     Page<OrderDto> getAllOrderListForAdmin(Pageable pageable,
-                                           @Param("status") OrderStatus status,
-                                           @Param("cylinderType") CylinderType cylinderType,
+                                           @Param("status") List<OrderStatus> status,
+                                           @Param("cylinderType") List<CylinderType> cylinderType,
                                            @Param("search") String search,
                                            @Param("quantityOrder") String quantityOrder);
 
@@ -40,8 +40,8 @@ public interface OrderRepo extends JpaRepository<OrderEntity, Long> {
         private static final String ALL_ORDER_LIST_FOR_ADMIN = " FROM OrderEntity ord " +
                 " LEFT JOIN UserEntity u ON u.id = ord.userId " +
                 " WHERE ord.activeFlag = 1 " +
-                " AND (:status IS NULL OR ord.orderStatus = :status)" +
-                " AND (:cylinderType IS NULL OR ord.cylinderType = :cylinderType)" +
+                " AND (COALESCE(:status) IS NULL OR ord.orderStatus IN :status)" +
+                " AND (COALESCE(:cylinderType) IS NULL OR ord.cylinderType IN :cylinderType)" +
                 " AND (:search IS NULL OR u.name LIKE :search%)" +
                 " AND (:quantityOrder IS NULL)" +
                 " ORDER BY ord.createdDate DESC, ord.orderStatus ASC ";
