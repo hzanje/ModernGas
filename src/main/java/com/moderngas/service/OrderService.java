@@ -1,6 +1,7 @@
 package com.moderngas.service;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.moderngas.pojo.user.CartDto;
 import com.moderngas.pojo.NameIdDto;
 import com.moderngas.pojo.user.OrderDto;
@@ -29,5 +30,5 @@ public interface OrderService {
 
     String updateOrderStatus(Long orderId, Long statusId) throws Exception;
 
-    Page<com.moderngas.pojo.admin.OrderDto> getAllOrderListForAdmin(Pageable pageable, String status, String cylinderId, String search, String quantityOrder);
+    Page<com.moderngas.pojo.admin.OrderDto> getAllOrderListForAdmin(Pageable pageable, String status, String cylinderId, String search, String quantityOrder) throws JsonProcessingException;
 }

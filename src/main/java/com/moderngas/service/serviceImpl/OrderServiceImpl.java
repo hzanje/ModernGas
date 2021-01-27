@@ -1,5 +1,8 @@
 package com.moderngas.service.serviceImpl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.moderngas.constants.Constants;
 import com.moderngas.constants.ExceptionConstants;
 import com.moderngas.enums.CylinderType;
@@ -179,16 +182,20 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Page<com.moderngas.pojo.admin.OrderDto> getAllOrderListForAdmin(Pageable pageable, String status, String cylinderType, String search, String quantityOrder) {
+    public Page<com.moderngas.pojo.admin.OrderDto> getAllOrderListForAdmin(Pageable pageable, String status, String cylinderType, String search, String quantityOrder) throws JsonProcessingException {
         List<OrderStatus> statusList = new ArrayList<>();
         List<CylinderType> cylinderTypeList = new ArrayList<>();
+        ObjectMapper mapper = new ObjectMapper();
         if (null != status) {
             statusList.add(OrderStatus.getByStatus(status));
         } else {
             statusList = OrderStatus.getOrderStatusList();
         }
         if (null != cylinderType) {
-            cylinderTypeList.add(CylinderType.getByStatus(cylinderType));
+            List<String> jsonCylinderTypeList = mapper.readValue(cylinderType, new TypeReference<List<String>>(){});
+            for (String type : jsonCylinderTypeList) {
+                cylinderTypeList.add(CylinderType.getByStatus(type));
+            }
         } else {
             cylinderTypeList = CylinderType.getCylinderTypeList();
         }
