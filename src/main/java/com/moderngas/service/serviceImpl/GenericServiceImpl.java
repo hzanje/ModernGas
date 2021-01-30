@@ -1,5 +1,6 @@
 package com.moderngas.service.serviceImpl;
 
+import com.moderngas.constants.Constants;
 import com.moderngas.enums.CylinderType;
 import com.moderngas.enums.OrderStatus;
 import com.moderngas.jpaentity.AddressEntity;
@@ -7,6 +8,8 @@ import com.moderngas.jpaentity.CartEntity;
 import com.moderngas.jpaentity.CategoryMaster;
 import com.moderngas.jpaentity.OrderEntity;
 import com.moderngas.jpaentity.UserEntity;
+import com.moderngas.pojo.DateStatusDto;
+import com.moderngas.pojo.admin.FilterDto;
 import com.moderngas.pojo.user.AddressDto;
 import com.moderngas.pojo.user.CartDto;
 import com.moderngas.pojo.user.OrderDto;
@@ -170,8 +173,26 @@ public class GenericServiceImpl implements GenericService {
             orderDto.setStatus(orderEntity.getOrderStatus().getName());
             orderDto.setUserId(orderEntity.getUserId());
             orderDto.setGasId(orderEntity.getGasMaster().getId());
+            orderDto.setDateStatusDto(convertDateStatus(orderEntity));
         }
         return orderDto;
+    }
+
+    private List<DateStatusDto> convertDateStatus(OrderEntity orderEntity) {
+        List<DateStatusDto> dateStatusDtoList = new ArrayList<>();
+        for (OrderStatus orderStatus : OrderStatus.values()) {
+            if (orderStatus.getName().equals("Ordered")) {
+                dateStatusDtoList.add(new DateStatusDto(
+                        (long) orderStatus.ordinal(), orderStatus.getName(), orderEntity.getCreatedDate()));
+            } else if (orderStatus.getName().equals("Loaded")) {
+                dateStatusDtoList.add(new DateStatusDto(
+                        (long) orderStatus.ordinal(), orderStatus.getName(), orderEntity.getLoadedDate()));
+            } else if (orderStatus.getName().equals("Delivered")) {
+                dateStatusDtoList.add(new DateStatusDto(
+                        (long) orderStatus.ordinal(), orderStatus.getName(), orderEntity.getDeliveredDate()));
+            }
+        }
+        return dateStatusDtoList;
     }
 
     @Override
@@ -248,5 +269,17 @@ public class GenericServiceImpl implements GenericService {
             orderEntity.setOrderStatus(orderStatus);
         }
         return orderEntity;
+    }
+
+    @Override
+    public FilterDto getFilterList() {
+        List<String> cylinderTypeList = new ArrayList<>();
+        List<String> quantityOrdering = new ArrayList<>();
+        for (CylinderType cylinderType : CylinderType.values()) {
+            cylinderTypeList.add(cylinderType.getName());
+        }
+        quantityOrdering.add(Constants.FILTER_ORDERING_MAX_MIN);
+        quantityOrdering.add(Constants.FILTER_ORDERING_MIN_MAX);
+        return new FilterDto(cylinderTypeList, quantityOrdering);
     }
 }

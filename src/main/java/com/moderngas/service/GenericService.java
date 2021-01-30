@@ -6,6 +6,7 @@ import com.moderngas.jpaentity.CartEntity;
 import com.moderngas.jpaentity.CategoryMaster;
 import com.moderngas.jpaentity.OrderEntity;
 import com.moderngas.jpaentity.UserEntity;
+import com.moderngas.pojo.admin.FilterDto;
 import com.moderngas.pojo.user.AddressDto;
 import com.moderngas.pojo.user.CartDto;
 import com.moderngas.pojo.user.OrderDto;
@@ -41,4 +42,6 @@ public interface GenericService {
     List<OrderEntity> convertCartToOrderEntity(List<CartEntity> cartEntityList);
 
     OrderEntity changeOrderStatus(OrderEntity orderEntity, OrderStatus orderStatus);
+
+    FilterDto getFilterList();
 }

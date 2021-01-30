@@ -154,9 +154,6 @@ public class OrderServiceImpl implements OrderService {
         OrderDto orderDto = genericService.convertOrderEntityToDto(orderEntity);
         orderDto.setAddressDto(genericService.convertAddressEntityToDto(userEntity.getAddressEntity()));
         orderDto.setUserName(userEntity.getName());
-        orderDto.setOrderedOnDate(orderEntity.getCreatedDate());
-        orderDto.setLoadedOnDate(orderEntity.getLoadedDate());
-        orderDto.setDeliveredOnDate(orderEntity.getDeliveredDate());
         return orderDto;
     }
 
@@ -182,18 +179,16 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Page<com.moderngas.pojo.admin.OrderDto> getAllOrderListForAdmin(Pageable pageable, String status, String cylinderType, String search, String quantityOrder) throws JsonProcessingException {
+    public Page<com.moderngas.pojo.admin.OrderDto> getAllOrderListForAdmin(Pageable pageable, String status, List<String> cylinderType, String search, String quantityOrder) throws JsonProcessingException {
         List<OrderStatus> statusList = new ArrayList<>();
         List<CylinderType> cylinderTypeList = new ArrayList<>();
-        ObjectMapper mapper = new ObjectMapper();
         if (null != status) {
             statusList.add(OrderStatus.getByStatus(status));
         } else {
             statusList = OrderStatus.getOrderStatusList();
         }
-        if (null != cylinderType) {
-            List<String> jsonCylinderTypeList = mapper.readValue(cylinderType, new TypeReference<List<String>>(){});
-            for (String type : jsonCylinderTypeList) {
+        if (!CollectionUtils.isEmpty(cylinderType)) {
+            for (String type : cylinderType) {
                 cylinderTypeList.add(CylinderType.getByStatus(type));
             }
         } else {

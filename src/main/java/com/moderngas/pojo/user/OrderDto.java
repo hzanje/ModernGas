@@ -1,8 +1,10 @@
 package com.moderngas.pojo.user;
 
+import com.moderngas.pojo.DateStatusDto;
 import lombok.Data;
 
 import java.util.Date;
+import java.util.List;
 
 @Data
 public class OrderDto {
@@ -30,6 +32,8 @@ public class OrderDto {
     private String status;
 
     private String userName;
+
+    private List<DateStatusDto> dateStatusDto;
 
     private Date orderedOnDate;
 
