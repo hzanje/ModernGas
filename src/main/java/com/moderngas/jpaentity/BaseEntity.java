@@ -25,7 +25,7 @@ public class BaseEntity implements Serializable {
 
     @JsonIgnore
     @Column(name = "active_flag", columnDefinition = "tinyint(1) DEFAULT 1" )
-    protected boolean activeFlag;
+    protected boolean activeFlag = true;
 
     @JsonIgnore
     @CreationTimestamp
