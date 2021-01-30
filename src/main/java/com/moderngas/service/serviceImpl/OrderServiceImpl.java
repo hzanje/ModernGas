@@ -11,7 +11,6 @@ import com.moderngas.exception.BadRequestException;
 import com.moderngas.jpaentity.CartEntity;
 import com.moderngas.jpaentity.OrderEntity;
 import com.moderngas.jpaentity.UserEntity;
-import com.moderngas.pojo.admin.FilterDto;
 import com.moderngas.pojo.user.CartDto;
 import com.moderngas.pojo.user.OrderDto;
 import com.moderngas.repository.CartRepo;
@@ -26,7 +25,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -181,22 +179,16 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Page<com.moderngas.pojo.admin.OrderDto> getAllOrderListForAdmin(Pageable pageable, String status, String search, String filter) throws JsonProcessingException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        FilterDto filterDto = new FilterDto();
-        if (!StringUtils.isEmpty(filter)) {
-            filterDto = objectMapper.readValue(filter, FilterDto.class);
-        }
+    public Page<com.moderngas.pojo.admin.OrderDto> getAllOrderListForAdmin(Pageable pageable, String status, List<String> cylinderType, String search, String quantityOrder) throws JsonProcessingException {
         List<OrderStatus> statusList = new ArrayList<>();
         List<CylinderType> cylinderTypeList = new ArrayList<>();
-        String quantityOrder = null;
         if (null != status) {
             statusList.add(OrderStatus.getByStatus(status));
         } else {
             statusList = OrderStatus.getOrderStatusList();
         }
-        if (null != filterDto && !CollectionUtils.isEmpty(filterDto.getCylinderType())) {
-            for (String type : filterDto.getCylinderType()) {
+        if (!CollectionUtils.isEmpty(cylinderType)) {
+            for (String type : cylinderType) {
                 cylinderTypeList.add(CylinderType.getByStatus(type));
             }
         } else {

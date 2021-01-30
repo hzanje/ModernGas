@@ -55,12 +55,13 @@ public class AdminController {
                @RequestParam(value = "size",defaultValue = "0") Integer size,
                @RequestParam(value = "page", defaultValue = "0") Integer page,
                @RequestParam(value = "status", required = false) String status,
+               @RequestParam(value = "cylinder", required = false) List<String> cylinderType,
                @RequestParam(value = "search", required = false) String search,
-               @RequestParam(value = "filter", required = false) String filter) throws JsonProcessingException {
+               @RequestParam(value = "quantityOrder", required = false) String quantityOrder) throws JsonProcessingException {
         Pageable pageable = PageRequest.of(page, size);
-        Page<OrderDto> orderDtoList = orderService.getAllOrderListForAdmin(pageable, status, search, filter);
+        Page<OrderDto> orderDtoList = orderService.getAllOrderListForAdmin(pageable, status, cylinderType, search, quantityOrder);
         Link link = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(AdminController.class)
-                .getAllOrderList(assembler, size, page, status, search, filter)).withSelfRel();
+                .getAllOrderList(assembler, size, page, status, cylinderType, search, quantityOrder)).withSelfRel();
 
         PagedModel<EntityModel<OrderDto>> model = assembler.toModel(orderDtoList, link);
         return new ResponseEntity<>(model, HttpStatus.OK);
@@ -73,14 +74,14 @@ public class AdminController {
         return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
     }
 
-    //@PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping(value = "/addEmployee")
     public ResponseEntity<ResponseStatus> addEmployee(@RequestBody UserEntityDto userEntityDto) {
         String response = userService.addUser(userEntityDto);
         return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
     }
 
-    @PreAuthorize("hasRole('ADMIN') or hasRole('EMPLOYEE')")
+    //@PreAuthorize("hasRole('ADMIN') or hasRole('EMPLOYEE')")
     @GetMapping("/filter")
     public FilterDto getFilters() {
         return genericService.getFilterList();
