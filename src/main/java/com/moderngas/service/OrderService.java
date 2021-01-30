@@ -30,5 +30,5 @@ public interface OrderService {
 
     String updateOrderStatus(Long orderId, Long statusId) throws Exception;
 
-    Page<com.moderngas.pojo.admin.OrderDto> getAllOrderListForAdmin(Pageable pageable, String status, List<String> cylinderType, String search, String quantityOrder) throws JsonProcessingException;
+    Page<com.moderngas.pojo.admin.OrderDto> getAllOrderListForAdmin(Pageable pageable, String status, String search, String filter) throws JsonProcessingException;
 }

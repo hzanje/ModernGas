@@ -50,7 +50,7 @@ public interface OrderRepo extends JpaRepository<OrderEntity, Long> {
                 "ord.id, ord.cylinderType, ord.isRefill, u.id, u.name, ord.gasMaster.name, ord.gasMaster.categoryMaster.name," +
                 " ord.orderStatus, ord.quantity, ord.createdDate) " + ALL_ORDER_LIST_FOR_ADMIN;
 
-        private static final String ALL_ORDER_LIST_FOR_ADMIN_COUNT = "SELECT COUNT(id) " + ALL_ORDER_LIST_FOR_ADMIN;
+        private static final String ALL_ORDER_LIST_FOR_ADMIN_COUNT = "SELECT COUNT(ord.id) " + ALL_ORDER_LIST_FOR_ADMIN;
 
     }
 }
