@@ -26,6 +26,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -182,7 +183,10 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public Page<com.moderngas.pojo.admin.OrderDto> getAllOrderListForAdmin(Pageable pageable, String status, String search, String filter) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
-        FilterDto filterDto = objectMapper.readValue(filter, FilterDto.class);
+        FilterDto filterDto = new FilterDto();
+        if (!StringUtils.isEmpty(filter)) {
+            filterDto = objectMapper.readValue(filter, FilterDto.class);
+        }
         List<OrderStatus> statusList = new ArrayList<>();
         List<CylinderType> cylinderTypeList = new ArrayList<>();
         String quantityOrder = null;
