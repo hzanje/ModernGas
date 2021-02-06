@@ -55,9 +55,9 @@ public class AdminController {
                @RequestParam(value = "size",defaultValue = "0") Integer size,
                @RequestParam(value = "page", defaultValue = "0") Integer page,
                @RequestParam(value = "status", required = false) String status,
-               @RequestParam(value = "cylinder", required = false) List<String> cylinderType,
+               @RequestParam(value = "cylinderType", required = false) List<String> cylinderType,
                @RequestParam(value = "search", required = false) String search,
-               @RequestParam(value = "quantityOrder", required = false) String quantityOrder) throws JsonProcessingException {
+               @RequestParam(value = "quantityOrdering", required = false) String quantityOrder) throws JsonProcessingException {
         Pageable pageable = PageRequest.of(page, size);
         Page<OrderDto> orderDtoList = orderService.getAllOrderListForAdmin(pageable, status, cylinderType, search, quantityOrder);
         Link link = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(AdminController.class)

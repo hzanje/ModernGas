@@ -19,9 +19,17 @@ public interface InventoryRepo extends JpaRepository<CylinderEntity, Long> {
     @Query("SELECT code FROM CylinderEntity WHERE cylinderStatus =:status")
     List<String> getAvailableCylinder(@Param("status") CylinderStatus status);
 
-    @Query("UPDATE CylinderEntity SET cylinderStatus =:status WHERE code IN (:codeListDto) AND userId=:userId")
-    void updateCylinderToAssigned(Long userId, CylinderCodeListDto codeListDto, CylinderStatus status);
+    @Query("UPDATE CylinderEntity SET cylinderStatus =:status, userId=:userId WHERE code IN (:codeList) ")
+    void updateCylinderToAssigned(@Param("userId") Long userId,
+                                  @Param("codeList") List<String> codeList,
+                                  @Param("status") CylinderStatus status);
 
-    /*@Query("UPDATE CylinderEntity SET cylinderStatus =:status AND userId = NULL WHERE code IN (:codeListDto) AND userId=:userId")
-    void updateCylinderToEmpty(Long userId, CylinderCodeListDto codeListDto, CylinderStatus status);*/
+    @Query("UPDATE CylinderEntity SET cylinderStatus =:status, userId = NULL WHERE code IN (:codeList) AND userId=:userId")
+    void updateCylinderToEmpty(@Param("userId") Long userId,
+                               @Param("codeList") List<String> codeList,
+                               @Param("status") CylinderStatus status);
+
+    @Query(" FROM CylinderEntity WHERE code = :code")
+    CylinderEntity checkIfCylinderCodeExist(@Param("code") String code);
+
 }

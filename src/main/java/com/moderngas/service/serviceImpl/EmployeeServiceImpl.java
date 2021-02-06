@@ -28,7 +28,6 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public String assignCylinderToUser(Long orderId, CylinderCodeListDto codeListDto) {
-        String response = Constants.FAILURE_STR;
         OrderEntity orderEntity = orderRepo.findById(orderId).orElse(null);
         if (null == orderEntity) {
             throw new BadRequestException(ExceptionConstants.INVALID_ORDER);
@@ -36,14 +35,12 @@ public class EmployeeServiceImpl implements EmployeeService {
         if (null == codeListDto || CollectionUtils.isEmpty(codeListDto.getCylinderCodes())) {
             throw new BadRequestException(ExceptionConstants.INVALID_REQUEST_DATA);
         }
-        inventoryRepo.updateCylinderToAssigned(orderEntity.getUserId(), codeListDto, CylinderStatus.getByStatus(""));
-        response = Constants.SUCCESS_STR;
-        return response;
+        inventoryRepo.updateCylinderToAssigned(orderEntity.getUserId(), codeListDto.getCylinderCodes(), CylinderStatus.CYLINDER_STATUS_ASSIGNED);
+        return Constants.SUCCESS_STR;
     }
 
     @Override
     public String receiveCylinderFromUser(Long orderId, CylinderCodeListDto codeListDto) {
-        String response = Constants.FAILURE_STR;
         OrderEntity orderEntity = orderRepo.findById(orderId).orElse(null);
         if (null == orderEntity) {
             throw new BadRequestException(ExceptionConstants.INVALID_ORDER);
@@ -51,9 +48,8 @@ public class EmployeeServiceImpl implements EmployeeService {
         if (null == codeListDto || CollectionUtils.isEmpty(codeListDto.getCylinderCodes())) {
             throw new BadRequestException(ExceptionConstants.INVALID_REQUEST_DATA);
         }
-        //inventoryRepo.updateCylinderToEmpty(orderEntity.getUserId(), codeListDto, CylinderStatus.getByStatus(""));
-        response = Constants.SUCCESS_STR;
-        return response;
+        inventoryRepo.updateCylinderToEmpty(orderEntity.getUserId(), codeListDto.getCylinderCodes(), CylinderStatus.CYLINDER_STATUS_EMPTY);
+        return Constants.SUCCESS_STR;
     }
 
     @Override

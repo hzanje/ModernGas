@@ -14,7 +14,7 @@ import javax.persistence.Table;
 @Table(name = "cylinder")
 public class CylinderEntity extends BaseEntity {
 
-    @Column(name = "code")
+    @Column(name = "cylinder_code")
     private String code;
 
     @Column(name = "user_id")

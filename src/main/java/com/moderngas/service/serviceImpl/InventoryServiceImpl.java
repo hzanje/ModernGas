@@ -31,26 +31,32 @@ public class InventoryServiceImpl implements InventoryService {
 
     @Override
     public String addCylinder(Long userId, CylinderCodeStatusDto cylinderCodeStatusDto) {
-        String response = Constants.FAILURE_STR;
         if (null == cylinderCodeStatusDto) {
             throw new BadRequestException(ExceptionConstants.INVALID_REQUEST_DATA);
         }
         UserEntity userEntity = userRepo.findById(userId).orElse(null);
         if (null == userEntity) {
             throw new BadRequestException(ExceptionConstants.INVALID_USER);
-        } else if (StringUtils.isEmpty(userEntity.getRole()) || userEntity.getRole().equals("")) {
+        } else if (StringUtils.isEmpty(userEntity.getRole()) || userEntity.getRole().equals("USER")) {
             throw new UnauthorizedException(ExceptionConstants.INVALID_USER_ACCESS);
         }
+        if (!CylinderStatus.isExist(cylinderCodeStatusDto.getStatus())) {
+            throw new BadRequestException(ExceptionConstants.INVALID_STATUS);
+        }
+        CylinderStatus cylinderStatus = CylinderStatus.getByStatus(cylinderCodeStatusDto.getStatus());
         List<CylinderEntity> cylinderEntityList = new ArrayList<>();
         for (String code : cylinderCodeStatusDto.getCylinderCodes()) {
-            CylinderEntity cylinderEntity = new CylinderEntity();
-            cylinderEntity.setCode(code);
-            cylinderEntity.setUserId(cylinderEntity.getUserId());
-            cylinderEntity.setCylinderStatus(CylinderStatus.getByStatus(cylinderCodeStatusDto.getStatus()));
-            cylinderEntityList.add(cylinderEntity);
+            if (null == inventoryRepo.checkIfCylinderCodeExist(code)) {
+                CylinderEntity cylinderEntity = new CylinderEntity();
+                cylinderEntity.setCode(code);
+                if (cylinderStatus.equals(CylinderStatus.CYLINDER_STATUS_ASSIGNED)) {
+                    cylinderEntity.setUserId(userEntity.getId());
+                }
+                cylinderEntity.setCylinderStatus(cylinderStatus);
+                cylinderEntityList.add(cylinderEntity);
+            }
         }
         inventoryRepo.saveAll(cylinderEntityList);
-        response = Constants.SUCCESS_STR;
-        return response;
+        return Constants.SUCCESS_STR;
     }
 }
