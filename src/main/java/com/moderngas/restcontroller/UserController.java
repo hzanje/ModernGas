@@ -1,5 +1,6 @@
 package com.moderngas.restcontroller;
 
+import com.moderngas.exception.BadRequestException;
 import com.moderngas.pojo.*;
 import com.moderngas.pojo.ResponseStatus;
 import com.moderngas.pojo.user.AddressDto;
@@ -41,7 +42,7 @@ public class UserController {
     }
 
     @GetMapping(value = "/getClientById")
-    public UserEntityDto getClientById(@RequestParam("userId") Long userId) {
+    public UserEntityDto getClientById(@RequestParam("userId") Long userId) throws BadRequestException {
         return userService.getUserById(userId);
     }
 
@@ -69,7 +70,7 @@ public class UserController {
     }
 
     @GetMapping(value = "/getGasDetailsById")
-    public GasDto getGasDetailsById(@RequestParam("id") Long id) {
+    public GasDto getGasDetailsById(@RequestParam("id") Long id) throws BadRequestException {
         return userService.getGasDetailsById(id);
     }
     

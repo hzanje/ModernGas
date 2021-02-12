@@ -1,8 +1,11 @@
 package com.moderngas.restcontroller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.moderngas.exception.BadRequestException;
 import com.moderngas.pojo.ResponseStatus;
+import com.moderngas.pojo.NameIdDto;
 import com.moderngas.pojo.admin.CylinderCodeStatusDto;
+import com.moderngas.pojo.admin.DeliveryVehicleDto;
 import com.moderngas.pojo.admin.FilterDto;
 import com.moderngas.pojo.admin.OrderDto;
 import com.moderngas.pojo.user.UserEntityDto;
@@ -69,7 +72,7 @@ public class AdminController {
 
     @PostMapping("/addCylinder/{id}")
     public ResponseEntity<ResponseStatus> addCylinder(@PathVariable("id") Long userId,
-                                                      @RequestBody CylinderCodeStatusDto cylinderCodeStatusDto) {
+                                                      @RequestBody CylinderCodeStatusDto cylinderCodeStatusDto) throws BadRequestException {
         String response = inventoryService.addCylinder(userId, cylinderCodeStatusDto);
         return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
     }
@@ -81,10 +84,20 @@ public class AdminController {
         return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
     }
 
-    //@PreAuthorize("hasRole('ADMIN') or hasRole('EMPLOYEE')")
     @GetMapping("/filter")
     public FilterDto getFilters() {
         return genericService.getFilterList();
+    }
+
+    @PostMapping("/vehicle")
+    public ResponseEntity<ResponseStatus> addVehicle(@RequestBody DeliveryVehicleDto deliveryVehicleDto) throws BadRequestException {
+        String response = userService.addVehicle(deliveryVehicleDto);
+        return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
+    }
+
+    @GetMapping("/vehicle")
+    public List<NameIdDto> getVehicle(@RequestParam("id") Long userId) {
+        return userService.getVehicleNumberList(userId);
     }
 
 }

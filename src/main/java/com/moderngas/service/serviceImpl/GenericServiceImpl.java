@@ -6,9 +6,11 @@ import com.moderngas.enums.OrderStatus;
 import com.moderngas.jpaentity.AddressEntity;
 import com.moderngas.jpaentity.CartEntity;
 import com.moderngas.jpaentity.CategoryMaster;
+import com.moderngas.jpaentity.DeliveryVehicle;
 import com.moderngas.jpaentity.OrderEntity;
 import com.moderngas.jpaentity.UserEntity;
 import com.moderngas.pojo.DateStatusDto;
+import com.moderngas.pojo.admin.DeliveryVehicleDto;
 import com.moderngas.pojo.admin.FilterDto;
 import com.moderngas.pojo.user.AddressDto;
 import com.moderngas.pojo.user.CartDto;
@@ -249,19 +251,20 @@ public class GenericServiceImpl implements GenericService {
     }
 
     @Override
-    public OrderEntity changeOrderStatus(OrderEntity orderEntity, OrderStatus orderStatus) {
+    public OrderEntity changeOrderStatus(OrderEntity orderEntity, OrderStatus orderStatus, Long deliveryVehicleId) {
         log.info("GenericService >> Changes Status: {} for User: {}", orderStatus.getName(), orderEntity.getUserId());
         if (null != orderStatus) {
             switch (orderStatus) {
 
                 case ORDER_STATUS_LOADED: orderEntity.setLoadedDate(new Date());
+                                          orderEntity.setDeliveryVehicleNumber(deliveryVehicleId);
                     break;
 
                 case ORDER_STATUS_DEVLIVERED: orderEntity.setDeliveredDate(new Date());
                     break;
 
                 case ORDER_STATUS_CANCELLED: orderEntity.setActiveFlag(false);
-                /* Add cancel date in DB for records */
+                                             orderEntity.setCancellationDate(new Date());
                     break;
 
                 default: break;
@@ -281,5 +284,15 @@ public class GenericServiceImpl implements GenericService {
         quantityOrdering.add(Constants.FILTER_ORDERING_MAX_MIN);
         quantityOrdering.add(Constants.FILTER_ORDERING_MIN_MAX);
         return new FilterDto(cylinderTypeList, quantityOrdering);
+    }
+
+    @Override
+    public DeliveryVehicle convertDtoToDeliveryVehicle(DeliveryVehicleDto deliveryVehicleDto) {
+        DeliveryVehicle deliveryVehicle = new DeliveryVehicle();
+        deliveryVehicle.setColor(deliveryVehicleDto.getColor());
+        deliveryVehicle.setName(deliveryVehicleDto.getName());
+        deliveryVehicle.setNumber(deliveryVehicleDto.getNumber());
+        deliveryVehicle.setUserId(deliveryVehicleDto.getUserId());
+        return deliveryVehicle;
     }
 }

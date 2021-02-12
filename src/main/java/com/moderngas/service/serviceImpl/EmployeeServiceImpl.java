@@ -27,7 +27,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     private OrderRepo orderRepo;
 
     @Override
-    public String assignCylinderToUser(Long orderId, CylinderCodeListDto codeListDto) {
+    public String assignCylinderToUser(Long orderId, CylinderCodeListDto codeListDto) throws BadRequestException {
         OrderEntity orderEntity = orderRepo.findById(orderId).orElse(null);
         if (null == orderEntity) {
             throw new BadRequestException(ExceptionConstants.INVALID_ORDER);
@@ -40,7 +40,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public String receiveCylinderFromUser(Long orderId, CylinderCodeListDto codeListDto) {
+    public String receiveCylinderFromUser(Long orderId, CylinderCodeListDto codeListDto) throws BadRequestException {
         OrderEntity orderEntity = orderRepo.findById(orderId).orElse(null);
         if (null == orderEntity) {
             throw new BadRequestException(ExceptionConstants.INVALID_ORDER);

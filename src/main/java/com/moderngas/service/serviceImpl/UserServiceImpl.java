@@ -4,15 +4,19 @@ import com.moderngas.constants.Constants;
 import com.moderngas.constants.ExceptionConstants;
 import com.moderngas.enums.CylinderType;
 import com.moderngas.exception.BadRequestException;
+import com.moderngas.exception.UnauthorizedException;
 import com.moderngas.jpaentity.AddressEntity;
 import com.moderngas.jpaentity.CategoryMaster;
+import com.moderngas.jpaentity.DeliveryVehicle;
 import com.moderngas.jpaentity.GasImageEntity;
 import com.moderngas.jpaentity.GasMaster;
 import com.moderngas.jpaentity.UserEntity;
+import com.moderngas.pojo.admin.DeliveryVehicleDto;
 import com.moderngas.pojo.user.GasDto;
 import com.moderngas.pojo.NameIdDto;
 import com.moderngas.pojo.user.UserDashboardDto;
 import com.moderngas.pojo.user.UserEntityDto;
+import com.moderngas.repository.DeliveryVehicleRepo;
 import com.moderngas.repository.GasRepo;
 import com.moderngas.repository.UserRepo;
 import com.moderngas.service.EmailService;
@@ -26,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,6 +55,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private GasRepo gasRepo;
+
+    @Autowired
+    private DeliveryVehicleRepo deliveryVehicleRepo;
 
 
     @Override
@@ -93,7 +101,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserEntityDto getUserById(Long userId) {
+    public UserEntityDto getUserById(Long userId) throws BadRequestException {
         UserEntity userEntity = userRepo.findById(userId).orElse(null);
         if (null == userEntity) {
             throw new BadRequestException(ExceptionConstants.INVALID_USER);
@@ -137,7 +145,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String forgetPassword(Long userName) {
+    public String forgetPassword(Long userName) throws BadRequestException {
         log.info("UserService >> Forget Password by User: {}", userName);
         String result = Constants.FAILURE_STR;
         /* Check if User Exits */
@@ -235,7 +243,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public GasDto getGasDetailsById(Long id) {
+    public GasDto getGasDetailsById(Long id) throws BadRequestException {
         GasMaster gasMaster = gasRepo.findById(id).orElse(null);
         if (null == gasMaster) {
             throw new BadRequestException(ExceptionConstants.INVALID_GAS);
@@ -252,5 +260,31 @@ public class UserServiceImpl implements UserService {
                     .map(GasImageEntity::getImageUrl).collect(Collectors.toList()));
         }
         return gasDto;
+    }
+
+    @Override
+    public void checkIfRoleIsNotUser(UserEntity userEntity) throws BadRequestException {
+        if (null == userEntity) {
+            throw new BadRequestException(ExceptionConstants.INVALID_USER);
+        } else if (StringUtils.isEmpty(userEntity.getRole()) || userEntity.getRole().equals("USER")) {
+            throw new UnauthorizedException(ExceptionConstants.INVALID_USER_ACCESS);
+        }
+    }
+
+    @Override
+    public String addVehicle(DeliveryVehicleDto deliveryVehicleDto) throws BadRequestException {
+        if (null == deliveryVehicleDto) {
+            throw new BadRequestException(ExceptionConstants.INVALID_REQUEST_DATA);
+        }
+        UserEntity userEntity = userRepo.findById(deliveryVehicleDto.getUserId()).orElse(null);
+        checkIfRoleIsNotUser(userEntity);
+        DeliveryVehicle deliveryVehicle = genericService.convertDtoToDeliveryVehicle(deliveryVehicleDto);
+        deliveryVehicleRepo.save(deliveryVehicle);
+        return Constants.SUCCESS_STR;
+    }
+
+    @Override
+    public List<NameIdDto> getVehicleNumberList(Long userId) {
+        return deliveryVehicleRepo.getVehicleNumberList(userId);
     }
 }

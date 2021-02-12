@@ -33,6 +33,8 @@ public class OrderDto {
 
     private String userName;
 
+    private String deliveryVehicle;
+
     private List<DateStatusDto> dateStatusDto;
 
     private Date orderedOnDate;

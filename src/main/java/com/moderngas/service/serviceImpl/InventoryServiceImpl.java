@@ -4,7 +4,6 @@ import com.moderngas.constants.Constants;
 import com.moderngas.constants.ExceptionConstants;
 import com.moderngas.enums.CylinderStatus;
 import com.moderngas.exception.BadRequestException;
-import com.moderngas.exception.UnauthorizedException;
 import com.moderngas.jpaentity.CylinderEntity;
 import com.moderngas.jpaentity.UserEntity;
 import com.moderngas.pojo.admin.CylinderCodeStatusDto;
@@ -14,7 +13,8 @@ import com.moderngas.service.InventoryService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
+
+import com.moderngas.service.UserService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,22 +24,21 @@ import java.util.List;
 public class InventoryServiceImpl implements InventoryService {
 
     @Autowired
+    private UserService userService;
+
+    @Autowired
     private UserRepo userRepo;
 
     @Autowired
     private InventoryRepo inventoryRepo;
 
     @Override
-    public String addCylinder(Long userId, CylinderCodeStatusDto cylinderCodeStatusDto) {
+    public String addCylinder(Long userId, CylinderCodeStatusDto cylinderCodeStatusDto) throws BadRequestException {
         if (null == cylinderCodeStatusDto) {
             throw new BadRequestException(ExceptionConstants.INVALID_REQUEST_DATA);
         }
         UserEntity userEntity = userRepo.findById(userId).orElse(null);
-        if (null == userEntity) {
-            throw new BadRequestException(ExceptionConstants.INVALID_USER);
-        } else if (StringUtils.isEmpty(userEntity.getRole()) || userEntity.getRole().equals("USER")) {
-            throw new UnauthorizedException(ExceptionConstants.INVALID_USER_ACCESS);
-        }
+        userService.checkIfRoleIsNotUser(userEntity);
         if (!CylinderStatus.isExist(cylinderCodeStatusDto.getStatus())) {
             throw new BadRequestException(ExceptionConstants.INVALID_STATUS);
         }

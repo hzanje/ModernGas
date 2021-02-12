@@ -1,8 +1,9 @@
 package com.moderngas.service;
 
+import com.moderngas.exception.BadRequestException;
 import com.moderngas.pojo.admin.CylinderCodeStatusDto;
 
 public interface InventoryService {
 
-    String addCylinder(Long userid, CylinderCodeStatusDto cylinderCodeStatusDto);
+    String addCylinder(Long userid, CylinderCodeStatusDto cylinderCodeStatusDto) throws BadRequestException;
 }

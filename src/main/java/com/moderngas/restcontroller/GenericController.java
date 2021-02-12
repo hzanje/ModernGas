@@ -1,6 +1,7 @@
 package com.moderngas.restcontroller;
 
 import com.moderngas.Security.UserDetailsServiceImpl;
+import com.moderngas.exception.BadRequestException;
 import com.moderngas.pojo.ResponseStatus;
 import com.moderngas.pojo.user.UserEntityDto;
 import com.moderngas.service.UserService;
@@ -38,7 +39,7 @@ public class GenericController {
     }
 
     @GetMapping(value = "/forgetPassword")
-    public ResponseEntity<ResponseStatus> forgetPassword(@RequestParam("userName") Long userName) {
+    public ResponseEntity<ResponseStatus> forgetPassword(@RequestParam("userName") Long userName) throws BadRequestException {
         String response = userService.forgetPassword(userName);
         return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
     }

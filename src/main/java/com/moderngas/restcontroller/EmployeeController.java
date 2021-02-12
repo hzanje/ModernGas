@@ -1,5 +1,6 @@
 package com.moderngas.restcontroller;
 
+import com.moderngas.exception.BadRequestException;
 import com.moderngas.pojo.admin.CylinderCodeListDto;
 import com.moderngas.pojo.admin.CylinderCodeStatusDto;
 import com.moderngas.service.EmployeeService;
@@ -22,13 +23,13 @@ public class EmployeeController {
 
     @PutMapping("/assign/{orderId}")
     public String assignCylinderToUser(@PathVariable("orderId") Long orderId,
-                                       @RequestBody CylinderCodeListDto codeListDto) {
+                                       @RequestBody CylinderCodeListDto codeListDto) throws BadRequestException {
         return employeeService.assignCylinderToUser(orderId, codeListDto);
     }
 
     @PutMapping("/receive/{orderId}")
     public String receiveCylinderFromUser(@PathVariable("orderId") Long orderId,
-                                          @RequestBody CylinderCodeListDto codeListDto) {
+                                          @RequestBody CylinderCodeListDto codeListDto) throws BadRequestException {
         return employeeService.receiveCylinderFromUser(orderId, codeListDto);
     }
 

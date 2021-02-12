@@ -1,7 +1,9 @@
 package com.moderngas.service;
 
+import com.moderngas.exception.BadRequestException;
 import com.moderngas.jpaentity.AddressEntity;
 import com.moderngas.jpaentity.UserEntity;
+import com.moderngas.pojo.admin.DeliveryVehicleDto;
 import com.moderngas.pojo.user.GasDto;
 import com.moderngas.pojo.NameIdDto;
 import com.moderngas.pojo.user.UserDashboardDto;
@@ -19,7 +21,7 @@ public interface UserService {
 
     List<UserEntityDto> getAllUser();
 
-    UserEntityDto getUserById(Long userId);
+    UserEntityDto getUserById(Long userId) throws BadRequestException;
 
     String checkUserExist(Long mobileNumber);
 
@@ -27,7 +29,7 @@ public interface UserService {
 
     String changePassword(Long username, String oldPassword, String newPassword);
 
-    String forgetPassword(Long userName);
+    String forgetPassword(Long userName) throws BadRequestException;
 
     List<UserDashboardDto> getUserDashboard(Long userId);
 
@@ -39,6 +41,11 @@ public interface UserService {
 
     List<NameIdDto> getListByCategoryId(Long categoryId);
 
-    GasDto getGasDetailsById(Long id);
+    GasDto getGasDetailsById(Long id) throws BadRequestException;
 
+    void checkIfRoleIsNotUser(UserEntity userEntity) throws BadRequestException;
+
+    String addVehicle(DeliveryVehicleDto deliveryVehicleDto) throws BadRequestException;
+
+    List<NameIdDto> getVehicleNumberList(Long userId);
 }

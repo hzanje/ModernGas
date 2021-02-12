@@ -44,11 +44,17 @@ public class OrderEntity extends BaseEntity {
     @JoinColumn(name = "gas_id", referencedColumnName = "id")
     private GasMaster gasMaster;
 
+    @Column(name = "delivery_vehicle")
+    private Long deliveryVehicleNumber;
+
     @Column(name = "loaded_date")
     private Date loadedDate;
 
     @Column(name = "delivered_date")
     private Date deliveredDate;
+
+    @Column(name = "cancellation_date")
+    private Date cancellationDate;
 
     @Column(name = "price")
     private int price;

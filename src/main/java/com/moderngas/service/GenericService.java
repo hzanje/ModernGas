@@ -4,8 +4,10 @@ import com.moderngas.enums.OrderStatus;
 import com.moderngas.jpaentity.AddressEntity;
 import com.moderngas.jpaentity.CartEntity;
 import com.moderngas.jpaentity.CategoryMaster;
+import com.moderngas.jpaentity.DeliveryVehicle;
 import com.moderngas.jpaentity.OrderEntity;
 import com.moderngas.jpaentity.UserEntity;
+import com.moderngas.pojo.admin.DeliveryVehicleDto;
 import com.moderngas.pojo.admin.FilterDto;
 import com.moderngas.pojo.user.AddressDto;
 import com.moderngas.pojo.user.CartDto;
@@ -41,7 +43,9 @@ public interface GenericService {
 
     List<OrderEntity> convertCartToOrderEntity(List<CartEntity> cartEntityList);
 
-    OrderEntity changeOrderStatus(OrderEntity orderEntity, OrderStatus orderStatus);
+    OrderEntity changeOrderStatus(OrderEntity orderEntity, OrderStatus orderStatus, Long deliveryVehicleId);
 
     FilterDto getFilterList();
+
+    DeliveryVehicle convertDtoToDeliveryVehicle(DeliveryVehicleDto deliveryVehicleDto);
 }

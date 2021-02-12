@@ -2,6 +2,7 @@ package com.moderngas.service;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.moderngas.exception.BadRequestException;
 import com.moderngas.pojo.user.CartDto;
 import com.moderngas.pojo.NameIdDto;
 import com.moderngas.pojo.user.OrderDto;
@@ -14,21 +15,21 @@ public interface OrderService {
 
     String placeOrder(OrderDto orderDto);
 
-    List<OrderDto> getOrderListByUser(Long userId);
+    List<OrderDto> getOrderListByUser(Long userId) throws BadRequestException;
 
     String addCart(CartDto cartDto);
 
-    List<CartDto> getCartByUser(Long userId);
+    List<CartDto> getCartByUser(Long userId) throws BadRequestException;
 
-    String deleteOrder(Long orderId);
+    String deleteOrder(Long orderId) throws BadRequestException;
 
-    String deleteCart(Long cartId);
+    String deleteCart(Long cartId) throws BadRequestException;
 
-    String placeOrderFromCart(Long userId);
+    String placeOrderFromCart(Long userId) throws BadRequestException;
 
-    OrderDto getOrderDetailsById(Long orderId);
+    OrderDto getOrderDetailsById(Long orderId) throws BadRequestException;
 
-    String updateOrderStatus(Long orderId, Long statusId) throws Exception;
+    String updateOrderStatus(Long orderId, String orderStatus, Long vehicleNumber) throws BadRequestException;
 
     Page<com.moderngas.pojo.admin.OrderDto> getAllOrderListForAdmin(Pageable pageable, String status, List<String> cylinderType, String search, String quantityOrder) throws JsonProcessingException;
 }
