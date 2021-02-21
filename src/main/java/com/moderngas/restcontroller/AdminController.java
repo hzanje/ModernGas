@@ -7,6 +7,7 @@ import com.moderngas.pojo.NameIdDto;
 import com.moderngas.pojo.admin.CylinderCodeStatusDto;
 import com.moderngas.pojo.admin.DeliveryVehicleDto;
 import com.moderngas.pojo.admin.FilterDto;
+import com.moderngas.pojo.admin.InventoryCylinderDto;
 import com.moderngas.pojo.admin.OrderDto;
 import com.moderngas.pojo.user.UserEntityDto;
 import com.moderngas.service.GenericService;
@@ -98,6 +99,11 @@ public class AdminController {
     @GetMapping("/vehicle")
     public List<NameIdDto> getVehicle(@RequestParam("id") Long userId) {
         return userService.getVehicleNumberList(userId);
+    }
+
+    @GetMapping("/inventory")
+    public List<InventoryCylinderDto> getInventoryCylinderForAdmin(@RequestParam("id") Long adminId) {
+        return inventoryService.getInventoryCylinderForAdmin(adminId);
     }
 
 }

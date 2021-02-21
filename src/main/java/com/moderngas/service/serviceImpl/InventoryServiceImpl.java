@@ -7,6 +7,7 @@ import com.moderngas.exception.BadRequestException;
 import com.moderngas.jpaentity.CylinderEntity;
 import com.moderngas.jpaentity.UserEntity;
 import com.moderngas.pojo.admin.CylinderCodeStatusDto;
+import com.moderngas.pojo.admin.InventoryCylinderDto;
 import com.moderngas.repository.InventoryRepo;
 import com.moderngas.repository.UserRepo;
 import com.moderngas.service.InventoryService;
@@ -57,5 +58,10 @@ public class InventoryServiceImpl implements InventoryService {
         }
         inventoryRepo.saveAll(cylinderEntityList);
         return Constants.SUCCESS_STR;
+    }
+
+    @Override
+    public List<InventoryCylinderDto> getInventoryCylinderForAdmin(Long adminId) {
+        return inventoryRepo.getInventoryCylinderForAdmin();
     }
 }
