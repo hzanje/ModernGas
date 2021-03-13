@@ -14,8 +14,6 @@ public class UserEntityDto {
 
     private String email;
 
-    private String address;
-
     private String password;
 
     private String companyName;
@@ -23,5 +21,6 @@ public class UserEntityDto {
     private String contactPerson;
 
     private String role;
+
 
 }

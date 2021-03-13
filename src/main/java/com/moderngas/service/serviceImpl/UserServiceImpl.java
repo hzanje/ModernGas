@@ -16,6 +16,7 @@ import com.moderngas.pojo.user.GasDto;
 import com.moderngas.pojo.NameIdDto;
 import com.moderngas.pojo.user.UserDashboardDto;
 import com.moderngas.pojo.user.UserEntityDto;
+import com.moderngas.pojo.user.UserSearchDto;
 import com.moderngas.repository.DeliveryVehicleRepo;
 import com.moderngas.repository.GasRepo;
 import com.moderngas.repository.UserRepo;
@@ -27,6 +28,8 @@ import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONObject;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -286,5 +289,13 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<NameIdDto> getVehicleNumberList(Long userId) {
         return deliveryVehicleRepo.getVehicleNumberList(userId);
+    }
+
+    @Override
+    public Page<UserSearchDto> searchUserByName(Pageable pageable, String name) throws BadRequestException {
+        if (StringUtils.isEmpty(name)) {
+            throw new BadRequestException(ExceptionConstants.INVALID_REQUEST_DATA);
+        }
+        return userRepo.searchUserByName(pageable, name);
     }
 }

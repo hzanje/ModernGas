@@ -10,6 +10,7 @@ import com.moderngas.pojo.admin.FilterDto;
 import com.moderngas.pojo.admin.InventoryCylinderDto;
 import com.moderngas.pojo.admin.OrderDto;
 import com.moderngas.pojo.user.UserEntityDto;
+import com.moderngas.pojo.user.UserSearchDto;
 import com.moderngas.service.GenericService;
 import com.moderngas.service.OrderService;
 import com.moderngas.service.UserService;
@@ -104,6 +105,20 @@ public class AdminController {
     @GetMapping("/inventory")
     public List<InventoryCylinderDto> getInventoryCylinderForAdmin(@RequestParam("id") Long adminId) {
         return inventoryService.getInventoryCylinderForAdmin(adminId);
+    }
+
+    @GetMapping("/search")
+    public HttpEntity<PagedModel<EntityModel<UserSearchDto>>> searchUser(PagedResourcesAssembler<UserSearchDto> assembler,
+                                                                         @RequestParam(value = "size",defaultValue = "0") Integer size,
+                                                                         @RequestParam(value = "page", defaultValue = "0") Integer page,
+                                                                         @RequestParam(value = "name") String name) throws BadRequestException {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<UserSearchDto> userSearchList = userService.searchUserByName(pageable, name);
+        Link link = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(AdminController.class)
+                .searchUser(assembler, size, page, name)).withSelfRel();
+
+        PagedModel<EntityModel<UserSearchDto>> model = assembler.toModel(userSearchList, link);
+        return new ResponseEntity<>(model, HttpStatus.OK);
     }
 
 }

@@ -14,6 +14,7 @@ import com.moderngas.pojo.user.CartDto;
 import com.moderngas.pojo.user.OrderDto;
 import com.moderngas.pojo.user.UserDashboardDto;
 import com.moderngas.pojo.user.UserEntityDto;
+import com.moderngas.pojo.user.UserSearchDto;
 
 import java.util.List;
 
@@ -48,4 +49,5 @@ public interface GenericService {
     FilterDto getFilterList();
 
     DeliveryVehicle convertDtoToDeliveryVehicle(DeliveryVehicleDto deliveryVehicleDto);
+
 }

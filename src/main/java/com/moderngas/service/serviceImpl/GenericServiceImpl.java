@@ -17,6 +17,7 @@ import com.moderngas.pojo.user.CartDto;
 import com.moderngas.pojo.user.OrderDto;
 import com.moderngas.pojo.user.UserDashboardDto;
 import com.moderngas.pojo.user.UserEntityDto;
+import com.moderngas.pojo.user.UserSearchDto;
 import com.moderngas.repository.GasRepo;
 import com.moderngas.service.GenericService;
 import lombok.extern.slf4j.Slf4j;
@@ -60,15 +61,18 @@ public class GenericServiceImpl implements GenericService {
 
     @Override
     public UserEntityDto convertUserDataToDto(UserEntity userEntity) {
-        UserEntityDto userEntityDto = new UserEntityDto();
-        userEntityDto.setId(userEntity.getId());
-        userEntityDto.setName(userEntity.getName());
-        userEntityDto.setEmail(userEntity.getEmail());
-        userEntityDto.setMobileNumber(userEntity.getMobileNumber());
-        userEntityDto.setCompanyName(userEntity.getCompanyName());
-        userEntityDto.setRole(userEntity.getRole());
-        userEntityDto.setContactPerson(userEntity.getContactPerson());
-        return userEntityDto;
+        if (null != userEntity) {
+            UserEntityDto userEntityDto = new UserEntityDto();
+            userEntityDto.setId(userEntity.getId());
+            userEntityDto.setName(userEntity.getName());
+            userEntityDto.setEmail(userEntity.getEmail());
+            userEntityDto.setMobileNumber(userEntity.getMobileNumber());
+            userEntityDto.setCompanyName(userEntity.getCompanyName());
+            userEntityDto.setRole(userEntity.getRole());
+            userEntityDto.setContactPerson(userEntity.getContactPerson());
+            return userEntityDto;
+        }
+        return null;
     }
 
     @Override
@@ -295,4 +299,5 @@ public class GenericServiceImpl implements GenericService {
         deliveryVehicle.setUserId(deliveryVehicleDto.getUserId());
         return deliveryVehicle;
     }
+
 }

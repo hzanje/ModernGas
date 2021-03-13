@@ -5,16 +5,20 @@ import com.moderngas.constants.ExceptionConstants;
 import com.moderngas.enums.CylinderStatus;
 import com.moderngas.exception.BadRequestException;
 import com.moderngas.jpaentity.OrderEntity;
+import com.moderngas.jpaentity.UserEntity;
 import com.moderngas.pojo.admin.CylinderCodeListDto;
 import com.moderngas.repository.InventoryRepo;
 import com.moderngas.repository.OrderRepo;
+import com.moderngas.repository.UserRepo;
 import com.moderngas.service.EmployeeService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -25,6 +29,9 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Autowired
     private OrderRepo orderRepo;
+
+    @Autowired
+    private UserRepo userRepo;
 
     @Override
     public String assignCylinderToUser(Long orderId, CylinderCodeListDto codeListDto) throws BadRequestException {
@@ -55,5 +62,14 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public List<String> getAvailableCylinder() {
         return inventoryRepo.getAvailableCylinder(CylinderStatus.getByStatus("Filled"));
+    }
+
+    @Override
+    public List<String> getAssignedCylinderByUserId(Long userId) throws BadRequestException {
+        UserEntity userEntity = userRepo.findById(userId).orElse(null);
+        if (null == userEntity) {
+            throw new BadRequestException(ExceptionConstants.INVALID_USER);
+        }
+        return inventoryRepo.getAssignedCylinderByUserId(userId);
     }
 }

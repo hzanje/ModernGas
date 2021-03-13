@@ -14,4 +14,6 @@ public interface EmployeeService {
     String assignCylinderToUser(Long orderId, CylinderCodeListDto codeListDto) throws BadRequestException;
 
     String receiveCylinderFromUser(Long orderId, CylinderCodeListDto codeListDto) throws BadRequestException;
+
+    List<String> getAssignedCylinderByUserId(Long userId) throws BadRequestException;
 }

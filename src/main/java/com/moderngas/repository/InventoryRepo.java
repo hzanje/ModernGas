@@ -32,7 +32,10 @@ public interface InventoryRepo extends JpaRepository<CylinderEntity, Long> {
     @Query(" FROM CylinderEntity WHERE code = :code")
     CylinderEntity checkIfCylinderCodeExist(@Param("code") String code);
 
-    @Query("SELECT new com.moderngas.pojo.admin.InventoryCylinderDto(ce.id, ce.code, ce.cylinderStatus, ue.name) FROM CylinderEntity ce " +
+    @Query("SELECT new com.moderngas.pojo.admin.InventoryCylinderDto(ce.id, ce.code, ce.cylinderStatus, ue.id, ue.name) FROM CylinderEntity ce " +
             "LEFT JOIN UserEntity ue ON ce.userId = ue.id ")
     List<InventoryCylinderDto> getInventoryCylinderForAdmin();
+
+    @Query("SELECT code FROM CylinderEntity WHERE userId=:userId")
+    List<String> getAssignedCylinderByUserId(@Param("userId") Long userId);
 }
