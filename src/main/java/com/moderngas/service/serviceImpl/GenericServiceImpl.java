@@ -3,12 +3,14 @@ package com.moderngas.service.serviceImpl;
 import com.moderngas.constants.Constants;
 import com.moderngas.enums.CylinderType;
 import com.moderngas.enums.OrderStatus;
+import com.moderngas.enums.UserRole;
 import com.moderngas.jpaentity.AddressEntity;
 import com.moderngas.jpaentity.CartEntity;
 import com.moderngas.jpaentity.CategoryMaster;
 import com.moderngas.jpaentity.DeliveryVehicle;
 import com.moderngas.jpaentity.OrderEntity;
 import com.moderngas.jpaentity.UserEntity;
+import com.moderngas.jpaentity.UserRoleEntity;
 import com.moderngas.pojo.DateStatusDto;
 import com.moderngas.pojo.admin.DeliveryVehicleDto;
 import com.moderngas.pojo.admin.FilterDto;
@@ -25,11 +27,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -50,13 +56,24 @@ public class GenericServiceImpl implements GenericService {
             userEntity.setEmail(userEntityDto.getEmail());
             userEntity.setMobileNumber(userEntityDto.getMobileNumber());
             userEntity.setCompanyName(userEntityDto.getCompanyName());
-            userEntity.setRole(userEntityDto.getRole());
+            userEntity.setRoleEntitySet(addUserRole(userEntityDto.getRole()));
             userEntity.setContactPerson(userEntityDto.getContactPerson());
             if (null != userEntityDto.getPassword() && !userEntityDto.getPassword().isEmpty()) {
                 userEntity.setPassword(encodeUserPassword(userEntityDto.getPassword()));
             }
         }
         return userEntity;
+    }
+
+    private Set<UserRoleEntity> addUserRole(String role) {
+        if (StringUtils.isEmpty(role)) {
+            return null;
+        }
+        Set<UserRoleEntity> userRoleEntitySet = new HashSet<>();
+        UserRoleEntity userRole = new UserRoleEntity();
+        userRole.setRole(UserRole.getByRole(role).getRole());
+        userRoleEntitySet.add(userRole);
+        return userRoleEntitySet;
     }
 
     @Override
@@ -68,7 +85,7 @@ public class GenericServiceImpl implements GenericService {
             userEntityDto.setEmail(userEntity.getEmail());
             userEntityDto.setMobileNumber(userEntity.getMobileNumber());
             userEntityDto.setCompanyName(userEntity.getCompanyName());
-            userEntityDto.setRole(userEntity.getRole());
+            userEntityDto.setRole(userEntity.getRoleEntitySet().stream().map(UserRoleEntity::getRole).collect(Collectors.joining()));
             userEntityDto.setContactPerson(userEntity.getContactPerson());
             return userEntityDto;
         }

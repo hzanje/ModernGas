@@ -11,6 +11,7 @@ import com.moderngas.jpaentity.DeliveryVehicle;
 import com.moderngas.jpaentity.GasImageEntity;
 import com.moderngas.jpaentity.GasMaster;
 import com.moderngas.jpaentity.UserEntity;
+import com.moderngas.jpaentity.UserRoleEntity;
 import com.moderngas.pojo.admin.DeliveryVehicleDto;
 import com.moderngas.pojo.user.GasDto;
 import com.moderngas.pojo.NameIdDto;
@@ -30,6 +31,7 @@ import net.minidev.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -269,9 +271,9 @@ public class UserServiceImpl implements UserService {
     public void checkIfRoleIsNotUser(UserEntity userEntity) throws BadRequestException {
         if (null == userEntity) {
             throw new BadRequestException(ExceptionConstants.INVALID_USER);
-        } else if (StringUtils.isEmpty(userEntity.getRole()) || userEntity.getRole().equals("USER")) {
+        } /*else if (userEntity.getRoleEntitySet().contains(UserRoleEntity :: getRole)) {
             throw new UnauthorizedException(ExceptionConstants.INVALID_USER_ACCESS);
-        }
+        }*/
     }
 
     @Override
@@ -280,7 +282,7 @@ public class UserServiceImpl implements UserService {
             throw new BadRequestException(ExceptionConstants.INVALID_REQUEST_DATA);
         }
         UserEntity userEntity = userRepo.findById(deliveryVehicleDto.getUserId()).orElse(null);
-        checkIfRoleIsNotUser(userEntity);
+        //checkIfRoleIsNotUser(userEntity);
         DeliveryVehicle deliveryVehicle = genericService.convertDtoToDeliveryVehicle(deliveryVehicleDto);
         deliveryVehicleRepo.save(deliveryVehicle);
         return Constants.SUCCESS_STR;

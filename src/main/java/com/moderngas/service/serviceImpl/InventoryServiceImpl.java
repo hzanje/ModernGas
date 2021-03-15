@@ -39,7 +39,7 @@ public class InventoryServiceImpl implements InventoryService {
             throw new BadRequestException(ExceptionConstants.INVALID_REQUEST_DATA);
         }
         UserEntity userEntity = userRepo.findById(userId).orElse(null);
-        userService.checkIfRoleIsNotUser(userEntity);
+        //userService.checkIfRoleIsNotUser(userEntity);
         if (!CylinderStatus.isExist(cylinderCodeStatusDto.getStatus())) {
             throw new BadRequestException(ExceptionConstants.INVALID_STATUS);
         }

@@ -9,8 +9,8 @@ CREATE TABLE `user` (
   `mobile_number` bigint(20) DEFAULT NULL,
   `name` varchar(255) DEFAULT NULL,
   `password` longtext,
-  `role` varchar(255) NOT NULL,
   `address_id` bigint(20) DEFAULT NULL,
+  `employer_id` BIGINT(20) DEFAULT NULL,
   PRIMARY KEY (`id`),
   CONSTRAINT `FK_USER_ADDRESS` FOREIGN KEY (`address_id`) REFERENCES `address`(`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4000;

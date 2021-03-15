@@ -27,6 +27,7 @@ import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -55,6 +56,7 @@ public class AdminController {
     @Autowired
     private GenericService genericService;
 
+    @Secured("ROLE_ADMIN")
     @GetMapping("/order")
     public HttpEntity<PagedModel<EntityModel<OrderDto>>> getAllOrderList(PagedResourcesAssembler<OrderDto> assembler,
                @RequestParam(value = "size",defaultValue = "0") Integer size,
@@ -79,34 +81,39 @@ public class AdminController {
         return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @Secured("ROLE_ADMIN")
     @PostMapping(value = "/addEmployee")
     public ResponseEntity<ResponseStatus> addEmployee(@RequestBody UserEntityDto userEntityDto) {
         String response = userService.addUser(userEntityDto);
         return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
     }
 
+    @Secured("ROLE_ADMIN")
     @GetMapping("/filter")
     public FilterDto getFilters() {
         return genericService.getFilterList();
     }
 
+    @Secured("ROLE_ADMIN")
     @PostMapping("/vehicle")
     public ResponseEntity<ResponseStatus> addVehicle(@RequestBody DeliveryVehicleDto deliveryVehicleDto) throws BadRequestException {
         String response = userService.addVehicle(deliveryVehicleDto);
         return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
     }
 
+    @Secured("ROLE_ADMIN")
     @GetMapping("/vehicle")
     public List<NameIdDto> getVehicle(@RequestParam("id") Long userId) {
         return userService.getVehicleNumberList(userId);
     }
 
+    @Secured("ROLE_ADMIN")
     @GetMapping("/inventory")
     public List<InventoryCylinderDto> getInventoryCylinderForAdmin(@RequestParam("id") Long adminId) {
         return inventoryService.getInventoryCylinderForAdmin(adminId);
     }
 
+    @Secured("ROLE_ADMIN")
     @GetMapping("/search")
     public HttpEntity<PagedModel<EntityModel<UserSearchDto>>> searchUser(PagedResourcesAssembler<UserSearchDto> assembler,
                                                                          @RequestParam(value = "size",defaultValue = "0") Integer size,

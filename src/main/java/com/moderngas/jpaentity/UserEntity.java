@@ -3,6 +3,7 @@ package com.moderngas.jpaentity;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.Set;
 
 @Entity
 @Data
@@ -29,8 +30,12 @@ public class UserEntity extends BaseEntity {
     @Column(name = "contact_person")
     private String contactPerson;
 
-    @Column(name = "role", nullable = false)
-    private String role;
+    @Column(name = "employer_id")
+    private Long employerId;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
+    private Set<UserRoleEntity> roleEntitySet;
 
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "addressId", referencedColumnName = "id")
