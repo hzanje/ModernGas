@@ -5,6 +5,7 @@ import com.moderngas.jpaentity.AddressEntity;
 import com.moderngas.jpaentity.UserEntity;
 import com.moderngas.pojo.admin.DeliveryVehicleDto;
 import com.moderngas.pojo.admin.OrderDto;
+import com.moderngas.pojo.admin.UserDetails;
 import com.moderngas.pojo.user.GasDto;
 import com.moderngas.pojo.NameIdDto;
 import com.moderngas.pojo.user.UserDashboardDto;
@@ -54,4 +55,6 @@ public interface UserService {
     List<NameIdDto> getVehicleNumberList(Long userId);
 
     Page<UserSearchDto> searchUserByName(Pageable pageable, String name) throws BadRequestException;
+
+    UserDetails getUserDetailsForAdmin(Long id) throws BadRequestException;
 }

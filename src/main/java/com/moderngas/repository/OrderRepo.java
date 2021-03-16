@@ -33,6 +33,9 @@ public interface OrderRepo extends JpaRepository<OrderEntity, Long> {
                                            @Param("search") String search,
                                            @Param("quantityOrder") String quantityOrder);
 
+    @Query(QUERIES.ORDER_LIST_FOR_ADMIN_IN_USER_DETAILS)
+    List<OrderDto> getUserOrderListForAdminInUserDetails(@Param("userId") Long userId);
+
     class QUERIES {
 
         private static final String ORDER_ENTRIES_BY_USER_ID = "FROM OrderEntity WHERE userId = :userId ORDER BY updatedDate ";
@@ -51,6 +54,11 @@ public interface OrderRepo extends JpaRepository<OrderEntity, Long> {
                 " ord.orderStatus, ord.quantity, ord.createdDate) " + ALL_ORDER_LIST_FOR_ADMIN;
 
         private static final String ALL_ORDER_LIST_FOR_ADMIN_COUNT = "SELECT COUNT(ord.id) " + ALL_ORDER_LIST_FOR_ADMIN;
+
+        private static final String ORDER_LIST_FOR_ADMIN_IN_USER_DETAILS = "SELECT new com.moderngas.pojo.admin.OrderDto(" +
+                "ord.id, ord.cylinderType, ord.isRefill, u.id, u.name, ord.gasMaster.name, ord.gasMaster.categoryMaster.name," +
+                " ord.orderStatus, ord.quantity, ord.createdDate) FROM OrderEntity ord LEFT JOIN UserEntity u ON u.id = ord.userId " +
+                " WHERE ord.userId =:userId ORDER BY ord.createdDate DESC";
 
     }
 }

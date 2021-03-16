@@ -9,6 +9,7 @@ import com.moderngas.pojo.admin.DeliveryVehicleDto;
 import com.moderngas.pojo.admin.FilterDto;
 import com.moderngas.pojo.admin.InventoryCylinderDto;
 import com.moderngas.pojo.admin.OrderDto;
+import com.moderngas.pojo.admin.UserDetails;
 import com.moderngas.pojo.user.UserEntityDto;
 import com.moderngas.pojo.user.UserSearchDto;
 import com.moderngas.service.GenericService;
@@ -126,6 +127,17 @@ public class AdminController {
 
         PagedModel<EntityModel<UserSearchDto>> model = assembler.toModel(userSearchList, link);
         return new ResponseEntity<>(model, HttpStatus.OK);
+    }
+
+    @Secured("ROLE_ADMIN")
+    @GetMapping("/userDetails")
+    public UserDetails getUserDetails(@RequestParam("id") Long id) throws BadRequestException {
+        return userService.getUserDetailsForAdmin(id);
+    }
+
+    @GetMapping("/userOrder")
+    public List<OrderDto> getUserOrder(@RequestParam("id") Long id) throws BadRequestException {
+        return orderService.getUserOrderListForAdminInUserDetails(id);
     }
 
 }

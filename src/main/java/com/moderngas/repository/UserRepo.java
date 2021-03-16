@@ -1,6 +1,7 @@
 package com.moderngas.repository;
 
 import com.moderngas.jpaentity.UserEntity;
+import com.moderngas.pojo.admin.UserDetails;
 import com.moderngas.pojo.user.UserSearchDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,6 +22,10 @@ public interface UserRepo extends JpaRepository<UserEntity, Long> {
     @Query(value = UserRepo.QUERIES.ALL_USER_BY_NAME, countQuery = UserRepo.QUERIES.ALL_USER_BY_NAME_COUNT)
     Page<UserSearchDto> searchUserByName(Pageable pageable,
                                          @Param("name") String name);
+
+    @Query("SELECT new com.moderngas.pojo.admin.UserDetails(u.id, u.activeFlag, u.name, u.mobileNumber, u.email, u.companyName) " +
+            "FROM UserEntity u WHERE u.id = :id")
+    UserDetails getUserDetailsForAdmin(@Param("id") Long id);
 
     class QUERIES {
 

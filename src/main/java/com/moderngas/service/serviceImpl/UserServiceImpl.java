@@ -10,9 +10,11 @@ import com.moderngas.jpaentity.CategoryMaster;
 import com.moderngas.jpaentity.DeliveryVehicle;
 import com.moderngas.jpaentity.GasImageEntity;
 import com.moderngas.jpaentity.GasMaster;
+import com.moderngas.jpaentity.OrderEntity;
 import com.moderngas.jpaentity.UserEntity;
 import com.moderngas.jpaentity.UserRoleEntity;
 import com.moderngas.pojo.admin.DeliveryVehicleDto;
+import com.moderngas.pojo.admin.UserDetails;
 import com.moderngas.pojo.user.GasDto;
 import com.moderngas.pojo.NameIdDto;
 import com.moderngas.pojo.user.UserDashboardDto;
@@ -20,6 +22,8 @@ import com.moderngas.pojo.user.UserEntityDto;
 import com.moderngas.pojo.user.UserSearchDto;
 import com.moderngas.repository.DeliveryVehicleRepo;
 import com.moderngas.repository.GasRepo;
+import com.moderngas.repository.InventoryRepo;
+import com.moderngas.repository.OrderRepo;
 import com.moderngas.repository.UserRepo;
 import com.moderngas.service.EmailService;
 import com.moderngas.service.GenericService;
@@ -38,6 +42,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -63,6 +68,12 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private DeliveryVehicleRepo deliveryVehicleRepo;
+
+    @Autowired
+    private InventoryRepo inventoryRepo;
+
+    @Autowired
+    private OrderRepo orderRepo;
 
 
     @Override
@@ -282,7 +293,6 @@ public class UserServiceImpl implements UserService {
             throw new BadRequestException(ExceptionConstants.INVALID_REQUEST_DATA);
         }
         UserEntity userEntity = userRepo.findById(deliveryVehicleDto.getUserId()).orElse(null);
-        //checkIfRoleIsNotUser(userEntity);
         DeliveryVehicle deliveryVehicle = genericService.convertDtoToDeliveryVehicle(deliveryVehicleDto);
         deliveryVehicleRepo.save(deliveryVehicle);
         return Constants.SUCCESS_STR;
@@ -299,5 +309,29 @@ public class UserServiceImpl implements UserService {
             throw new BadRequestException(ExceptionConstants.INVALID_REQUEST_DATA);
         }
         return userRepo.searchUserByName(pageable, name);
+    }
+
+    @Override
+    public UserDetails getUserDetailsForAdmin(Long id) throws BadRequestException {
+        UserEntity userEntity = userRepo.findById(id).orElse(null);
+        if (null == userEntity) {
+            throw new BadRequestException(ExceptionConstants.INVALID_USER);
+        }
+        UserDetails userDetails = userRepo.getUserDetailsForAdmin(id);
+        userDetails.setAssignedCylinder(getUserInventory(id));
+        userDetails.setTotalOrders(getUserOrdersCount(id));
+        return userDetails;
+    }
+
+    private int getUserOrdersCount(Long userId) {
+        List<OrderEntity> orderEntityList = orderRepo.getOrderEntitiesByUserId(userId);
+        if (CollectionUtils.isEmpty(orderEntityList)) {
+            return 0;
+        }
+        return orderEntityList.size();
+    }
+
+    private List<String> getUserInventory(Long userId) {
+        return inventoryRepo.getAssignedCylinderByUserId(userId);
     }
 }

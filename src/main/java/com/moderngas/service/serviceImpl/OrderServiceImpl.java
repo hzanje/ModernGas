@@ -213,4 +213,13 @@ public class OrderServiceImpl implements OrderService {
         }
         return orderStatus;
     }
+
+    @Override
+    public List<com.moderngas.pojo.admin.OrderDto> getUserOrderListForAdminInUserDetails(Long userId) throws BadRequestException {
+        UserEntity userEntity = userRepo.findById(userId).orElse(null);
+        if (null == userEntity) {
+            throw new BadRequestException(ExceptionConstants.INVALID_USER);
+        }
+        return orderRepo.getUserOrderListForAdminInUserDetails(userId);
+    }
 }
