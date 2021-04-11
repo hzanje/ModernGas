@@ -43,7 +43,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 /* Add Jwt filter : Authentication and Authorization */
-                .addFilter(new JwtAuthenicationFilter(authenticationManager()))
+                .addFilter(new JwtAuthenticationFilter(authenticationManager(), this.userRepo))
                 .addFilter(new JwtAuthorizationFilter(authenticationManager(), this.userRepo))
                 .authorizeRequests()
                 .antMatchers(HttpMethod.POST, "/login").permitAll()

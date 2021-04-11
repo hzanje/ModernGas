@@ -27,6 +27,12 @@ public interface UserRepo extends JpaRepository<UserEntity, Long> {
             "FROM UserEntity u WHERE u.id = :id")
     UserDetails getUserDetailsForAdmin(@Param("id") Long id);
 
+    @Query("SELECT CASE  WHEN count(u)> 0 THEN true ELSE false END FROM UserEntity u WHERE u.token = :token")
+    boolean isTokenExist(@Param("token") String token);
+
+    @Query("FROM UserEntity u WHERE u.token = :token")
+    UserEntity getUserDetailsByToken(@Param("token") String existingToken);
+
     class QUERIES {
 
         private static final String ALL_USER_BY_NAME = "SELECT new com.moderngas.pojo.user.UserSearchDto(u.id, u.name, u.companyName) FROM UserEntity u WHERE u.name LIKE :name% ORDER BY u.name ASC ";

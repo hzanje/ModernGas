@@ -2,8 +2,10 @@ package com.moderngas.Security;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.moderngas.jpaentity.UserEntity;
 import com.moderngas.repository.UserRepo;
+import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -51,25 +53,41 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         String token = request.getHeader(JwtProperties.HEADER_STRING)
                 .replace(JwtProperties.TOKEN_PREFIX,"");
 
-        if (token != null) {
-            // parse the token and validate it
-            String userName = JWT.require(Algorithm.HMAC512(JwtProperties.SECRET.getBytes()))
-                    .build()
-                    .verify(token)
-                    .getSubject();
+        try {
+            if (token != null && isTokenExist(token)) {
+                // parse the token and validate it
+                String userName = JWT.require(Algorithm.HMAC512(JwtProperties.SECRET.getBytes()))
+                        .build()
+                        .verify(token)
+                        .getSubject();
 
-            // Search in the DB if we find the user by token subject (username)
-            // If so, then grab user details and create spring auth token using username, pass, authorities/roles
-            if (userName != null) {
-                UserEntity userEntity = userRepo.findByMobileNumber(Long.parseLong(userName)).get();
-                UserDetailsImpl userDetails = new UserDetailsImpl(userEntity);
-                UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(userName, null, userDetails.getAuthorities());
+                // Search in the DB if we find the user by token subject (username)
+                // If so, then grab user details and create spring auth token using username, pass, authorities/roles
+                if (userName != null) {
+                    UserEntity userEntity = userRepo.findByMobileNumber(Long.parseLong(userName)).get();
+                    UserDetailsImpl userDetails = new UserDetailsImpl(userEntity);
+                    UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(userName, null, userDetails.getAuthorities());
+                    return auth;
+                }
+                return null;
+            }
+        } catch (ExpiredJwtException | TokenExpiredException expiredException) {
+            String requestURL = request.getRequestURL().toString();
+            if (requestURL.contains("refreshToken") ||
+                    requestURL.contains("logout")) {
+                UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
+                        null, null, null);
                 return auth;
             }
-            return null;
+            throw new TokenExpiredException("");
+        } catch (Exception exception) {
+            return (Authentication) exception;
         }
         return null;
     }
 
+    private boolean isTokenExist(String token) {
+        return userRepo.isTokenExist(token);
+    }
 
 }

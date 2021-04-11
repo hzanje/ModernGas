@@ -17,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface UserService {
 
@@ -42,7 +43,7 @@ public interface UserService {
     
     JSONObject getAddress(Long userId);
 
-    String refreshToken(String existingToken);
+    String refreshToken(String existingToken) throws BadRequestException;
 
     List<NameIdDto> getListByCategoryId(Long categoryId);
 
@@ -57,4 +58,6 @@ public interface UserService {
     Page<UserSearchDto> searchUserByName(Pageable pageable, String name) throws BadRequestException;
 
     UserDetails getUserDetailsForAdmin(Long id) throws BadRequestException;
+
+    String logout(String token) throws BadRequestException;
 }

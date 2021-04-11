@@ -1,5 +1,8 @@
 package com.moderngas.service.serviceImpl;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.moderngas.Security.JwtProperties;
 import com.moderngas.constants.Constants;
 import com.moderngas.constants.ExceptionConstants;
 import com.moderngas.enums.CylinderType;
@@ -42,6 +45,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -254,8 +258,29 @@ public class UserServiceImpl implements UserService {
 	}
 
     @Override
-    public String refreshToken(String existingToken) {
-        return null;
+    public String refreshToken(String existingToken) throws BadRequestException {
+        UserEntity userEntity = userRepo.getUserDetailsByToken(existingToken.replace(JwtProperties.TOKEN_PREFIX,""));
+        if (null == userEntity) {
+            throw new BadRequestException(ExceptionConstants.INVALID_USER_TOKEN);
+        }
+        String token = JWT.create()
+                .withSubject(userEntity.getMobileNumber().toString())
+                .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.EXPIRATION_TIME))
+                .sign(Algorithm.HMAC512(JwtProperties.SECRET.getBytes()));
+        userEntity.setToken(token);
+        userRepo.save(userEntity);
+        return token;
+    }
+
+    @Override
+    public String logout(String token) throws BadRequestException {
+        UserEntity userEntity = userRepo.getUserDetailsByToken(token.replace(JwtProperties.TOKEN_PREFIX,""));
+        if (null == userEntity) {
+            throw new BadRequestException(ExceptionConstants.INVALID_USER_TOKEN);
+        }
+        userEntity.setToken(null);
+        userRepo.save(userEntity);
+        return Constants.SUCCESS_STR;
     }
 
     @Override
@@ -282,9 +307,7 @@ public class UserServiceImpl implements UserService {
     public void checkIfRoleIsNotUser(UserEntity userEntity) throws BadRequestException {
         if (null == userEntity) {
             throw new BadRequestException(ExceptionConstants.INVALID_USER);
-        } /*else if (userEntity.getRoleEntitySet().contains(UserRoleEntity :: getRole)) {
-            throw new UnauthorizedException(ExceptionConstants.INVALID_USER_ACCESS);
-        }*/
+        }
     }
 
     @Override
@@ -334,4 +357,5 @@ public class UserServiceImpl implements UserService {
     private List<String> getUserInventory(Long userId) {
         return inventoryRepo.getAssignedCylinderByUserId(userId);
     }
+
 }

@@ -1,7 +1,9 @@
 package com.moderngas.advice;
 
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.moderngas.exception.BadRequestException;
 import com.moderngas.pojo.ResponseStatus;
+import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -54,6 +56,13 @@ public class ModernGasAdvice {
     public ResponseEntity<ResponseStatus> handleAccessDeniedException(AccessDeniedException accessDeniedException) {
         ResponseStatus status = new ResponseStatus();
         status.setStatus("Access Restricted");
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(status);
+    }
+
+    @ExceptionHandler({TokenExpiredException.class})
+    public ResponseEntity<ResponseStatus> handleTokenExpiredException(TokenExpiredException tokenExpiredException) {
+        ResponseStatus status = new ResponseStatus();
+        status.setStatus("Request Token Has Expired");
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(status);
     }
 
