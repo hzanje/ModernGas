@@ -44,8 +44,8 @@ public class EmployeeController {
         return employeeService.getAssignedCylinderByUserId(userId);
     }
 
-    @PutMapping("/fill")
-    public String fillCylinder() {
-        return null;
+    @PutMapping("/fill/{cylinderCode}")
+    public String fillCylinder(@PathVariable("cylinderCode") String cylinderCode) throws BadRequestException {
+        return employeeService.fillCylinder(cylinderCode);
     }
 }

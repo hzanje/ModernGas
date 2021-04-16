@@ -4,6 +4,7 @@ import com.moderngas.constants.Constants;
 import com.moderngas.constants.ExceptionConstants;
 import com.moderngas.enums.CylinderStatus;
 import com.moderngas.exception.BadRequestException;
+import com.moderngas.jpaentity.CylinderEntity;
 import com.moderngas.jpaentity.OrderEntity;
 import com.moderngas.jpaentity.UserEntity;
 import com.moderngas.pojo.admin.CylinderCodeListDto;
@@ -71,5 +72,16 @@ public class EmployeeServiceImpl implements EmployeeService {
             throw new BadRequestException(ExceptionConstants.INVALID_USER);
         }
         return inventoryRepo.getAssignedCylinderByUserId(userId);
+    }
+
+    @Override
+    public String fillCylinder(String cylinderCode) throws BadRequestException {
+        CylinderEntity cylinderEntity = inventoryRepo.checkIfCylinderCodeExist(cylinderCode);
+        if (null == cylinderEntity) {
+            throw new BadRequestException(ExceptionConstants.INVALID_CYLINDER_CODE);
+        }
+        cylinderEntity.setCylinderStatus(CylinderStatus.CYLINDER_STATUS_FILLED);
+        inventoryRepo.save(cylinderEntity);
+        return Constants.SUCCESS_STR;
     }
 }

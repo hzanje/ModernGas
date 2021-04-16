@@ -4,14 +4,17 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.moderngas.jpaentity.UserEntity;
+import com.moderngas.jpaentity.UserTokenEntity;
 import com.moderngas.pojo.LoginDto;
 import com.moderngas.repository.UserRepo;
+import io.jsonwebtoken.Jwts;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import javax.servlet.FilterChain;
@@ -21,6 +24,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
@@ -61,21 +66,28 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         /* Create JWT Token */
         /* If token already exist return same else create new token */
         UserEntity userEntity = userRepo.findByMobileNumber(Long.parseLong(principal.getUsername())).get();
-        String token = userEntity.getToken();
-        if (StringUtils.isEmpty(token)) {
-            token = JWT.create()
-                    .withSubject(principal.getUsername())
-                    .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.EXPIRATION_TIME))
-                    .sign(Algorithm.HMAC512(JwtProperties.SECRET.getBytes()));
-            saveUserToken(token, userEntity);
-        }
+        String token = JWT.create()
+                .withSubject(principal.getUsername())
+                .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.EXPIRATION_TIME))
+                .sign(Algorithm.HMAC512(JwtProperties.SECRET.getBytes()));
+        Date expiredDate = new Date(System.currentTimeMillis() + JwtProperties.EXPIRATION_TIME);
+        saveUserToken(token, expiredDate, userEntity);
 
         /* Add token in Response */
         response.addHeader(JwtProperties.HEADER_STRING, JwtProperties.TOKEN_PREFIX + token);
     }
 
-    private void saveUserToken(String token, UserEntity userEntity) {
-        userEntity.setToken(token);
+    private void saveUserToken(String token, Date expiredDate, UserEntity userEntity) {
+        UserTokenEntity tokenEntity = new UserTokenEntity();
+        tokenEntity.setToken(token);
+        tokenEntity.setExpiredDate(expiredDate);
+
+        Set<UserTokenEntity> tokenEntitySet = userEntity.getUserTokenSet();
+        if (CollectionUtils.isEmpty(tokenEntitySet)) {
+            tokenEntitySet = new HashSet<>();
+        }
+        tokenEntitySet.add(tokenEntity);
+        userEntity.setUserTokenSet(tokenEntitySet);
         userRepo.save(userEntity);
     }
 }

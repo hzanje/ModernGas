@@ -33,13 +33,13 @@ public class UserEntity extends BaseEntity {
     @Column(name = "employer_id")
     private Long employerId;
 
-    @Lob
-    @Column(name = "token")
-    private String token;
-
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     private Set<UserRoleEntity> roleEntitySet;
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
+    private Set<UserTokenEntity> userTokenSet;
 
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "addressId", referencedColumnName = "id")

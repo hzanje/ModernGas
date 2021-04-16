@@ -27,10 +27,11 @@ public interface UserRepo extends JpaRepository<UserEntity, Long> {
             "FROM UserEntity u WHERE u.id = :id")
     UserDetails getUserDetailsForAdmin(@Param("id") Long id);
 
-    @Query("SELECT CASE  WHEN count(u)> 0 THEN true ELSE false END FROM UserEntity u WHERE u.token = :token")
+    @Query("SELECT CASE  WHEN count(u)> 0 THEN true ELSE false END FROM UserEntity u INNER JOIN u.userTokenSet ut " +
+            " WHERE ut.token = :token")
     boolean isTokenExist(@Param("token") String token);
 
-    @Query("FROM UserEntity u WHERE u.token = :token")
+    @Query("FROM UserEntity u INNER JOIN u.userTokenSet ut WHERE ut.token = :token")
     UserEntity getUserDetailsByToken(@Param("token") String existingToken);
 
     class QUERIES {

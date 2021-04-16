@@ -16,6 +16,7 @@ import com.moderngas.jpaentity.GasMaster;
 import com.moderngas.jpaentity.OrderEntity;
 import com.moderngas.jpaentity.UserEntity;
 import com.moderngas.jpaentity.UserRoleEntity;
+import com.moderngas.jpaentity.UserTokenEntity;
 import com.moderngas.pojo.admin.DeliveryVehicleDto;
 import com.moderngas.pojo.admin.UserDetails;
 import com.moderngas.pojo.user.GasDto;
@@ -49,6 +50,7 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -267,7 +269,14 @@ public class UserServiceImpl implements UserService {
                 .withSubject(userEntity.getMobileNumber().toString())
                 .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.EXPIRATION_TIME))
                 .sign(Algorithm.HMAC512(JwtProperties.SECRET.getBytes()));
-        userEntity.setToken(token);
+
+        Set<UserTokenEntity> userTokenSet = userEntity.getUserTokenSet()
+                .stream().filter(t -> t.getExpiredDate().after(new Date())).collect(Collectors.toSet());
+        UserTokenEntity tokenEntity = new UserTokenEntity();
+        tokenEntity.setToken(token);
+        tokenEntity.setExpiredDate(new Date(System.currentTimeMillis() + JwtProperties.EXPIRATION_TIME));
+        userTokenSet.add(tokenEntity);
+        userEntity.setUserTokenSet(userTokenSet);
         userRepo.save(userEntity);
         return token;
     }
@@ -278,7 +287,9 @@ public class UserServiceImpl implements UserService {
         if (null == userEntity) {
             throw new BadRequestException(ExceptionConstants.INVALID_USER_TOKEN);
         }
-        userEntity.setToken(null);
+        Set<UserTokenEntity> userTokenSet = userEntity.getUserTokenSet()
+                .stream().filter(t -> t.getExpiredDate().after(new Date())).collect(Collectors.toSet());
+        userEntity.setUserTokenSet(userTokenSet);
         userRepo.save(userEntity);
         return Constants.SUCCESS_STR;
     }

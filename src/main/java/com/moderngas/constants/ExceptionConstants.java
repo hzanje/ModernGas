@@ -8,6 +8,7 @@ public class ExceptionConstants {
     public static final String INVALID_CART = "Please enter valid Cart Id";
     public static final String INVALID_STATUS = "Please enter valid Status Id";
     public static final String INVALID_REQUEST_DATA = "Please enter valid request Data";
-    public static final String INVALID_USER_ACCESS = "Current User does not access for this feature";
+    public static final String INVALID_USER_ACCESS = "Restricted User Access";
     public static final String INVALID_GAS = "Please enter valid Gas Id";
+    public static final String INVALID_CYLINDER_CODE = "Please enter valid Cylinder Code";
 }
