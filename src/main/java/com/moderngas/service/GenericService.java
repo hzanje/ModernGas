@@ -1,6 +1,7 @@
 package com.moderngas.service;
 
 import com.moderngas.enums.OrderStatus;
+import com.moderngas.exception.BadRequestException;
 import com.moderngas.jpaentity.AddressEntity;
 import com.moderngas.jpaentity.CartEntity;
 import com.moderngas.jpaentity.CategoryMaster;
@@ -9,6 +10,7 @@ import com.moderngas.jpaentity.OrderEntity;
 import com.moderngas.jpaentity.UserEntity;
 import com.moderngas.pojo.admin.DeliveryVehicleDto;
 import com.moderngas.pojo.admin.FilterDto;
+import com.moderngas.pojo.superadmin.AdminEntityDto;
 import com.moderngas.pojo.user.AddressDto;
 import com.moderngas.pojo.user.CartDto;
 import com.moderngas.pojo.user.OrderDto;
@@ -21,6 +23,8 @@ import java.util.List;
 public interface GenericService {
 
     UserEntity convertDtoToUserData(UserEntityDto userEntityDto);
+
+    UserEntity convertDtoToUserData(AdminEntityDto adminEntityDto) throws BadRequestException;
 
     UserEntityDto convertUserDataToDto(UserEntity clientEntity);
 

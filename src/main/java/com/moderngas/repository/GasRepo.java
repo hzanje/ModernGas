@@ -23,4 +23,7 @@ public interface GasRepo extends JpaRepository<GasMaster,Long> {
 
     @Query("SELECT new com.moderngas.pojo.NameIdDto(gm.id, gm.name) FROM GasMaster gm WHERE gm.categoryMaster.id = :categoryId AND activeFlag = 1")
     List<NameIdDto> getGasMasterByCategoryId(@Param("categoryId") Long categoryId);
+
+    @Query("FROM GasMaster gm WHERE gm.name IN (:gasNames)")
+    List<GasMaster> getGasMasterByNameList(@Param("gasNames") List<String> gasNames);
 }

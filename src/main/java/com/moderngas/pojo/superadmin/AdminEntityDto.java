@@ -1,12 +1,11 @@
-package com.moderngas.pojo.user;
-
+package com.moderngas.pojo.superadmin;
 
 import lombok.Data;
 
 import java.util.List;
 
 @Data
-public class UserEntityDto {
+public class AdminEntityDto {
 
     private Long id;
 
@@ -22,9 +21,8 @@ public class UserEntityDto {
 
     private String contactPerson;
 
-    private List<String> role;
+    private List<String> roles;
 
-    private Long employerId;
-
+    private List<String> gasNames;
 
 }

@@ -1,19 +1,16 @@
 package com.moderngas.service.serviceImpl;
 
 import com.moderngas.constants.Constants;
+import com.moderngas.constants.ExceptionConstants;
 import com.moderngas.enums.CylinderType;
 import com.moderngas.enums.OrderStatus;
 import com.moderngas.enums.UserRole;
-import com.moderngas.jpaentity.AddressEntity;
-import com.moderngas.jpaentity.CartEntity;
-import com.moderngas.jpaentity.CategoryMaster;
-import com.moderngas.jpaentity.DeliveryVehicle;
-import com.moderngas.jpaentity.OrderEntity;
-import com.moderngas.jpaentity.UserEntity;
-import com.moderngas.jpaentity.UserRoleEntity;
+import com.moderngas.exception.BadRequestException;
+import com.moderngas.jpaentity.*;
 import com.moderngas.pojo.DateStatusDto;
 import com.moderngas.pojo.admin.DeliveryVehicleDto;
 import com.moderngas.pojo.admin.FilterDto;
+import com.moderngas.pojo.superadmin.AdminEntityDto;
 import com.moderngas.pojo.user.AddressDto;
 import com.moderngas.pojo.user.CartDto;
 import com.moderngas.pojo.user.OrderDto;
@@ -65,14 +62,51 @@ public class GenericServiceImpl implements GenericService {
         return userEntity;
     }
 
-    private Set<UserRoleEntity> addUserRole(String role) {
-        if (StringUtils.isEmpty(role)) {
+    @Override
+    public UserEntity convertDtoToUserData(AdminEntityDto adminEntityDto) throws BadRequestException {
+        UserEntity userEntity = null;
+        if (StringUtils.isEmpty(adminEntityDto.getEmail())) {
+            throw new BadRequestException(ExceptionConstants.USER_ALREADY_EXIST);
+        }
+        if (CollectionUtils.isEmpty(adminEntityDto.getGasNames())) {
+            throw new BadRequestException(ExceptionConstants.ADMIN_GAS_IS_EMPTY);
+        }
+        if (null != adminEntityDto) {
+            userEntity = new UserEntity();
+            userEntity.setName(adminEntityDto.getName());
+            userEntity.setEmail(adminEntityDto.getEmail());
+            userEntity.setMobileNumber(adminEntityDto.getMobileNumber());
+            userEntity.setCompanyName(adminEntityDto.getCompanyName());
+            userEntity.setRoleEntitySet(addUserRole(adminEntityDto.getRoles()));
+            userEntity.setContactPerson(adminEntityDto.getContactPerson());
+            userEntity.setAdminGasMappings(gasMappingByName(adminEntityDto.getGasNames()));
+        }
+        return userEntity;
+    }
+
+    private Set<AdminGasMapping> gasMappingByName(List<String> gasNames) {
+        Set<AdminGasMapping> adminGasMappingSet = new HashSet<>();
+        List<GasMaster> gasMasterList = gasRepo.getGasMasterByNameList(gasNames);
+        for (GasMaster gasMaster : gasMasterList) {
+            AdminGasMapping adminGasMapping  = new AdminGasMapping();
+            adminGasMapping.setGasId(gasMaster.getId());
+            adminGasMapping.setGasName(gasMaster.getName());
+            adminGasMapping.setDescription(gasMaster.getDescription());
+            adminGasMappingSet.add(adminGasMapping);
+        }
+        return adminGasMappingSet;
+    }
+
+    private Set<UserRoleEntity> addUserRole(List<String> roles) {
+        if (CollectionUtils.isEmpty(roles)) {
             return null;
         }
         Set<UserRoleEntity> userRoleEntitySet = new HashSet<>();
-        UserRoleEntity userRole = new UserRoleEntity();
-        userRole.setRole(UserRole.getByRole(role).getRole());
-        userRoleEntitySet.add(userRole);
+        for (String role : roles) {
+            UserRoleEntity userRole = new UserRoleEntity();
+            userRole.setRole(UserRole.getByRole(role).getRole());
+            userRoleEntitySet.add(userRole);
+        }
         return userRoleEntitySet;
     }
 
@@ -85,7 +119,8 @@ public class GenericServiceImpl implements GenericService {
             userEntityDto.setEmail(userEntity.getEmail());
             userEntityDto.setMobileNumber(userEntity.getMobileNumber());
             userEntityDto.setCompanyName(userEntity.getCompanyName());
-            userEntityDto.setRole(userEntity.getRoleEntitySet().stream().map(UserRoleEntity::getRole).collect(Collectors.joining()));
+            userEntityDto.setRole(userEntity.getRoleEntitySet()
+                    .stream().map(UserRoleEntity::getRole).collect(Collectors.toList()));
             userEntityDto.setContactPerson(userEntity.getContactPerson());
             return userEntityDto;
         }
