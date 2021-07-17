@@ -107,6 +107,7 @@ public class UserServiceImpl implements UserService {
         	tempUser.setName(userEntity.getName());
         	tempUser.setEmail(userEntity.getEmail());
         	tempUser.setCompanyName(userEntity.getCompanyName());
+
             userRepo.save(tempUser);
             response = Constants.SUCCESS_STR;
         }
@@ -173,11 +174,11 @@ public class UserServiceImpl implements UserService {
         log.info("UserService >> Forget Password by User: {}", userName);
         String result = Constants.FAILURE_STR;
         /* Check if User Exits */
-        Optional<UserEntity> entity=userRepo.findByMobileNumber(userName);
-        if(!entity.isPresent()) {
+        Optional<UserEntity> user =userRepo.findByMobileNumber(userName);
+        if(!user.isPresent()) {
             throw new BadRequestException(ExceptionConstants.INVALID_USER);
         }
-        UserEntity userEntity = entity.get();
+        UserEntity userEntity = user.get();
         try {
             if (null != userEntity && null != userEntity.getEmail()) {
                 String tempPassword = genericService.generateRandomPassword();
@@ -188,8 +189,10 @@ public class UserServiceImpl implements UserService {
 
                 /* Update user with random password */
                 userEntity.setPassword(passwordEncoder.encode(tempPassword));
-                result = updateUser(userEntity);
-
+                userEntity.setOnboarding(false);
+                userEntity.setForgetPassword(false);
+                userRepo.save(userEntity);
+                result = Constants.SUCCESS_STR;
             }
         } catch (Exception e) {
             e.printStackTrace();

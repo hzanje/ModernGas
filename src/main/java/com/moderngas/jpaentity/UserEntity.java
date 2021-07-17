@@ -33,6 +33,9 @@ public class UserEntity extends BaseEntity {
     @Column(name = "is_onboarding", columnDefinition = "tinyint(1) DEFAULT 1" )
     protected boolean isOnboarding = true;
 
+    @Column(name = "is_forget_password", columnDefinition = "tinyint(1) DEFAULT 0")
+    private boolean isForgetPassword = false;
+
     @Column(name = "employer_id")
     private Long employerId;
 

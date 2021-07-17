@@ -26,5 +26,9 @@ public class UserEntityDto {
 
     private Long employerId;
 
+    private boolean isForgetPassword;
+
+    private boolean isOnboarding;
+
 
 }

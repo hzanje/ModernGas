@@ -1,1 +1,0 @@
-ALTER TABLE `user` ADD COLUMN `is_onboarding` tinyint(1) NOT NULL DEFAULT '1' AFTER `employer_id`;
