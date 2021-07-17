@@ -22,18 +22,14 @@ import com.moderngas.repository.GasRepo;
 import com.moderngas.repository.UserRepo;
 import com.moderngas.service.GenericService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -72,7 +68,11 @@ public class GenericServiceImpl implements GenericService {
         if (StringUtils.isEmpty(adminEntityDto.getMobileNumber())) {
             throw new BadRequestException(ExceptionConstants.USER_MOBILE_IS_EMPTY);
         }
-        UserEntity userEntity = userRepo.findByMobileNumber(adminEntityDto.getMobileNumber()).get();
+        UserEntity userEntity = new UserEntity();
+        Optional<UserEntity> user = userRepo.findByMobileNumber(adminEntityDto.getMobileNumber());
+        if (user.isPresent()) {
+            userEntity = user.get();
+        }
         if (StringUtils.isEmpty(adminEntityDto.getEmail())) {
             throw new BadRequestException(ExceptionConstants.USER_EMAIL_IS_EMPTY);
         }
@@ -81,9 +81,6 @@ public class GenericServiceImpl implements GenericService {
         }
         if (CollectionUtils.isEmpty(adminEntityDto.getGasNameCylinderTypes())) {
             throw new BadRequestException(ExceptionConstants.ADMIN_GAS_IS_EMPTY);
-        }
-        if (null == userEntity) {
-            userEntity = new UserEntity();
         }
         userEntity.setName(adminEntityDto.getName());
         userEntity.setEmail(adminEntityDto.getEmail());
