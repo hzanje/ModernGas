@@ -163,7 +163,10 @@ public class UserServiceImpl implements UserService {
             userEntity = optionalUserEntity.get();
             if (passwordEncoder.matches(oldPassword, userEntity.getPassword())) {
                 userEntity.setPassword(passwordEncoder.encode(newPassword));
-                result = updateUser(userEntity);
+                userEntity.setOnboarding(false);
+                userEntity.setForgetPassword(false);
+                userRepo.save(userEntity);
+                result = Constants.SUCCESS_STR;
             }
         }
         return result;
@@ -189,8 +192,7 @@ public class UserServiceImpl implements UserService {
 
                 /* Update user with random password */
                 userEntity.setPassword(passwordEncoder.encode(tempPassword));
-                userEntity.setOnboarding(false);
-                userEntity.setForgetPassword(false);
+                userEntity.setForgetPassword(true);
                 userRepo.save(userEntity);
                 result = Constants.SUCCESS_STR;
             }

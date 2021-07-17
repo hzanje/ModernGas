@@ -7,7 +7,7 @@ import java.util.List;
 @Data
 public class GasNameCylinderTypeDto {
 
-    private String name;
+    private Long id;
 
     private List<String> types;
 }

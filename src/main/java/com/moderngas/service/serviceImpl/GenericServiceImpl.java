@@ -100,11 +100,12 @@ public class GenericServiceImpl implements GenericService {
             return null;
         }
         Set<AdminGasMapping> adminGasMappingSet = new HashSet<>();
-        List<GasMaster> gasMasterList = gasRepo.getGasMasterByNameList(
-                gasNameCylinderTypes.stream().map(e -> e.getName()).collect(Collectors.toList()));
+        List<GasMaster> gasMasterList = gasRepo.getGasMasterByIdList(
+                gasNameCylinderTypes.stream().map(e -> e.getId()).collect(Collectors.toList()));
+
         for (GasNameCylinderTypeDto nameType : gasNameCylinderTypes) {
             GasMaster gasMaster = gasMasterList.stream().filter(
-                    g -> g.getName().equals(nameType.getName())).findFirst().get();
+                    g -> g.getId().equals(nameType.getId())).findFirst().get();
             AdminGasMapping adminGasMapping  = new AdminGasMapping();
             adminGasMapping.setGasId(gasMaster.getId());
             adminGasMapping.setGasName(gasMaster.getName());
