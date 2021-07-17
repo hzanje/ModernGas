@@ -30,4 +30,9 @@ public class MasterController {
     public List<String> getCylinderType() {
         return masterService.getCylinderType();
     }
+
+    @GetMapping("/gas")
+    public List<NameIdDto> getGasList() {
+        return masterService.getGasList();
+    }
 }

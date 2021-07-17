@@ -10,6 +10,7 @@ import com.moderngas.jpaentity.OrderEntity;
 import com.moderngas.jpaentity.UserEntity;
 import com.moderngas.pojo.admin.DeliveryVehicleDto;
 import com.moderngas.pojo.admin.FilterDto;
+import com.moderngas.pojo.admin.OnboardingDto;
 import com.moderngas.pojo.superadmin.AdminEntityDto;
 import com.moderngas.pojo.user.AddressDto;
 import com.moderngas.pojo.user.CartDto;
@@ -54,4 +55,5 @@ public interface GenericService {
 
     DeliveryVehicle convertDtoToDeliveryVehicle(DeliveryVehicleDto deliveryVehicleDto);
 
+    List<OnboardingDto> convertUserDateToOnboardingList(UserEntity userEntity) throws BadRequestException;
 }

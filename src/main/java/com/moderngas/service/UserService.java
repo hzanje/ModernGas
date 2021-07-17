@@ -4,6 +4,7 @@ import com.moderngas.exception.BadRequestException;
 import com.moderngas.jpaentity.AddressEntity;
 import com.moderngas.jpaentity.UserEntity;
 import com.moderngas.pojo.admin.DeliveryVehicleDto;
+import com.moderngas.pojo.admin.OnboardingDto;
 import com.moderngas.pojo.admin.OrderDto;
 import com.moderngas.pojo.admin.UserDetails;
 import com.moderngas.pojo.user.GasDto;
@@ -60,4 +61,6 @@ public interface UserService {
     UserDetails getUserDetailsForAdmin(Long id) throws BadRequestException;
 
     String logout(String token) throws BadRequestException;
+
+    List<OnboardingDto> getAdminOnboardingDetails(Long id) throws BadRequestException;
 }

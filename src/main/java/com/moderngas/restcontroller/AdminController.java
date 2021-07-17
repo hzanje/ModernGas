@@ -4,12 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.moderngas.exception.BadRequestException;
 import com.moderngas.pojo.ResponseStatus;
 import com.moderngas.pojo.NameIdDto;
-import com.moderngas.pojo.admin.CylinderCodeStatusDto;
-import com.moderngas.pojo.admin.DeliveryVehicleDto;
-import com.moderngas.pojo.admin.FilterDto;
-import com.moderngas.pojo.admin.InventoryCylinderDto;
-import com.moderngas.pojo.admin.OrderDto;
-import com.moderngas.pojo.admin.UserDetails;
+import com.moderngas.pojo.admin.*;
 import com.moderngas.pojo.user.UserEntityDto;
 import com.moderngas.pojo.user.UserSearchDto;
 import com.moderngas.service.GenericService;
@@ -138,6 +133,17 @@ public class AdminController {
     @GetMapping("/userOrder")
     public List<OrderDto> getUserOrder(@RequestParam("id") Long id) throws BadRequestException {
         return orderService.getUserOrderListForAdminInUserDetails(id);
+    }
+
+    //@Secured("ROLE_ADMIN")
+    @GetMapping("/onboarding")
+    public List<OnboardingDto> getAdminOnboardingDetails(@RequestParam("id") Long id) throws BadRequestException {
+        return userService.getAdminOnboardingDetails(id);
+    }
+
+    @PostMapping("/onBoarding")
+    public ResponseEntity<ResponseStatus> saveAdminOnBoardingDetails() {
+        return new ResponseEntity<>(new ResponseStatus("response"), HttpStatus.OK);
     }
 
 }

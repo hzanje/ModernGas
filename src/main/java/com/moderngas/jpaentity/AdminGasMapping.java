@@ -3,10 +3,8 @@ package com.moderngas.jpaentity;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Lob;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.util.Set;
 
 @Entity
 @Data
@@ -29,5 +27,8 @@ public class AdminGasMapping extends BaseEntity {
     @Column(name = "price")
     private Integer price;
 
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "admin_gas_id", referencedColumnName = "id", nullable = false)
+    private Set<AdminGasCylinderTypeMapping> adminGasCylinderTypeMapping;
 
 }

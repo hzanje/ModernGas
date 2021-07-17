@@ -10,14 +10,16 @@ import com.moderngas.jpaentity.*;
 import com.moderngas.pojo.DateStatusDto;
 import com.moderngas.pojo.admin.DeliveryVehicleDto;
 import com.moderngas.pojo.admin.FilterDto;
+import com.moderngas.pojo.admin.OnboardingDto;
 import com.moderngas.pojo.superadmin.AdminEntityDto;
+import com.moderngas.pojo.superadmin.GasNameCylinderTypeDto;
 import com.moderngas.pojo.user.AddressDto;
 import com.moderngas.pojo.user.CartDto;
 import com.moderngas.pojo.user.OrderDto;
 import com.moderngas.pojo.user.UserDashboardDto;
 import com.moderngas.pojo.user.UserEntityDto;
-import com.moderngas.pojo.user.UserSearchDto;
 import com.moderngas.repository.GasRepo;
+import com.moderngas.repository.UserRepo;
 import com.moderngas.service.GenericService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +46,9 @@ public class GenericServiceImpl implements GenericService {
     @Autowired
     private GasRepo gasRepo;
 
+    @Autowired
+    private UserRepo userRepo;
+
     @Override
     public UserEntity convertDtoToUserData(UserEntityDto userEntityDto) {
         UserEntity userEntity = null;
@@ -64,37 +69,64 @@ public class GenericServiceImpl implements GenericService {
 
     @Override
     public UserEntity convertDtoToUserData(AdminEntityDto adminEntityDto) throws BadRequestException {
-        UserEntity userEntity = null;
-        if (StringUtils.isEmpty(adminEntityDto.getEmail())) {
-            throw new BadRequestException(ExceptionConstants.USER_ALREADY_EXIST);
+        if (StringUtils.isEmpty(adminEntityDto.getMobileNumber())) {
+            throw new BadRequestException(ExceptionConstants.USER_MOBILE_IS_EMPTY);
         }
-        if (CollectionUtils.isEmpty(adminEntityDto.getGasNames())) {
+        UserEntity userEntity = userRepo.findByMobileNumber(adminEntityDto.getMobileNumber()).get();
+        if (StringUtils.isEmpty(adminEntityDto.getEmail())) {
+            throw new BadRequestException(ExceptionConstants.USER_EMAIL_IS_EMPTY);
+        }
+        if (StringUtils.isEmpty(adminEntityDto.getRoles())) {
+            throw new BadRequestException(ExceptionConstants.USER_ROLE_IS_EMPTY);
+        }
+        if (CollectionUtils.isEmpty(adminEntityDto.getGasNameCylinderTypes())) {
             throw new BadRequestException(ExceptionConstants.ADMIN_GAS_IS_EMPTY);
         }
-        if (null != adminEntityDto) {
+        if (null == userEntity) {
             userEntity = new UserEntity();
-            userEntity.setName(adminEntityDto.getName());
-            userEntity.setEmail(adminEntityDto.getEmail());
-            userEntity.setMobileNumber(adminEntityDto.getMobileNumber());
-            userEntity.setCompanyName(adminEntityDto.getCompanyName());
-            userEntity.setRoleEntitySet(addUserRole(adminEntityDto.getRoles()));
-            userEntity.setContactPerson(adminEntityDto.getContactPerson());
-            userEntity.setAdminGasMappings(gasMappingByName(adminEntityDto.getGasNames()));
         }
+        userEntity.setName(adminEntityDto.getName());
+        userEntity.setEmail(adminEntityDto.getEmail());
+        userEntity.setMobileNumber(adminEntityDto.getMobileNumber());
+        userEntity.setCompanyName(adminEntityDto.getCompanyName());
+        userEntity.setRoleEntitySet(addUserRole(adminEntityDto.getRoles()));
+        userEntity.setContactPerson(adminEntityDto.getContactPerson());
+        userEntity.setAdminGasMappings(gasMappingByNameAndType(adminEntityDto.getGasNameCylinderTypes()));
         return userEntity;
     }
 
-    private Set<AdminGasMapping> gasMappingByName(List<String> gasNames) {
+    private Set<AdminGasMapping> gasMappingByNameAndType(List<GasNameCylinderTypeDto> gasNameCylinderTypes) {
+        if (CollectionUtils.isEmpty(gasNameCylinderTypes)) {
+            return null;
+        }
         Set<AdminGasMapping> adminGasMappingSet = new HashSet<>();
-        List<GasMaster> gasMasterList = gasRepo.getGasMasterByNameList(gasNames);
-        for (GasMaster gasMaster : gasMasterList) {
+        List<GasMaster> gasMasterList = gasRepo.getGasMasterByNameList(
+                gasNameCylinderTypes.stream().map(e -> e.getName()).collect(Collectors.toList()));
+        for (GasNameCylinderTypeDto nameType : gasNameCylinderTypes) {
+            GasMaster gasMaster = gasMasterList.stream().filter(
+                    g -> g.getName().equals(nameType.getName())).findFirst().get();
             AdminGasMapping adminGasMapping  = new AdminGasMapping();
             adminGasMapping.setGasId(gasMaster.getId());
             adminGasMapping.setGasName(gasMaster.getName());
             adminGasMapping.setDescription(gasMaster.getDescription());
+            if (!CollectionUtils.isEmpty(nameType.getTypes())) {
+                adminGasMapping.setAdminGasCylinderTypeMapping(getCylinderTypeSet(nameType.getTypes()));
+            }
             adminGasMappingSet.add(adminGasMapping);
         }
         return adminGasMappingSet;
+    }
+
+    private Set<AdminGasCylinderTypeMapping> getCylinderTypeSet(List<String> types) {
+        Set<AdminGasCylinderTypeMapping> selectedCylinderType = new HashSet<>();
+        for (String type : types) {
+            if (CylinderType.isExist(type)) {
+                AdminGasCylinderTypeMapping cylinderTypeMapping = new AdminGasCylinderTypeMapping();
+                cylinderTypeMapping.setCylinderType(CylinderType.getByStatus(type));
+                selectedCylinderType.add(cylinderTypeMapping);
+            }
+        }
+        return selectedCylinderType;
     }
 
     private Set<UserRoleEntity> addUserRole(List<String> roles) {
@@ -352,4 +384,27 @@ public class GenericServiceImpl implements GenericService {
         return deliveryVehicle;
     }
 
+    @Override
+    public List<OnboardingDto> convertUserDateToOnboardingList(UserEntity userEntity) throws BadRequestException {
+        List<OnboardingDto> onboardingDtoList = new ArrayList<>();
+        if (CollectionUtils.isEmpty(userEntity.getAdminGasMappings())) {
+            throw new BadRequestException(ExceptionConstants.GAS_LIST_IS_EMPTY);
+        }
+        Set<AdminGasMapping> adminGasMappings = userEntity.getAdminGasMappings();
+        for (AdminGasMapping adminGas : adminGasMappings) {
+            OnboardingDto onboardingDto = new OnboardingDto();
+            onboardingDto.setId(adminGas.getId());
+            onboardingDto.setGasId(adminGas.getGasId());
+            onboardingDto.setGasName(adminGas.getGasName());
+            onboardingDto.setDescription(adminGas.getDescription());
+            onboardingDto.setPrice(adminGas.getPrice());
+            onboardingDto.setCylinderTypeList(getCylinderType(adminGas.getAdminGasCylinderTypeMapping()));
+            onboardingDtoList.add(onboardingDto);
+        }
+        return onboardingDtoList;
+    }
+
+    private List<String> getCylinderType(Set<AdminGasCylinderTypeMapping> adminGasCylinderTypeMapping) {
+        return adminGasCylinderTypeMapping.stream().map(e -> e.getCylinderType().getName()).collect(Collectors.toList());
+    }
 }

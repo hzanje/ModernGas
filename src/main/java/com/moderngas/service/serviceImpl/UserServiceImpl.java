@@ -6,6 +6,7 @@ import com.moderngas.Security.JwtProperties;
 import com.moderngas.constants.Constants;
 import com.moderngas.constants.ExceptionConstants;
 import com.moderngas.enums.CylinderType;
+import com.moderngas.enums.UserRole;
 import com.moderngas.exception.BadRequestException;
 import com.moderngas.exception.UnauthorizedException;
 import com.moderngas.jpaentity.AddressEntity;
@@ -18,6 +19,7 @@ import com.moderngas.jpaentity.UserEntity;
 import com.moderngas.jpaentity.UserRoleEntity;
 import com.moderngas.jpaentity.UserTokenEntity;
 import com.moderngas.pojo.admin.DeliveryVehicleDto;
+import com.moderngas.pojo.admin.OnboardingDto;
 import com.moderngas.pojo.admin.UserDetails;
 import com.moderngas.pojo.user.GasDto;
 import com.moderngas.pojo.NameIdDto;
@@ -369,4 +371,16 @@ public class UserServiceImpl implements UserService {
         return inventoryRepo.getAssignedCylinderByUserId(userId);
     }
 
+    @Override
+    public List<OnboardingDto> getAdminOnboardingDetails(Long id) throws BadRequestException {
+        UserEntity userEntity = userRepo.findById(id).orElse(null);
+        if (null == userEntity) {
+            throw new BadRequestException(ExceptionConstants.INVALID_USER);
+        }
+        if (CollectionUtils.isEmpty(userEntity.getRoleEntitySet())) {
+            throw new BadRequestException(ExceptionConstants.INVALID_USER_ACCESS);
+        }
+        List<OnboardingDto> onboardingDtoList = genericService.convertUserDateToOnboardingList(userEntity);
+        return onboardingDtoList;
+    }
 }

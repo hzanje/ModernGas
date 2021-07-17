@@ -4,8 +4,10 @@ import com.moderngas.enums.CylinderStatus;
 import com.moderngas.enums.CylinderType;
 import com.moderngas.enums.OrderStatus;
 import com.moderngas.pojo.NameIdDto;
+import com.moderngas.repository.GasRepo;
 import com.moderngas.service.MasterService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -14,6 +16,9 @@ import java.util.List;
 @Slf4j
 @Service
 public class MasterServiceImpl implements MasterService {
+
+    @Autowired
+    private GasRepo gasRepo;
 
     @Override
     public List<NameIdDto> getOrderStatus() {
@@ -40,5 +45,11 @@ public class MasterServiceImpl implements MasterService {
             cylinderTypeList.add(cylinderType.getName());
         }
         return cylinderTypeList;
+    }
+
+    @Override
+    public List<NameIdDto> getGasList() {
+        List<NameIdDto> gasList = gasRepo.getGasMasterNameIdList();
+        return gasList;
     }
 }

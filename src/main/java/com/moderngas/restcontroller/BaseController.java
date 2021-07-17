@@ -24,8 +24,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 
 @RestController
-@RequestMapping(value = "/moderngas", produces = "application/json")
-public class GenericController {
+@RequestMapping(value = "/base", produces = "application/json")
+public class BaseController {
 
     @Autowired
     private UserService userService;

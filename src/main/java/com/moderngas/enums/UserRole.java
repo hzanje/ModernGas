@@ -5,7 +5,8 @@ import org.springframework.util.StringUtils;
 public enum UserRole {
 
     USER_ROLE_USER("ROLE_USER"),
-    USER_ROLE_ADMIN("ROLE_ADMIN");
+    USER_ROLE_ADMIN("ROLE_ADMIN"),
+    USER_ROLE_SUPER_ADMIN("ROLE_SUPER_ADMIN");
 
     private final String role;
 

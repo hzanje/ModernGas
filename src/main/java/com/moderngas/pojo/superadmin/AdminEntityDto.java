@@ -23,6 +23,6 @@ public class AdminEntityDto {
 
     private List<String> roles;
 
-    private List<String> gasNames;
+    private List<GasNameCylinderTypeDto> gasNameCylinderTypes;
 
 }

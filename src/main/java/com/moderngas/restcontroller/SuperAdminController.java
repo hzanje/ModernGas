@@ -7,6 +7,7 @@ import com.moderngas.service.SuperAdminService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,6 +20,7 @@ public class SuperAdminController {
     @Autowired
     private SuperAdminService superAdminService;
 
+    @Secured("ROLE_SUPER_ADMIN")
     @PostMapping("/createAdmin")
     public ResponseEntity<ResponseStatus> createAdmin(@RequestBody AdminEntityDto adminEntityDto) throws BadRequestException {
         String response = superAdminService.createAdmin(adminEntityDto);

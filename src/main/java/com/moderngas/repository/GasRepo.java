@@ -5,6 +5,7 @@ import com.moderngas.jpaentity.CategoryMaster;
 import com.moderngas.jpaentity.GasMaster;
 import com.moderngas.pojo.NameIdDto;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -26,4 +27,8 @@ public interface GasRepo extends JpaRepository<GasMaster,Long> {
 
     @Query("FROM GasMaster gm WHERE gm.name IN (:gasNames)")
     List<GasMaster> getGasMasterByNameList(@Param("gasNames") List<String> gasNames);
+
+    @Modifying
+    @Query("SELECT new com.moderngas.pojo.NameIdDto(gm.id, gm.name) FROM GasMaster gm")
+    List<NameIdDto> getGasMasterNameIdList();
 }
