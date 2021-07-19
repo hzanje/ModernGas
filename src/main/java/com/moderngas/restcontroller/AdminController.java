@@ -7,10 +7,7 @@ import com.moderngas.pojo.NameIdDto;
 import com.moderngas.pojo.admin.*;
 import com.moderngas.pojo.user.UserEntityDto;
 import com.moderngas.pojo.user.UserSearchDto;
-import com.moderngas.service.GenericService;
-import com.moderngas.service.OrderService;
-import com.moderngas.service.UserService;
-import com.moderngas.service.InventoryService;
+import com.moderngas.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -24,7 +21,6 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -51,6 +47,9 @@ public class AdminController {
 
     @Autowired
     private GenericService genericService;
+
+    @Autowired
+    private AdminService adminService;
 
     @Secured("ROLE_ADMIN")
     @GetMapping("/order")
@@ -138,11 +137,12 @@ public class AdminController {
     //@Secured("ROLE_ADMIN")
     @GetMapping("/onboarding")
     public List<OnboardingDto> getAdminOnboardingDetails(@RequestParam("id") Long id) throws BadRequestException {
-        return userService.getAdminOnboardingDetails(id);
+        return adminService.getOnboardingDetails(id);
     }
 
-    @PostMapping("/onBoarding")
-    public ResponseEntity<ResponseStatus> saveAdminOnBoardingDetails() {
+    @PostMapping("/onboarding")
+    public ResponseEntity<ResponseStatus> saveAdminOnBoardingDetails(@RequestBody OnboardingDtoList onboardingDtoList) throws BadRequestException {
+        String response = adminService.saveOnBoardingDetails(onboardingDtoList);
         return new ResponseEntity<>(new ResponseStatus("response"), HttpStatus.OK);
     }
 

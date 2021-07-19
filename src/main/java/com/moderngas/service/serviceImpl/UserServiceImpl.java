@@ -146,28 +146,23 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserEntity getUserByLoginId(Long username) {
-        Optional<UserEntity> userEntity = userRepo.findByMobileNumber(username);
-        if (userEntity.isPresent()) {
-            return userEntity.get();
-        }
-        return null;
+        return userRepo.findByMobileNumber(username).orElse(null);
     }
 
     @Override
-    public String changePassword(Long username, String oldPassword, String newPassword) {
+    public String changePassword(Long username, String oldPassword, String newPassword) throws BadRequestException {
         log.info("UserService >> Changes password for User: {}", username);
         String result = Constants.FAILURE_STR;
-        UserEntity userEntity;
-        Optional<UserEntity> optionalUserEntity = userRepo.findByMobileNumber(username);
-        if (optionalUserEntity.isPresent()) {
-            userEntity = optionalUserEntity.get();
-            if (passwordEncoder.matches(oldPassword, userEntity.getPassword())) {
-                userEntity.setPassword(passwordEncoder.encode(newPassword));
-                userEntity.setOnboarding(false);
-                userEntity.setForgetPassword(false);
-                userRepo.save(userEntity);
-                result = Constants.SUCCESS_STR;
-            }
+        UserEntity userEntity = userRepo.findByMobileNumber(username).orElse(null);
+        if (null == userEntity) {
+            throw new BadRequestException(ExceptionConstants.INVALID_USER);
+        }
+        if (passwordEncoder.matches(oldPassword, userEntity.getPassword())) {
+            userEntity.setPassword(passwordEncoder.encode(newPassword));
+            userEntity.setOnboarding(false);
+            userEntity.setForgetPassword(false);
+            userRepo.save(userEntity);
+            result = Constants.SUCCESS_STR;
         }
         return result;
     }
@@ -177,11 +172,10 @@ public class UserServiceImpl implements UserService {
         log.info("UserService >> Forget Password by User: {}", userName);
         String result = Constants.FAILURE_STR;
         /* Check if User Exits */
-        Optional<UserEntity> user =userRepo.findByMobileNumber(userName);
-        if(!user.isPresent()) {
+        UserEntity userEntity =userRepo.findByMobileNumber(userName).orElse(null);
+        if(null == userEntity) {
             throw new BadRequestException(ExceptionConstants.INVALID_USER);
         }
-        UserEntity userEntity = user.get();
         try {
             if (null != userEntity && null != userEntity.getEmail()) {
                 String tempPassword = genericService.generateRandomPassword();
@@ -376,16 +370,4 @@ public class UserServiceImpl implements UserService {
         return inventoryRepo.getAssignedCylinderByUserId(userId);
     }
 
-    @Override
-    public List<OnboardingDto> getAdminOnboardingDetails(Long id) throws BadRequestException {
-        UserEntity userEntity = userRepo.findById(id).orElse(null);
-        if (null == userEntity) {
-            throw new BadRequestException(ExceptionConstants.INVALID_USER);
-        }
-        if (CollectionUtils.isEmpty(userEntity.getRoleEntitySet())) {
-            throw new BadRequestException(ExceptionConstants.INVALID_USER_ACCESS);
-        }
-        List<OnboardingDto> onboardingDtoList = genericService.convertUserDateToOnboardingList(userEntity);
-        return onboardingDtoList;
-    }
 }

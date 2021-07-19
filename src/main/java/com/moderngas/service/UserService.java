@@ -34,7 +34,7 @@ public interface UserService {
 
     UserEntity getUserByLoginId(Long username);
 
-    String changePassword(Long username, String oldPassword, String newPassword);
+    String changePassword(Long username, String oldPassword, String newPassword) throws BadRequestException;
 
     String forgetPassword(Long userName) throws BadRequestException;
 
@@ -61,6 +61,4 @@ public interface UserService {
     UserDetails getUserDetailsForAdmin(Long id) throws BadRequestException;
 
     String logout(String token) throws BadRequestException;
-
-    List<OnboardingDto> getAdminOnboardingDetails(Long id) throws BadRequestException;
 }
