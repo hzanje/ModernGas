@@ -54,7 +54,7 @@ public class UserController {
     @PostMapping(value = "/changePassword")
     public ResponseEntity<ResponseStatus> changePassword(@RequestParam("userName") final Long username,
                                                          @RequestParam("oldPassword") final String oldPassword,
-                                                         @RequestParam("newPassword") final String newPassword) {
+                                                         @RequestParam("newPassword") final String newPassword) throws BadRequestException {
         String response = userService.changePassword(username, oldPassword, newPassword);
         return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
     }
@@ -82,7 +82,7 @@ public class UserController {
 
     @PostMapping(value = "/updateAddress")
     public ResponseEntity<ResponseStatus> updateAddress(@RequestBody AddressDto addressDtoStr,
-                                                        @RequestParam("userId") final Long userId) {
+                                                        @RequestParam("userId") final Long userId) throws BadRequestException {
         String response = userService.updateAddress(genericService.convertDtoToAddressEntity(addressDtoStr), userId);
         return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
     }

@@ -6,9 +6,7 @@ import com.moderngas.Security.JwtProperties;
 import com.moderngas.constants.Constants;
 import com.moderngas.constants.ExceptionConstants;
 import com.moderngas.enums.CylinderType;
-import com.moderngas.enums.UserRole;
 import com.moderngas.exception.BadRequestException;
-import com.moderngas.exception.UnauthorizedException;
 import com.moderngas.jpaentity.AddressEntity;
 import com.moderngas.jpaentity.CategoryMaster;
 import com.moderngas.jpaentity.DeliveryVehicle;
@@ -16,10 +14,8 @@ import com.moderngas.jpaentity.GasImageEntity;
 import com.moderngas.jpaentity.GasMaster;
 import com.moderngas.jpaentity.OrderEntity;
 import com.moderngas.jpaentity.UserEntity;
-import com.moderngas.jpaentity.UserRoleEntity;
 import com.moderngas.jpaentity.UserTokenEntity;
 import com.moderngas.pojo.admin.DeliveryVehicleDto;
-import com.moderngas.pojo.admin.OnboardingDto;
 import com.moderngas.pojo.admin.UserDetails;
 import com.moderngas.pojo.user.GasDto;
 import com.moderngas.pojo.NameIdDto;
@@ -41,7 +37,6 @@ import net.minidev.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -127,10 +122,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserEntityDto getUserById(Long userId) throws BadRequestException {
-        UserEntity userEntity = userRepo.findById(userId).orElse(null);
-        if (null == userEntity) {
-            throw new BadRequestException(ExceptionConstants.INVALID_USER);
-        }
+        UserEntity userEntity = userRepo.findById(userId)
+                .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER));
         return genericService.convertUserDataToDto(userEntity);
     }
 
@@ -153,10 +146,8 @@ public class UserServiceImpl implements UserService {
     public String changePassword(Long username, String oldPassword, String newPassword) throws BadRequestException {
         log.info("UserService >> Changes password for User: {}", username);
         String result = Constants.FAILURE_STR;
-        UserEntity userEntity = userRepo.findByMobileNumber(username).orElse(null);
-        if (null == userEntity) {
-            throw new BadRequestException(ExceptionConstants.INVALID_USER);
-        }
+        UserEntity userEntity = userRepo.findByMobileNumber(username)
+                .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER));
         if (passwordEncoder.matches(oldPassword, userEntity.getPassword())) {
             userEntity.setPassword(passwordEncoder.encode(newPassword));
             userEntity.setOnboarding(false);
@@ -172,10 +163,8 @@ public class UserServiceImpl implements UserService {
         log.info("UserService >> Forget Password by User: {}", userName);
         String result = Constants.FAILURE_STR;
         /* Check if User Exits */
-        UserEntity userEntity =userRepo.findByMobileNumber(userName).orElse(null);
-        if(null == userEntity) {
-            throw new BadRequestException(ExceptionConstants.INVALID_USER);
-        }
+        UserEntity userEntity =userRepo.findByMobileNumber(userName)
+                .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER));
         try {
             if (null != userEntity && null != userEntity.getEmail()) {
                 String tempPassword = genericService.generateRandomPassword();
@@ -231,32 +220,25 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String updateAddress(AddressEntity addressEntity, Long userId) {
-        String response = Constants.FAILURE_STR;
-        Optional<UserEntity> optionalUser = userRepo.findById(userId);
-        if (optionalUser.isPresent()) {
-            UserEntity userEntity = optionalUser.get();
-            userEntity.setAddressEntity(addressEntity);
-            userRepo.save(userEntity);
-            response = Constants.SUCCESS_STR;
-        }
-        return response;
+    public String updateAddress(AddressEntity addressEntity, Long userId) throws BadRequestException {
+        UserEntity userEntity = userRepo.findById(userId)
+                .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER));
+        userEntity.setAddressEntity(addressEntity);
+        userRepo.save(userEntity);
+        return Constants.SUCCESS_STR;
     }
 
 	@Override
-	public JSONObject getAddress(Long userId) {
-		Optional<UserEntity> optional=userRepo.findById(userId);
+	public JSONObject getAddress(Long userId) throws BadRequestException {
+		UserEntity userEntity = userRepo.findById(userId)
+                .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER));
 		JSONObject obj=new JSONObject();
-		if (optional.isPresent()) {
-			AddressEntity address=optional.get().getAddressEntity();
-			if (address==null) {
-				obj.put("message", "Address does not exist");
-			} else {
-				obj.put("address", genericService.convertAddressEntityToDto(address));
-			}
-		} else {
-			obj.put("message", "User does not exists");
-		}
+        AddressEntity address = userEntity.getAddressEntity();
+        if (address==null) {
+            obj.put("message", "Address does not exist");
+        } else {
+            obj.put("address", genericService.convertAddressEntityToDto(address));
+        }
 		return obj;
 	}
 
@@ -297,10 +279,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public GasDto getGasDetailsById(Long id) throws BadRequestException {
-        GasMaster gasMaster = gasRepo.findById(id).orElse(null);
-        if (null == gasMaster) {
-            throw new BadRequestException(ExceptionConstants.INVALID_GAS);
-        }
+        GasMaster gasMaster = gasRepo.findById(id)
+                .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_GAS));
         GasDto gasDto = new GasDto();
         gasDto.setId(gasMaster.getId());
         gasDto.setName(gasMaster.getName());
@@ -327,7 +307,8 @@ public class UserServiceImpl implements UserService {
         if (null == deliveryVehicleDto) {
             throw new BadRequestException(ExceptionConstants.INVALID_REQUEST_DATA);
         }
-        UserEntity userEntity = userRepo.findById(deliveryVehicleDto.getUserId()).orElse(null);
+        UserEntity userEntity = userRepo.findById(deliveryVehicleDto.getUserId())
+                .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER));
         DeliveryVehicle deliveryVehicle = genericService.convertDtoToDeliveryVehicle(deliveryVehicleDto);
         deliveryVehicleRepo.save(deliveryVehicle);
         return Constants.SUCCESS_STR;
@@ -348,13 +329,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDetails getUserDetailsForAdmin(Long id) throws BadRequestException {
-        UserEntity userEntity = userRepo.findById(id).orElse(null);
-        if (null == userEntity) {
-            throw new BadRequestException(ExceptionConstants.INVALID_USER);
-        }
-        UserDetails userDetails = userRepo.getUserDetailsForAdmin(id);
-        userDetails.setAssignedCylinder(getUserInventory(id));
-        userDetails.setTotalOrders(getUserOrdersCount(id));
+        UserEntity userEntity = userRepo.findById(id)
+                .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER));
+        UserDetails userDetails = userRepo.getUserDetailsForAdmin(userEntity.getId());
+        userDetails.setAssignedCylinder(getUserInventory(userEntity.getId()));
+        userDetails.setTotalOrders(getUserOrdersCount(userEntity.getId()));
         return userDetails;
     }
 

@@ -36,10 +36,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public String assignCylinderToUser(Long orderId, CylinderCodeListDto codeListDto) throws BadRequestException {
-        OrderEntity orderEntity = orderRepo.findById(orderId).orElse(null);
-        if (null == orderEntity) {
-            throw new BadRequestException(ExceptionConstants.INVALID_ORDER);
-        }
+        OrderEntity orderEntity = orderRepo.findById(orderId)
+                .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_ORDER));
         if (null == codeListDto || CollectionUtils.isEmpty(codeListDto.getCylinderCodes())) {
             throw new BadRequestException(ExceptionConstants.INVALID_REQUEST_DATA);
         }
@@ -49,10 +47,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public String receiveCylinderFromUser(Long orderId, CylinderCodeListDto codeListDto) throws BadRequestException {
-        OrderEntity orderEntity = orderRepo.findById(orderId).orElse(null);
-        if (null == orderEntity) {
-            throw new BadRequestException(ExceptionConstants.INVALID_ORDER);
-        }
+        OrderEntity orderEntity = orderRepo.findById(orderId)
+                .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_ORDER));
         if (null == codeListDto || CollectionUtils.isEmpty(codeListDto.getCylinderCodes())) {
             throw new BadRequestException(ExceptionConstants.INVALID_REQUEST_DATA);
         }
@@ -67,19 +63,15 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public List<String> getAssignedCylinderByUserId(Long userId) throws BadRequestException {
-        UserEntity userEntity = userRepo.findById(userId).orElse(null);
-        if (null == userEntity) {
-            throw new BadRequestException(ExceptionConstants.INVALID_USER);
-        }
+        UserEntity userEntity = userRepo.findById(userId)
+                .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER));
         return inventoryRepo.getAssignedCylinderByUserId(userId);
     }
 
     @Override
     public String fillCylinder(String cylinderCode) throws BadRequestException {
-        CylinderEntity cylinderEntity = inventoryRepo.checkIfCylinderCodeExist(cylinderCode);
-        if (null == cylinderEntity) {
-            throw new BadRequestException(ExceptionConstants.INVALID_CYLINDER_CODE);
-        }
+        CylinderEntity cylinderEntity = inventoryRepo.checkIfCylinderCodeExist(cylinderCode)
+                .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_CYLINDER_CODE));
         cylinderEntity.setCylinderStatus(CylinderStatus.CYLINDER_STATUS_FILLED);
         inventoryRepo.save(cylinderEntity);
         return Constants.SUCCESS_STR;

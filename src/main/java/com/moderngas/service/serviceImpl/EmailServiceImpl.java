@@ -33,8 +33,8 @@ public class EmailServiceImpl implements EmailService {
         try {
             log.info("Sending mail to {}", to);
             MimeMessage mimeMessage = javaMailSender.createMimeMessage();
-            /*MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED,
-                    StandardCharsets.UTF_8.name());*/
+            /** MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED,
+                    StandardCharsets.UTF_8.name()); */
             mimeMessage.setRecipient(Message.RecipientType.TO, new InternetAddress(to));
             mimeMessage.setFrom(new InternetAddress(fromMail));
             mimeMessage.setSubject(subject);

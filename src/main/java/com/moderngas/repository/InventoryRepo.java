@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 @Transactional
@@ -33,7 +34,7 @@ public interface InventoryRepo extends JpaRepository<CylinderEntity, Long> {
                                @Param("status") CylinderStatus status);
 
     @Query(" FROM CylinderEntity WHERE code = :code")
-    CylinderEntity checkIfCylinderCodeExist(@Param("code") String code);
+    Optional<CylinderEntity> checkIfCylinderCodeExist(@Param("code") String code);
 
     @Query("SELECT new com.moderngas.pojo.admin.InventoryCylinderDto(ce.id, ce.code, ce.cylinderStatus, ue.id, ue.name) FROM CylinderEntity ce " +
             "LEFT JOIN UserEntity ue ON ce.userId = ue.id ")

@@ -7,6 +7,7 @@ import com.moderngas.enums.OrderStatus;
 import com.moderngas.enums.UserRole;
 import com.moderngas.exception.BadRequestException;
 import com.moderngas.jpaentity.*;
+import com.moderngas.pojo.CylinderTypeDto;
 import com.moderngas.pojo.DateStatusDto;
 import com.moderngas.pojo.admin.DeliveryVehicleDto;
 import com.moderngas.pojo.admin.FilterDto;
@@ -271,13 +272,13 @@ public class GenericServiceImpl implements GenericService {
     private List<DateStatusDto> convertDateStatus(OrderEntity orderEntity) {
         List<DateStatusDto> dateStatusDtoList = new ArrayList<>();
         for (OrderStatus orderStatus : OrderStatus.values()) {
-            if (orderStatus.getName().equals("Ordered")) {
+            if (orderStatus.getName().equals(Constants.STATUS_ORDERED)) {
                 dateStatusDtoList.add(new DateStatusDto(
                         (long) orderStatus.ordinal(), orderStatus.getName(), orderEntity.getCreatedDate()));
-            } else if (orderStatus.getName().equals("Loaded")) {
+            } else if (orderStatus.getName().equals(Constants.STATUS_LOADED)) {
                 dateStatusDtoList.add(new DateStatusDto(
                         (long) orderStatus.ordinal(), orderStatus.getName(), orderEntity.getLoadedDate()));
-            } else if (orderStatus.getName().equals("Delivered")) {
+            } else if (orderStatus.getName().equals(Constants.STATUS_DELIVERED)) {
                 dateStatusDtoList.add(new DateStatusDto(
                         (long) orderStatus.ordinal(), orderStatus.getName(), orderEntity.getDeliveredDate()));
             }
@@ -386,7 +387,7 @@ public class GenericServiceImpl implements GenericService {
 
     @Override
     public List<OnboardingDto> convertUserDateToOnboardingList(UserEntity userEntity) throws BadRequestException {
-        List<OnboardingDto> onboardingDtoList = new ArrayList<>();
+        List<OnboardingDto> onBoardingDtoList = new ArrayList<>();
         if (CollectionUtils.isEmpty(userEntity.getAdminGasMappings())) {
             throw new BadRequestException(ExceptionConstants.GAS_LIST_IS_EMPTY);
         }
@@ -399,12 +400,14 @@ public class GenericServiceImpl implements GenericService {
             onboardingDto.setDescription(adminGas.getDescription());
             onboardingDto.setPrice(adminGas.getPrice());
             onboardingDto.setCylinderTypeList(getCylinderType(adminGas.getAdminGasCylinderTypeMapping()));
-            onboardingDtoList.add(onboardingDto);
+            onBoardingDtoList.add(onboardingDto);
         }
-        return onboardingDtoList;
+        return onBoardingDtoList;
     }
 
-    private List<String> getCylinderType(Set<AdminGasCylinderTypeMapping> adminGasCylinderTypeMapping) {
-        return adminGasCylinderTypeMapping.stream().map(e -> e.getCylinderType().getName()).collect(Collectors.toList());
+    private List<CylinderTypeDto> getCylinderType(Set<AdminGasCylinderTypeMapping> adminGasCylinderTypeMapping) {
+        return adminGasCylinderTypeMapping.stream()
+                .map(e -> new CylinderTypeDto(e.getCylinderType().getName(), e.getCylinderType().getDescription()))
+                .collect(Collectors.toList());
     }
 }

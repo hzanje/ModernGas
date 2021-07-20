@@ -49,7 +49,6 @@ public class MasterServiceImpl implements MasterService {
 
     @Override
     public List<NameIdDto> getGasList() {
-        List<NameIdDto> gasList = gasRepo.getGasMasterNameIdList();
-        return gasList;
+        return gasRepo.getGasMasterNameIdList();
     }
 }

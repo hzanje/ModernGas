@@ -40,9 +40,9 @@ public interface UserService {
 
     List<UserDashboardDto> getUserDashboard(Long userId);
 
-    String updateAddress(AddressEntity addressEntity, Long userId);
+    String updateAddress(AddressEntity addressEntity, Long userId) throws BadRequestException;
     
-    JSONObject getAddress(Long userId);
+    JSONObject getAddress(Long userId) throws BadRequestException;
 
     String refreshToken(String existingToken) throws BadRequestException;
 

@@ -38,7 +38,8 @@ public class InventoryServiceImpl implements InventoryService {
         if (null == cylinderCodeStatusDto) {
             throw new BadRequestException(ExceptionConstants.INVALID_REQUEST_DATA);
         }
-        UserEntity userEntity = userRepo.findById(userId).orElse(null);
+        UserEntity userEntity = userRepo.findById(userId)
+                .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER));
         //userService.checkIfRoleIsNotUser(userEntity);
         if (!CylinderStatus.isExist(cylinderCodeStatusDto.getStatus())) {
             throw new BadRequestException(ExceptionConstants.INVALID_STATUS);
@@ -46,7 +47,7 @@ public class InventoryServiceImpl implements InventoryService {
         CylinderStatus cylinderStatus = CylinderStatus.getByStatus(cylinderCodeStatusDto.getStatus());
         List<CylinderEntity> cylinderEntityList = new ArrayList<>();
         for (String code : cylinderCodeStatusDto.getCylinderCodes()) {
-            if (null == inventoryRepo.checkIfCylinderCodeExist(code)) {
+            if (!inventoryRepo.checkIfCylinderCodeExist(code).isPresent()) {
                 CylinderEntity cylinderEntity = new CylinderEntity();
                 cylinderEntity.setCode(code);
                 if (cylinderStatus.equals(CylinderStatus.CYLINDER_STATUS_ASSIGNED)) {

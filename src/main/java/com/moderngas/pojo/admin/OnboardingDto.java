@@ -1,5 +1,6 @@
 package com.moderngas.pojo.admin;
 
+import com.moderngas.pojo.CylinderTypeDto;
 import lombok.Data;
 
 import java.util.List;
@@ -17,6 +18,6 @@ public class OnboardingDto {
 
     private Integer price;
 
-    private List<String> cylinderTypeList;
+    private List<CylinderTypeDto> cylinderTypeList;
 
 }

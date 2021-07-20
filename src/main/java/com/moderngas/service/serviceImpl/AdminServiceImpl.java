@@ -31,15 +31,12 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public List<OnboardingDto> getOnboardingDetails(Long id) throws BadRequestException {
-        UserEntity userEntity = userRepo.findById(id).orElse(null);
-        if (null == userEntity) {
-            throw new BadRequestException(ExceptionConstants.INVALID_USER);
-        }
+        UserEntity userEntity = userRepo.findById(id)
+                .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER));
         if (CollectionUtils.isEmpty(userEntity.getRoleEntitySet())) {
             throw new BadRequestException(ExceptionConstants.INVALID_USER_ACCESS);
         }
-        List<OnboardingDto> onboardingDtoList = genericService.convertUserDateToOnboardingList(userEntity);
-        return onboardingDtoList;
+        return genericService.convertUserDateToOnboardingList(userEntity);
     }
 
     @Override
@@ -48,10 +45,8 @@ public class AdminServiceImpl implements AdminService {
         if (null == onboardingDtoList && CollectionUtils.isEmpty(onboardingDtoList.getOnboardingDtoList())) {
             return response;
         }
-        UserEntity userEntity = userRepo.findById(onboardingDtoList.getId()).orElse(null);
-        if (null == userEntity) {
-            throw new BadRequestException(ExceptionConstants.INVALID_USER);
-        }
+        UserEntity userEntity = userRepo.findById(onboardingDtoList.getId())
+                .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER));
         Set<AdminGasMapping> adminGasMappings = new HashSet<>();
         for (OnboardingDto onboardingDto : onboardingDtoList.getOnboardingDtoList()) {
             AdminGasMapping adminGas = userEntity.getAdminGasMappings()
