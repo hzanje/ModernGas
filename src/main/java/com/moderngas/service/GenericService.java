@@ -53,7 +53,7 @@ public interface GenericService {
 
     FilterDto getFilterList();
 
-    DeliveryVehicle convertDtoToDeliveryVehicle(DeliveryVehicleDto deliveryVehicleDto);
+    List<DeliveryVehicle> convertDtoToDeliveryVehicle(DeliveryVehicleDto deliveryVehicleDto);
 
     List<OnboardingDto> convertUserDateToOnboardingList(UserEntity userEntity) throws BadRequestException;
 }

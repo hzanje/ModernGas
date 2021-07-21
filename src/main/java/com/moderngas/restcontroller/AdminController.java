@@ -71,8 +71,8 @@ public class AdminController {
 
     @PostMapping("/addCylinder/{id}")
     public ResponseEntity<ResponseStatus> addCylinder(@PathVariable("id") Long userId,
-                                                      @RequestBody CylinderCodeStatusDto cylinderCodeStatusDto) throws BadRequestException {
-        String response = inventoryService.addCylinder(userId, cylinderCodeStatusDto);
+                                                      @RequestBody CylinderCodeStatusListDto cylinderCodeStatusListDto) throws BadRequestException {
+        String response = inventoryService.addCylinder(userId, cylinderCodeStatusListDto);
         return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
     }
 

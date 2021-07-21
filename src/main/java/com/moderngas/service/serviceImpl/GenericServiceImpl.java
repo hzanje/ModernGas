@@ -376,13 +376,15 @@ public class GenericServiceImpl implements GenericService {
     }
 
     @Override
-    public DeliveryVehicle convertDtoToDeliveryVehicle(DeliveryVehicleDto deliveryVehicleDto) {
-        DeliveryVehicle deliveryVehicle = new DeliveryVehicle();
-        deliveryVehicle.setColor(deliveryVehicleDto.getColor());
-        deliveryVehicle.setName(deliveryVehicleDto.getName());
-        deliveryVehicle.setNumber(deliveryVehicleDto.getNumber());
-        deliveryVehicle.setUserId(deliveryVehicleDto.getUserId());
-        return deliveryVehicle;
+    public List<DeliveryVehicle> convertDtoToDeliveryVehicle(DeliveryVehicleDto deliveryVehicleDto) {
+        List<DeliveryVehicle> deliveryVehicleList = new ArrayList<>();
+        for (String vehicleName : deliveryVehicleDto.getNumbers()) {
+            DeliveryVehicle deliveryVehicle = new DeliveryVehicle();
+            deliveryVehicle.setNumber(vehicleName);
+            deliveryVehicle.setUserId(deliveryVehicleDto.getUserId());
+            deliveryVehicleList.add(deliveryVehicle);
+        }
+        return deliveryVehicleList;
     }
 
     @Override

@@ -306,11 +306,13 @@ public class UserServiceImpl implements UserService {
     public String addVehicle(DeliveryVehicleDto deliveryVehicleDto) throws BadRequestException {
         if (null == deliveryVehicleDto) {
             throw new BadRequestException(ExceptionConstants.INVALID_REQUEST_DATA);
+        } else if (CollectionUtils.isEmpty(deliveryVehicleDto.getNumbers())) {
+            throw new BadRequestException(ExceptionConstants.INVALID_REQUEST_DATA);
         }
-        UserEntity userEntity = userRepo.findById(deliveryVehicleDto.getUserId())
+        userRepo.findById(deliveryVehicleDto.getUserId())
                 .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER));
-        DeliveryVehicle deliveryVehicle = genericService.convertDtoToDeliveryVehicle(deliveryVehicleDto);
-        deliveryVehicleRepo.save(deliveryVehicle);
+        List<DeliveryVehicle> deliveryVehicleList = genericService.convertDtoToDeliveryVehicle(deliveryVehicleDto);
+        deliveryVehicleRepo.saveAll(deliveryVehicleList);
         return Constants.SUCCESS_STR;
     }
 

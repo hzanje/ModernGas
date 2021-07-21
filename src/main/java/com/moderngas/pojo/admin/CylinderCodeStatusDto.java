@@ -9,5 +9,5 @@ public class CylinderCodeStatusDto {
 
     private String status;
 
-    private List<String> cylinderCodes;
+    private String cylinderCode;
 }

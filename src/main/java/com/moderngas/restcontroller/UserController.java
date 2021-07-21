@@ -88,7 +88,7 @@ public class UserController {
     }
     
     @GetMapping(value="/getAddress")
-    public ResponseEntity<JSONObject> getAddress(@RequestParam("userId") final Long userId){
+    public ResponseEntity<JSONObject> getAddress(@RequestParam("userId") final Long userId) throws BadRequestException {
     	JSONObject obj=userService.getAddress(userId);
     	if(obj.containsKey("message")) {
     		return new ResponseEntity<>(obj, HttpStatus.BAD_REQUEST);
