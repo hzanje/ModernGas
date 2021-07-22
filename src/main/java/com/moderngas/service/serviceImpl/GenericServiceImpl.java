@@ -107,6 +107,8 @@ public class GenericServiceImpl implements GenericService {
             AdminGasMapping adminGasMapping  = new AdminGasMapping();
             adminGasMapping.setGasId(gasMaster.getId());
             adminGasMapping.setGasName(gasMaster.getName());
+            adminGasMapping.setCategoryId(gasMaster.getCategoryMaster().getId());
+            adminGasMapping.setCategoryName(gasMaster.getCategoryMaster().getName());
             adminGasMapping.setDescription(gasMaster.getDescription());
             if (!CollectionUtils.isEmpty(nameType.getTypes())) {
                 adminGasMapping.setAdminGasCylinderTypeMapping(getCylinderTypeSet(nameType.getTypes()));
@@ -399,6 +401,8 @@ public class GenericServiceImpl implements GenericService {
             onboardingDto.setId(adminGas.getId());
             onboardingDto.setGasId(adminGas.getGasId());
             onboardingDto.setGasName(adminGas.getGasName());
+            onboardingDto.setCategoryId(adminGas.getCategoryId());
+            onboardingDto.setCategoryName(adminGas.getCategoryName());
             onboardingDto.setDescription(adminGas.getDescription());
             onboardingDto.setPrice(adminGas.getPrice());
             onboardingDto.setCylinderTypeList(getCylinderType(adminGas.getAdminGasCylinderTypeMapping()));

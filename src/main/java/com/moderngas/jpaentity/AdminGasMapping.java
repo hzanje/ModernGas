@@ -20,12 +20,18 @@ public class AdminGasMapping extends BaseEntity {
     @Column(name = "gas_name")
     private String gasName;
 
+    @Column(name = "category_id")
+    private Long categoryId;
+
+    @Column(name = "category_name")
+    private String categoryName;
+
     @Lob
     @Column(name = "description")
     private String description;
 
     @Column(name = "price")
-    private Integer price;
+    private Float price;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "admin_gas_id", referencedColumnName = "id", nullable = false)

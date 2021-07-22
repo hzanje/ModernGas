@@ -14,9 +14,13 @@ public class OnboardingDto {
 
     private String gasName;
 
+    private Long categoryId;
+
+    private String categoryName;
+
     private String description;
 
-    private Integer price;
+    private Float price;
 
     private List<CylinderTypeDto> cylinderTypeList;
 
