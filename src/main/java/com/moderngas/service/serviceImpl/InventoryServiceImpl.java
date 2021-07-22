@@ -55,6 +55,7 @@ public class InventoryServiceImpl implements InventoryService {
                 if (cylinderStatus.equals(CylinderStatus.CYLINDER_STATUS_ASSIGNED)) {
                     cylinderEntity.setUserId(userEntity.getId());
                 }
+                cylinderEntity.setCode(cylinderCodeStatusDto.getCylinderCode());
                 cylinderEntity.setCylinderStatus(cylinderStatus);
                 cylinderEntityList.add(cylinderEntity);
             }
