@@ -69,10 +69,10 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<OrderDto> getOrderListByUser(Long userId) throws BadRequestException {
-        UserEntity user = userRepo.findById(userId)
+        UserEntity userEntity = userRepo.findById(userId)
                 .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER));
         List<OrderDto> orderDtoList = new ArrayList<>();
-        List<OrderEntity> orderEntityList = orderRepo.getOrderEntitiesByUserId(userId);
+        List<OrderEntity> orderEntityList = orderRepo.getOrderEntitiesByUserId(userEntity.getId());
         if (!CollectionUtils.isEmpty(orderEntityList)) {
             orderDtoList = orderEntityList.stream()
                     .map(e -> genericService.convertOrderEntityToDto(e)).collect(Collectors.toList());
@@ -94,10 +94,10 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<CartDto> getCartByUser(Long userId) throws BadRequestException {
-        UserEntity user = userRepo.findById(userId)
+        UserEntity userEntity = userRepo.findById(userId)
                 .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER));
         List<CartDto> cartDtoList = new ArrayList<>();
-        List<CartEntity> cartEntityList = cartRepo.getCartEntitiesByUserIdOrderByUpdatedDate(userId);
+        List<CartEntity> cartEntityList = cartRepo.getCartEntitiesByUserIdOrderByUpdatedDate(userEntity.getId());
         if (!CollectionUtils.isEmpty(cartEntityList)) {
             cartDtoList = cartEntityList.stream()
                     .map(e -> genericService.convertCartEntityToDto(e)).collect(Collectors.toList());
@@ -108,27 +108,27 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public String deleteOrder(Long orderId) throws BadRequestException {
         log.info("OrderService >> Delete Order {}", orderId);
-        OrderEntity order = orderRepo.findById(orderId)
+        OrderEntity orderEntity = orderRepo.findById(orderId)
                 .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_ORDER));
-        orderRepo.deleteOrderById(orderId);
+        orderRepo.deleteOrderById(orderEntity.getId());
         return Constants.SUCCESS_STR;
     }
 
     @Override
     public String deleteCart(Long cartId) throws BadRequestException {
         log.info("OrderService >> Delete Cart {}", cartId);
-        CartEntity cart = cartRepo.findById(cartId).orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_CART));
-        cartRepo.deleteById(cartId);
+        CartEntity cartEntity = cartRepo.findById(cartId).orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_CART));
+        cartRepo.deleteById(cartEntity.getId());
         return Constants.SUCCESS_STR;
     }
 
     @Override
     public String placeOrderFromCart(Long userId) throws BadRequestException {
         log.info("OrderService >> Place Order From Cart By User: {}", userId);
-        UserEntity user = userRepo.findById(userId)
+        UserEntity userEntity = userRepo.findById(userId)
                 .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER));
         String response = Constants.FAILURE_STR;
-        List<CartEntity> cartEntityList = cartRepo.getCartEntitiesByUserIdOrderByUpdatedDate(userId);
+        List<CartEntity> cartEntityList = cartRepo.getCartEntitiesByUserIdOrderByUpdatedDate(userEntity.getId());
         if (!CollectionUtils.isEmpty(cartEntityList)) {
             List<OrderEntity> orderEntityList = genericService.convertCartToOrderEntity(cartEntityList);
             orderRepo.saveAll(orderEntityList);
@@ -157,11 +157,10 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public String updateOrderStatus(Long orderId, String status, Long deliveryVehicleId) throws BadRequestException {
         log.info("OrderService >>");
-        OrderEntity order = orderRepo.findById(orderId)
+        OrderEntity orderEntity = orderRepo.findById(orderId)
                 .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_ORDER));
         OrderStatus orderStatus = validateOrderStatus(status);
         String response = Constants.FAILURE_STR;
-        OrderEntity orderEntity = orderRepo.getOrderEntitiesById(orderId);
         if (null != orderEntity) {
             orderEntity = genericService.changeOrderStatus(orderEntity, orderStatus, deliveryVehicleId);
             orderRepo.save(orderEntity);

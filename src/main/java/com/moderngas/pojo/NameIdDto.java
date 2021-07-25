@@ -1,6 +1,5 @@
 package com.moderngas.pojo;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data

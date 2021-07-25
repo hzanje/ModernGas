@@ -38,6 +38,9 @@ public interface OrderRepo extends JpaRepository<OrderEntity, Long> {
 
     class QUERIES {
 
+    private QUERIES() {
+    }
+
         private static final String ORDER_ENTRIES_BY_USER_ID = "FROM OrderEntity WHERE userId = :userId ORDER BY updatedDate ";
 
         private static final String ALL_ORDER_LIST_FOR_ADMIN = " FROM OrderEntity ord " +

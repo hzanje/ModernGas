@@ -19,18 +19,18 @@ public class UserDetails {
 
     private String email;
 
-    private String company_name;
+    private String companyName;
 
     private List<String> assignedCylinder;
 
     private int totalOrders;
 
-    public UserDetails(Long id, boolean active, String name, Long mobileNumber, String email, String company_name) {
+    public UserDetails(Long id, boolean active, String name, Long mobileNumber, String email, String companyName) {
         this.id = id;
         this.active = active;
         this.name = name;
         this.mobileNumber = mobileNumber;
         this.email = email;
-        this.company_name = company_name;
+        this.companyName = companyName;
     }
 }

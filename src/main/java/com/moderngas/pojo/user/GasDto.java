@@ -10,7 +10,7 @@ public class GasDto {
 
     private Long id;
 
-    private String Name;
+    private String name;
 
     private Long cylinderType;
 

@@ -1,4 +1,4 @@
-package com.moderngas.Security;
+package com.moderngas.security;
 
 import com.moderngas.jpaentity.UserEntity;
 import com.moderngas.jpaentity.UserRoleEntity;

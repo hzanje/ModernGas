@@ -36,6 +36,9 @@ public interface UserRepo extends JpaRepository<UserEntity, Long> {
 
     class QUERIES {
 
+        private QUERIES() {
+        }
+
         private static final String ALL_USER_BY_NAME = "SELECT new com.moderngas.pojo.user.UserSearchDto(u.id, u.name, u.companyName) FROM UserEntity u WHERE u.name LIKE :name% ORDER BY u.name ASC ";
 
         private static final String ALL_USER_BY_NAME_COUNT = "SELECT COUNT(u.id) FROM UserEntity u WHERE u.name LIKE :name% ORDER BY u.name ASC ";

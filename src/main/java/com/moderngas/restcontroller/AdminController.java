@@ -143,7 +143,7 @@ public class AdminController {
     @PostMapping("/onboarding")
     public ResponseEntity<ResponseStatus> saveAdminOnBoardingDetails(@RequestBody OnboardingDtoList onboardingDtoList) throws BadRequestException {
         String response = adminService.saveOnBoardingDetails(onboardingDtoList);
-        return new ResponseEntity<>(new ResponseStatus("response"), HttpStatus.OK);
+        return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
     }
 
 }

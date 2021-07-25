@@ -2,7 +2,7 @@ package com.moderngas.service.serviceImpl;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.moderngas.Security.JwtProperties;
+import com.moderngas.security.JwtProperties;
 import com.moderngas.constants.Constants;
 import com.moderngas.constants.ExceptionConstants;
 import com.moderngas.enums.CylinderType;
@@ -44,7 +44,6 @@ import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -304,9 +303,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String addVehicle(DeliveryVehicleDto deliveryVehicleDto) throws BadRequestException {
-        if (null == deliveryVehicleDto) {
-            throw new BadRequestException(ExceptionConstants.INVALID_REQUEST_DATA);
-        } else if (CollectionUtils.isEmpty(deliveryVehicleDto.getNumbers())) {
+        if (CollectionUtils.isEmpty(deliveryVehicleDto.getNumbers())) {
             throw new BadRequestException(ExceptionConstants.INVALID_REQUEST_DATA);
         }
         userRepo.findById(deliveryVehicleDto.getUserId())

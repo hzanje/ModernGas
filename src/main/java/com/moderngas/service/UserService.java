@@ -4,8 +4,6 @@ import com.moderngas.exception.BadRequestException;
 import com.moderngas.jpaentity.AddressEntity;
 import com.moderngas.jpaentity.UserEntity;
 import com.moderngas.pojo.admin.DeliveryVehicleDto;
-import com.moderngas.pojo.admin.OnboardingDto;
-import com.moderngas.pojo.admin.OrderDto;
 import com.moderngas.pojo.admin.UserDetails;
 import com.moderngas.pojo.user.GasDto;
 import com.moderngas.pojo.NameIdDto;
@@ -18,7 +16,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface UserService {
 

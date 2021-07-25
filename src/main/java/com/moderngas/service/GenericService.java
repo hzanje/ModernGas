@@ -17,8 +17,8 @@ import com.moderngas.pojo.user.CartDto;
 import com.moderngas.pojo.user.OrderDto;
 import com.moderngas.pojo.user.UserDashboardDto;
 import com.moderngas.pojo.user.UserEntityDto;
-import com.moderngas.pojo.user.UserSearchDto;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 public interface GenericService {
@@ -31,7 +31,7 @@ public interface GenericService {
 
     String encodeUserPassword(String password);
 
-    String generateRandomPassword();
+    String generateRandomPassword() throws NoSuchAlgorithmException;
 
     AddressEntity convertDtoToAddressEntity(AddressDto addressDto);
 

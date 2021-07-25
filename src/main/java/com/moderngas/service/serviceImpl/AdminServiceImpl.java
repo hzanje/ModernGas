@@ -42,13 +42,13 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public String saveOnBoardingDetails(OnboardingDtoList onboardingDtoList) throws BadRequestException {
         String response = Constants.FAILURE_STR;
-        if (null == onboardingDtoList && CollectionUtils.isEmpty(onboardingDtoList.getOnboardingDtoList())) {
+        if (CollectionUtils.isEmpty(onboardingDtoList.getOnBoardingListDto())) {
             return response;
         }
         UserEntity userEntity = userRepo.findById(onboardingDtoList.getId())
                 .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER));
         Set<AdminGasMapping> adminGasMappings = new HashSet<>();
-        for (OnboardingDto onboardingDto : onboardingDtoList.getOnboardingDtoList()) {
+        for (OnboardingDto onboardingDto : onboardingDtoList.getOnBoardingListDto()) {
             AdminGasMapping adminGas = userEntity.getAdminGasMappings()
                     .stream().filter(a -> a.getId().equals(onboardingDto.getId()))
                     .findAny().orElse(null);

@@ -17,9 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -65,7 +63,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     public List<String> getAssignedCylinderByUserId(Long userId) throws BadRequestException {
         UserEntity userEntity = userRepo.findById(userId)
                 .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER));
-        return inventoryRepo.getAssignedCylinderByUserId(userId);
+        return inventoryRepo.getAssignedCylinderByUserId(userEntity.getId());
     }
 
     @Override

@@ -30,6 +30,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -93,9 +95,9 @@ public class GenericServiceImpl implements GenericService {
         return userEntity;
     }
 
-    private Set<AdminGasMapping> gasMappingByNameAndType(List<GasNameCylinderTypeDto> gasNameCylinderTypes) {
+    private Set<AdminGasMapping> gasMappingByNameAndType(List<GasNameCylinderTypeDto> gasNameCylinderTypes) throws BadRequestException {
         if (CollectionUtils.isEmpty(gasNameCylinderTypes)) {
-            return null;
+            return Collections.emptySet();
         }
         Set<AdminGasMapping> adminGasMappingSet = new HashSet<>();
         List<GasMaster> gasMasterList = gasRepo.getGasMasterByIdList(
@@ -103,7 +105,8 @@ public class GenericServiceImpl implements GenericService {
 
         for (GasNameCylinderTypeDto nameType : gasNameCylinderTypes) {
             GasMaster gasMaster = gasMasterList.stream().filter(
-                    g -> g.getId().equals(nameType.getId())).findFirst().get();
+                    g -> g.getId().equals(nameType.getId())).findFirst()
+                    .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_GAS));
             AdminGasMapping adminGasMapping  = new AdminGasMapping();
             adminGasMapping.setGasId(gasMaster.getId());
             adminGasMapping.setGasName(gasMaster.getName());
@@ -132,7 +135,7 @@ public class GenericServiceImpl implements GenericService {
 
     private Set<UserRoleEntity> addUserRole(List<String> roles) {
         if (CollectionUtils.isEmpty(roles)) {
-            return null;
+            return Collections.emptySet();
         }
         Set<UserRoleEntity> userRoleEntitySet = new HashSet<>();
         for (String role : roles) {
@@ -168,14 +171,14 @@ public class GenericServiceImpl implements GenericService {
     }
 
     @Override
-    public String generateRandomPassword() {
+    public String generateRandomPassword() throws NoSuchAlgorithmException {
         log.info("GenericService >> Generating Random Password");
         String capitalLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         String smallLetters = "abcdefghijklmnopqrstuvwxyz";
         String specialCharacters = "!@#$*%";
         String numbers = "1234567890";
         String combinedChars = capitalLetters + smallLetters + specialCharacters + numbers;
-        Random random = new Random();
+        Random random = SecureRandom.getInstanceStrong();
         char[] password = new char[8];
 
         /* Create password with 1 Capital letter, 1 small Letter
@@ -344,24 +347,22 @@ public class GenericServiceImpl implements GenericService {
     @Override
     public OrderEntity changeOrderStatus(OrderEntity orderEntity, OrderStatus orderStatus, Long deliveryVehicleId) {
         log.info("GenericService >> Changes Status: {} for User: {}", orderStatus.getName(), orderEntity.getUserId());
-        if (null != orderStatus) {
-            switch (orderStatus) {
+        switch (orderStatus) {
 
-                case ORDER_STATUS_LOADED: orderEntity.setLoadedDate(new Date());
-                                          orderEntity.setDeliveryVehicleNumber(deliveryVehicleId);
-                    break;
+            case ORDER_STATUS_LOADED: orderEntity.setLoadedDate(new Date());
+                orderEntity.setDeliveryVehicleNumber(deliveryVehicleId);
+                break;
 
-                case ORDER_STATUS_DEVLIVERED: orderEntity.setDeliveredDate(new Date());
-                    break;
+            case ORDER_STATUS_DEVLIVERED: orderEntity.setDeliveredDate(new Date());
+                break;
 
-                case ORDER_STATUS_CANCELLED: orderEntity.setActiveFlag(false);
-                                             orderEntity.setCancellationDate(new Date());
-                    break;
+            case ORDER_STATUS_CANCELLED: orderEntity.setActiveFlag(false);
+                orderEntity.setCancellationDate(new Date());
+                break;
 
-                default: break;
-            }
-            orderEntity.setOrderStatus(orderStatus);
+            default: break;
         }
+        orderEntity.setOrderStatus(orderStatus);
         return orderEntity;
     }
 

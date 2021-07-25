@@ -1,4 +1,4 @@
-package com.moderngas.Security;
+package com.moderngas.security;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;

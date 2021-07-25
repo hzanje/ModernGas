@@ -1,4 +1,4 @@
-package com.moderngas.Security;
+package com.moderngas.security;
 
 public class JwtProperties {
 

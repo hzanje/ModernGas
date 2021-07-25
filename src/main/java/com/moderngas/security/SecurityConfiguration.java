@@ -1,4 +1,4 @@
-package com.moderngas.Security;
+package com.moderngas.security;
 
 import com.moderngas.repository.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;

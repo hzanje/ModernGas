@@ -1,8 +1,10 @@
-package com.moderngas.Security;
+package com.moderngas.security;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.TokenExpiredException;
+import com.moderngas.constants.ExceptionConstants;
+import com.moderngas.exception.BadRequestException;
 import com.moderngas.jpaentity.UserEntity;
 import com.moderngas.repository.UserRepo;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -64,10 +66,10 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
                 // Search in the DB if we find the user by token subject (username)
                 // If so, then grab user details and create spring auth token using username, pass, authorities/roles
                 if (userName != null) {
-                    UserEntity userEntity = userRepo.findByMobileNumber(Long.parseLong(userName)).get();
+                    UserEntity userEntity = userRepo.findByMobileNumber(Long.parseLong(userName))
+                            .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER));
                     UserDetailsImpl userDetails = new UserDetailsImpl(userEntity);
-                    UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(userName, null, userDetails.getAuthorities());
-                    return auth;
+                    return new UsernamePasswordAuthenticationToken(userName, null, userDetails.getAuthorities());
                 }
                 return null;
             }
@@ -75,9 +77,8 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
             String requestURL = request.getRequestURL().toString();
             if (requestURL.contains("refreshToken") ||
                     requestURL.contains("logout")) {
-                UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
+                return new UsernamePasswordAuthenticationToken(
                         null, null, null);
-                return auth;
             }
             throw new TokenExpiredException("");
         } catch (Exception exception) {

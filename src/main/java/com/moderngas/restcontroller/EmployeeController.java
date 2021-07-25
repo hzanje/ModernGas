@@ -2,7 +2,6 @@ package com.moderngas.restcontroller;
 
 import com.moderngas.exception.BadRequestException;
 import com.moderngas.pojo.admin.CylinderCodeListDto;
-import com.moderngas.pojo.admin.CylinderCodeStatusDto;
 import com.moderngas.service.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;

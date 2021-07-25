@@ -21,8 +21,6 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -39,9 +37,7 @@ public class InventoryServiceImpl implements InventoryService {
 
     @Override
     public String addCylinder(Long userId, CylinderCodeStatusListDto cylinderCodeStatusListDto) throws BadRequestException {
-        if (null == cylinderCodeStatusListDto) {
-            throw new BadRequestException(ExceptionConstants.INVALID_REQUEST_DATA);
-        } else if (CollectionUtils.isEmpty(cylinderCodeStatusListDto.getCylinderCodeStatusDtoList())) {
+        if (CollectionUtils.isEmpty(cylinderCodeStatusListDto.getCylinderCodeStatusDtoList())) {
             throw new BadRequestException(ExceptionConstants.INVALID_REQUEST_DATA);
         }
         UserEntity userEntity = userRepo.findById(userId)

@@ -1,5 +1,6 @@
 package com.moderngas.enums;
 
+import com.moderngas.exception.BadRequestException;
 import org.springframework.util.StringUtils;
 
 public enum CylinderStatus {
@@ -40,9 +41,9 @@ public enum CylinderStatus {
         return false;
     }
 
-    public static CylinderStatus getByOrdinal(Integer ord) throws Exception {
+    public static CylinderStatus getByOrdinal(Integer ord) throws BadRequestException {
         if((ord < 0 ) || (ord > CylinderStatus.values().length-1)) {
-            throw new Exception(String.format("%d is not a valid User Type", ord));
+            throw new BadRequestException(String.format("%d is not a valid User Type", ord));
         }
         return CylinderStatus.values()[ord];
     }

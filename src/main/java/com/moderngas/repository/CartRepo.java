@@ -1,7 +1,6 @@
 package com.moderngas.repository;
 
 import com.moderngas.jpaentity.CartEntity;
-import com.moderngas.jpaentity.OrderEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
