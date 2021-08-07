@@ -51,7 +51,7 @@ public interface OrderRepo extends JpaRepository<OrderEntity, Long> {
                 " AND (COALESCE(:cylinderType) IS NULL OR ord.cylinderType IN :cylinderType)" +
                 " AND (:search IS NULL OR u.name LIKE :search%)" +
                 " AND (:quantityOrder IS NULL)" +
-                " ORDER BY ord.createdDate DESC AND ord.orderStatus ASC ";
+                " ORDER BY ord.createdDate DESC, ord.orderStatus ASC ";
 
         private static final String ALL_ORDER_LIST_HEADER_FOR_ADMIN = "SELECT new com.moderngas.pojo.admin.OrderDto(" +
                 "ord.id, ord.cylinderType, ord.isRefill, u.id, u.name, ord.gasMaster.name, ord.gasMaster.categoryMaster.name," +
