@@ -25,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -170,7 +171,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Page<com.moderngas.pojo.admin.OrderDto> getAllOrderListForAdmin(Pageable pageable, String status, List<String> cylinderType, String search, String quantityOrder) throws JsonProcessingException {
+    public Page<com.moderngas.pojo.admin.OrderDto> getAllOrderListForAdmin(Pageable pageable, String status, List<String> cylinderType, Long adminId, String search, String quantityOrder) throws JsonProcessingException {
         List<OrderStatus> statusList = new ArrayList<>();
         List<CylinderType> cylinderTypeList = new ArrayList<>();
         if (null != status) {
@@ -185,7 +186,11 @@ public class OrderServiceImpl implements OrderService {
         } else {
             cylinderTypeList = CylinderType.getCylinderTypeList();
         }
-        return orderRepo.getAllOrderListForAdmin(pageable, statusList, cylinderTypeList, search, quantityOrder);
+
+
+
+        return orderRepo.getAllOrderListForAdmin(pageable, statusList, cylinderTypeList,
+                adminId, search, quantityOrder);
     }
 
     public OrderStatus validateOrderStatus(String status) throws BadRequestException {

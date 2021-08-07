@@ -56,7 +56,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
                 .replace(JwtProperties.TOKEN_PREFIX,"");
 
         try {
-            if (token != null && isTokenExist(token)) {
+            if (isTokenExist(token)) {
                 // parse the token and validate it
                 String userName = JWT.require(Algorithm.HMAC512(JwtProperties.SECRET.getBytes()))
                         .build()

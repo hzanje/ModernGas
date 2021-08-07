@@ -38,11 +38,6 @@ public class BaseController {
         return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
     }
 
-    @PostMapping(value = "/addUser")
-    public ResponseEntity<ResponseStatus> addUser(@RequestBody UserEntityDto userEntityDto) {
-        String response = userService.addUser(userEntityDto);
-        return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
-    }
 
     @GetMapping(value = "/forgetPassword")
     public ResponseEntity<ResponseStatus> forgetPassword(@RequestParam("userName") Long userName) throws BadRequestException {

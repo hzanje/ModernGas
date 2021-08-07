@@ -57,7 +57,7 @@ public class GenericServiceImpl implements GenericService {
             userEntity.setEmail(userEntityDto.getEmail());
             userEntity.setMobileNumber(userEntityDto.getMobileNumber());
             userEntity.setCompanyName(userEntityDto.getCompanyName());
-            userEntity.setRoleEntitySet(addUserRole(userEntityDto.getRole()));
+            userEntity.setRoleEntitySet(addUserRole(userEntityDto.getRole(), userEntity.getRoleEntitySet()));
             userEntity.setContactPerson(userEntityDto.getContactPerson());
             if (null != userEntityDto.getPassword() && !userEntityDto.getPassword().isEmpty()) {
                 userEntity.setPassword(encodeUserPassword(userEntityDto.getPassword()));
@@ -89,7 +89,7 @@ public class GenericServiceImpl implements GenericService {
         userEntity.setEmail(adminEntityDto.getEmail());
         userEntity.setMobileNumber(adminEntityDto.getMobileNumber());
         userEntity.setCompanyName(adminEntityDto.getCompanyName());
-        userEntity.setRoleEntitySet(addUserRole(adminEntityDto.getRoles()));
+        userEntity.setRoleEntitySet(addUserRole(adminEntityDto.getRoles(), userEntity.getRoleEntitySet()));
         userEntity.setContactPerson(adminEntityDto.getContactPerson());
         userEntity.setAdminGasMappings(gasMappingByNameAndType(adminEntityDto.getGasNameCylinderTypes()));
         return userEntity;
@@ -133,11 +133,13 @@ public class GenericServiceImpl implements GenericService {
         return selectedCylinderType;
     }
 
-    private Set<UserRoleEntity> addUserRole(List<String> roles) {
+    private Set<UserRoleEntity> addUserRole(List<String> roles, Set<UserRoleEntity> userRoleEntitySet) {
         if (CollectionUtils.isEmpty(roles)) {
             return Collections.emptySet();
         }
-        Set<UserRoleEntity> userRoleEntitySet = new HashSet<>();
+        if (CollectionUtils.isEmpty(userRoleEntitySet)) {
+            userRoleEntitySet = new HashSet<>();
+        }
         for (String role : roles) {
             UserRoleEntity userRole = new UserRoleEntity();
             userRole.setRole(UserRole.getByRole(role).getRole());

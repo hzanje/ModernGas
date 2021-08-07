@@ -9,6 +9,6 @@ public class Constants {
     public static final String STATUS_ORDERED = "Ordered";
     public static final String STATUS_LOADED = "Loaded";
     public static final String STATUS_DELIVERED = "Delivered";
-    public static final String ASA = "";
+    public static final String A = "";
 
 }

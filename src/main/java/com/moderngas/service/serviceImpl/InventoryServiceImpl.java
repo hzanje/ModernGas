@@ -14,6 +14,8 @@ import com.moderngas.repository.UserRepo;
 import com.moderngas.service.InventoryService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.moderngas.service.UserService;
@@ -40,9 +42,10 @@ public class InventoryServiceImpl implements InventoryService {
         if (CollectionUtils.isEmpty(cylinderCodeStatusListDto.getCylinderCodeStatusDtoList())) {
             throw new BadRequestException(ExceptionConstants.INVALID_REQUEST_DATA);
         }
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         UserEntity userEntity = userRepo.findById(userId)
                 .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER));
-        //userService.checkIfRoleIsNotUser(userEntity);
         List<CylinderEntity> cylinderEntityList = new ArrayList<>();
         for (CylinderCodeStatusDto cylinderCodeStatusDto : cylinderCodeStatusListDto.getCylinderCodeStatusDtoList()) {
             if (!inventoryRepo.checkIfCylinderCodeExist(cylinderCodeStatusDto.getCylinderCode()).isPresent()) {
