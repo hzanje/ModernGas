@@ -56,4 +56,6 @@ public interface GenericService {
     List<DeliveryVehicle> convertDtoToDeliveryVehicle(DeliveryVehicleDto deliveryVehicleDto);
 
     List<OnboardingDto> convertUserDateToOnboardingList(UserEntity userEntity) throws BadRequestException;
+
+    UserEntity getUserAdminDetails() throws BadRequestException;
 }

@@ -45,13 +45,13 @@ public interface OrderRepo extends JpaRepository<OrderEntity, Long> {
 
         private static final String ALL_ORDER_LIST_FOR_ADMIN = " FROM OrderEntity ord " +
                 " LEFT JOIN UserEntity u ON u.id = ord.userId " +
-                " WHERE u.id = :adminId" +
+                " WHERE u.employer_id = :adminId" +
                 " AND ord.activeFlag = 1 " +
                 " AND (COALESCE(:status) IS NULL OR ord.orderStatus IN :status)" +
                 " AND (COALESCE(:cylinderType) IS NULL OR ord.cylinderType IN :cylinderType)" +
                 " AND (:search IS NULL OR u.name LIKE :search%)" +
                 " AND (:quantityOrder IS NULL)" +
-                " ORDER BY ord.orderStatus ASC ";
+                " ORDER BY ord.createdDate DESC AND ord.orderStatus ASC ";
 
         private static final String ALL_ORDER_LIST_HEADER_FOR_ADMIN = "SELECT new com.moderngas.pojo.admin.OrderDto(" +
                 "ord.id, ord.cylinderType, ord.isRefill, u.id, u.name, ord.gasMaster.name, ord.gasMaster.categoryMaster.name," +

@@ -64,14 +64,13 @@ public class AdminController {
                @RequestParam(value = "status", required = false) String status,
                @RequestParam(value = "cylinderType", required = false) List<String> cylinderType,
                @RequestParam(value = "search", required = false) String search,
-               @RequestParam(value = "adminId") Long adminId,
-               @RequestParam(value = "quantityOrdering", required = false) String quantityOrder) throws JsonProcessingException {
+               @RequestParam(value = "quantityOrdering", required = false) String quantityOrder) throws JsonProcessingException, BadRequestException {
 
         Sort sortOrdering = getSortingOrder(quantityOrder);
-        Pageable pageable = PageRequest.of(page, size, sortOrdering);
-        Page<OrderDto> orderDtoList = orderService.getAllOrderListForAdmin(pageable, status, cylinderType, adminId, search, quantityOrder);
+        Pageable pageable = PageRequest.of(page, size);
+        Page<OrderDto> orderDtoList = orderService.getAllOrderListForAdmin(pageable, status, cylinderType, search, quantityOrder);
         Link link = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(AdminController.class)
-                .getAllOrderList(assembler, size, page, status, cylinderType, search, adminId, quantityOrder)).withSelfRel();
+                .getAllOrderList(assembler, size, page, status, cylinderType, search, quantityOrder)).withSelfRel();
 
         PagedModel<EntityModel<OrderDto>> model = assembler.toModel(orderDtoList, link);
         return new ResponseEntity<>(model, HttpStatus.OK);

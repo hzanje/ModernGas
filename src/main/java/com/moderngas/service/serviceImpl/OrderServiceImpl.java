@@ -171,7 +171,8 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Page<com.moderngas.pojo.admin.OrderDto> getAllOrderListForAdmin(Pageable pageable, String status, List<String> cylinderType, Long adminId, String search, String quantityOrder) throws JsonProcessingException {
+    public Page<com.moderngas.pojo.admin.OrderDto> getAllOrderListForAdmin(Pageable pageable, String status, List<String> cylinderType, String search, String quantityOrder) throws JsonProcessingException, BadRequestException {
+        UserEntity userEntity = genericService.getUserAdminDetails();
         List<OrderStatus> statusList = new ArrayList<>();
         List<CylinderType> cylinderTypeList = new ArrayList<>();
         if (null != status) {
@@ -186,11 +187,8 @@ public class OrderServiceImpl implements OrderService {
         } else {
             cylinderTypeList = CylinderType.getCylinderTypeList();
         }
-
-
-
         return orderRepo.getAllOrderListForAdmin(pageable, statusList, cylinderTypeList,
-                adminId, search, quantityOrder);
+                userEntity.getId(), search, quantityOrder);
     }
 
     public OrderStatus validateOrderStatus(String status) throws BadRequestException {

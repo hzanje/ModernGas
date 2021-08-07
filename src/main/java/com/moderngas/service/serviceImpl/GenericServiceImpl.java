@@ -25,6 +25,9 @@ import com.moderngas.service.GenericService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -418,5 +421,12 @@ public class GenericServiceImpl implements GenericService {
         return adminGasCylinderTypeMapping.stream()
                 .map(e -> new CylinderTypeDto(e.getCylinderType().getName(), e.getCylinderType().getDescription()))
                 .collect(Collectors.toList());
+    }
+
+    @Secured("ROLE_ADMIN")
+    @Override
+    public UserEntity getUserAdminDetails() throws BadRequestException {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return userRepo.findByMobileNumber((Long) auth.getPrincipal()).orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER));
     }
 }
