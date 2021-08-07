@@ -45,7 +45,7 @@ public interface OrderRepo extends JpaRepository<OrderEntity, Long> {
 
         private static final String ALL_ORDER_LIST_FOR_ADMIN = " FROM OrderEntity ord " +
                 " LEFT JOIN UserEntity u ON u.id = ord.userId " +
-                " WHERE u.employer_id = :adminId" +
+                " WHERE u.employerId = :adminId" +
                 " AND ord.activeFlag = 1 " +
                 " AND (COALESCE(:status) IS NULL OR ord.orderStatus IN :status)" +
                 " AND (COALESCE(:cylinderType) IS NULL OR ord.cylinderType IN :cylinderType)" +
