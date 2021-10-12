@@ -13,7 +13,7 @@ import javax.persistence.Table;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "delivery_vehicle")
-public class DeliveryVehicle extends BaseEntity {
+public class DeliveryVehicleEntity extends BaseEntity {
 
     @Column(name = "name")
     private String name;

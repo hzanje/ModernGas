@@ -23,19 +23,19 @@ public interface UserService {
 
     String updateUser(UserEntity userEntity);
 
-    List<UserEntityDto> getAllUser();
+    List<UserEntityDto> getAllUserByAdmin(Long adminId);
 
     UserEntityDto getUserById(Long userId) throws BadRequestException;
 
     String checkUserExist(Long mobileNumber);
 
-    UserEntity getUserByLoginId(Long username);
+    UserEntity getUserByLoginId(Long username) throws BadRequestException;
 
     String changePassword(Long username, String oldPassword, String newPassword) throws BadRequestException;
 
     String forgetPassword(Long userName) throws BadRequestException;
 
-    List<UserDashboardDto> getUserDashboard(Long userId);
+    List<UserDashboardDto> getUserDashboard(Long userId, Long adminId) throws BadRequestException;
 
     String updateAddress(AddressEntity addressEntity, Long userId) throws BadRequestException;
     
@@ -43,9 +43,9 @@ public interface UserService {
 
     String refreshToken(String existingToken) throws BadRequestException;
 
-    List<NameIdDto> getListByCategoryId(Long categoryId);
+    List<NameIdDto> getGasListByCategoryId(Long categoryId);
 
-    GasDto getGasDetailsById(Long id) throws BadRequestException;
+    GasDto getGasDetailsById(Long id, Long adminId) throws BadRequestException;
 
     void checkIfRoleIsNotUser(UserEntity userEntity) throws BadRequestException;
 

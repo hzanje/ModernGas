@@ -20,7 +20,7 @@ public class GasDto {
 
     private String description;
 
-    private Integer price;
+    private Float price;
 
     private List<String> imageList;
 

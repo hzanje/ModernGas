@@ -31,6 +31,9 @@ public class CartEntity extends BaseEntity {
     @Column(name = "userId")
     private Long userId;
 
+    @Column(name = "admin_id")
+    private Long adminId;
+
     @OneToOne
     @JoinColumn(name = "gas_id", referencedColumnName = "id")
     private GasMaster gasMaster;

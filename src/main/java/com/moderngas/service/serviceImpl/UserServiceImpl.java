@@ -2,19 +2,14 @@ package com.moderngas.service.serviceImpl;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.moderngas.jpaentity.*;
+import com.moderngas.pojo.CylinderTypeDto;
+import com.moderngas.repository.*;
 import com.moderngas.security.JwtProperties;
 import com.moderngas.constants.Constants;
 import com.moderngas.constants.ExceptionConstants;
 import com.moderngas.enums.CylinderType;
 import com.moderngas.exception.BadRequestException;
-import com.moderngas.jpaentity.AddressEntity;
-import com.moderngas.jpaentity.CategoryMaster;
-import com.moderngas.jpaentity.DeliveryVehicle;
-import com.moderngas.jpaentity.GasImageEntity;
-import com.moderngas.jpaentity.GasMaster;
-import com.moderngas.jpaentity.OrderEntity;
-import com.moderngas.jpaentity.UserEntity;
-import com.moderngas.jpaentity.UserTokenEntity;
 import com.moderngas.pojo.admin.DeliveryVehicleDto;
 import com.moderngas.pojo.admin.UserDetails;
 import com.moderngas.pojo.user.GasDto;
@@ -22,11 +17,6 @@ import com.moderngas.pojo.NameIdDto;
 import com.moderngas.pojo.user.UserDashboardDto;
 import com.moderngas.pojo.user.UserEntityDto;
 import com.moderngas.pojo.user.UserSearchDto;
-import com.moderngas.repository.DeliveryVehicleRepo;
-import com.moderngas.repository.GasRepo;
-import com.moderngas.repository.InventoryRepo;
-import com.moderngas.repository.OrderRepo;
-import com.moderngas.repository.UserRepo;
 import com.moderngas.service.EmailService;
 import com.moderngas.service.GenericService;
 import com.moderngas.service.UserService;
@@ -69,6 +59,9 @@ public class UserServiceImpl implements UserService {
     private GasRepo gasRepo;
 
     @Autowired
+    private AdminGasMappingRepo adminGasMappingRepo;
+
+    @Autowired
     private DeliveryVehicleRepo deliveryVehicleRepo;
 
     @Autowired
@@ -109,12 +102,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserEntityDto> getAllUser() {
-        List<UserEntity> userEntityList = userRepo.findAll();
+    public List<UserEntityDto> getAllUserByAdmin(Long adminId) {
         List<UserEntityDto> userEntityDtoList = new ArrayList<>();
-        for (UserEntity userEntity : userEntityList) {
-            UserEntityDto userEntityDto = genericService.convertUserDataToDto(userEntity);
-            userEntityDtoList.add(userEntityDto);
+        if (null != adminId) {
+            List<UserEntity> userEntityList = userRepo.getAllUserByAdmin(adminId);
+            for (UserEntity userEntity : userEntityList) {
+                UserEntityDto userEntityDto = genericService.convertUserDataToDto(userEntity);
+                userEntityDtoList.add(userEntityDto);
+            }
         }
         return userEntityDtoList;
     }
@@ -137,8 +132,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserEntity getUserByLoginId(Long username) {
-        return userRepo.findByMobileNumber(username).orElse(null);
+    public UserEntity getUserByLoginId(Long username) throws BadRequestException {
+        return userRepo.findByMobileNumber(username).orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER_NAME));
     }
 
     @Override
@@ -194,8 +189,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserDashboardDto> getUserDashboard(Long userId) {
+    public List<UserDashboardDto> getUserDashboard(Long userId, Long adminId) throws BadRequestException {
+        UserEntity userEntity = userRepo.findById(userId)
+                .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER));
+        if (!userEntity.getEmployerId().equals(adminId)) {
+            throw new BadRequestException(ExceptionConstants.INVALID_USER_ADMIN);
+        }
         List<UserDashboardDto> userDashboardDtoList = new ArrayList<>();
+
 
         /* Get all Category*/
         List<CategoryMaster> categoryMasterList = gasRepo.getAllCategory();
@@ -214,7 +215,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<NameIdDto> getListByCategoryId(Long categoryId) {
+    public List<NameIdDto> getGasListByCategoryId(Long categoryId) {
         return gasRepo.getGasMasterByCategoryId(categoryId);
     }
 
@@ -277,16 +278,20 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public GasDto getGasDetailsById(Long id) throws BadRequestException {
+    public GasDto getGasDetailsById(Long id, Long adminId) throws BadRequestException {
+        AdminGasMapping adminGasMapping = adminGasMappingRepo.getGasMappingByAdminId(id, adminId)
+                .orElseThrow(() -> new BadRequestException(ExceptionConstants.ADMIN_GAS_IS_EMPTY));
+        GasDto gasDto = new GasDto();
+        gasDto.setId(adminGasMapping.getGasId());
+        gasDto.setName(adminGasMapping.getGasName());
+        gasDto.setAvailableCylinderType(adminGasMapping.getAdminGasCylinderTypeMapping()
+                .stream().map(e -> new CylinderTypeDto(e.getCylinderType().getName(), e.getCylinderType().getDescription()))
+                .collect(Collectors.toList()));
+        gasDto.setDescription(adminGasMapping.getDescription());
+        gasDto.setPrice(adminGasMapping.getPrice());
+        gasDto.setAvailable(adminGasMapping.isActiveFlag());
         GasMaster gasMaster = gasRepo.findById(id)
                 .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_GAS));
-        GasDto gasDto = new GasDto();
-        gasDto.setId(gasMaster.getId());
-        gasDto.setName(gasMaster.getName());
-        gasDto.setAvailableCylinderType(CylinderType.getCylinderTypeDtoList());
-        gasDto.setDescription(gasMaster.getDescription());
-        gasDto.setPrice(gasMaster.getPrice());
-        gasDto.setAvailable(gasMaster.isAvaliable());
         if (!CollectionUtils.isEmpty(gasMaster.getGasImageEntityList())) {
             gasDto.setImageList(gasMaster.getGasImageEntityList().stream()
                     .map(GasImageEntity::getImageUrl).collect(Collectors.toList()));
@@ -308,8 +313,8 @@ public class UserServiceImpl implements UserService {
         }
         userRepo.findById(deliveryVehicleDto.getUserId())
                 .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER));
-        List<DeliveryVehicle> deliveryVehicleList = genericService.convertDtoToDeliveryVehicle(deliveryVehicleDto);
-        deliveryVehicleRepo.saveAll(deliveryVehicleList);
+        List<DeliveryVehicleEntity> deliveryVehicleEntityList = genericService.convertDtoToDeliveryVehicle(deliveryVehicleDto);
+        deliveryVehicleRepo.saveAll(deliveryVehicleEntityList);
         return Constants.SUCCESS_STR;
     }
 
@@ -337,11 +342,7 @@ public class UserServiceImpl implements UserService {
     }
 
     private int getUserOrdersCount(Long userId) {
-        List<OrderEntity> orderEntityList = orderRepo.getOrderEntitiesByUserId(userId);
-        if (CollectionUtils.isEmpty(orderEntityList)) {
-            return 0;
-        }
-        return orderEntityList.size();
+        return orderRepo.getOrderCountByUserId(userId);
     }
 
     private List<String> getUserInventory(Long userId) {

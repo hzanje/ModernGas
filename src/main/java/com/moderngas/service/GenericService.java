@@ -5,7 +5,7 @@ import com.moderngas.exception.BadRequestException;
 import com.moderngas.jpaentity.AddressEntity;
 import com.moderngas.jpaentity.CartEntity;
 import com.moderngas.jpaentity.CategoryMaster;
-import com.moderngas.jpaentity.DeliveryVehicle;
+import com.moderngas.jpaentity.DeliveryVehicleEntity;
 import com.moderngas.jpaentity.OrderEntity;
 import com.moderngas.jpaentity.UserEntity;
 import com.moderngas.pojo.admin.DeliveryVehicleDto;
@@ -43,7 +43,7 @@ public interface GenericService {
 
     OrderDto convertOrderEntityToDto(OrderEntity orderEntity);
 
-    CartEntity convertDtoToCartEntity(CartDto cartDto);
+    CartEntity convertDtoToCartEntity(CartDto cartDto) throws BadRequestException;
 
     CartDto convertCartEntityToDto(CartEntity cartEntity);
 
@@ -53,7 +53,7 @@ public interface GenericService {
 
     FilterDto getFilterList();
 
-    List<DeliveryVehicle> convertDtoToDeliveryVehicle(DeliveryVehicleDto deliveryVehicleDto);
+    List<DeliveryVehicleEntity> convertDtoToDeliveryVehicle(DeliveryVehicleDto deliveryVehicleDto);
 
     List<OnboardingDto> convertUserDateToOnboardingList(UserEntity userEntity) throws BadRequestException;
 

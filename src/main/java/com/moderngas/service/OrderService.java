@@ -14,17 +14,17 @@ public interface OrderService {
 
     String placeOrder(OrderDto orderDto);
 
-    List<OrderDto> getOrderListByUser(Long userId) throws BadRequestException;
+    List<OrderDto> getOrderListByUser(Long userId, Long adminId) throws BadRequestException;
 
-    String addCart(CartDto cartDto);
+    String addOrUpdateCart(CartDto cartDto) throws BadRequestException;
 
-    List<CartDto> getCartByUser(Long userId) throws BadRequestException;
+    List<CartDto> getCartByUser(Long userId, Long adminId) throws BadRequestException;
 
     String deleteOrder(Long orderId) throws BadRequestException;
 
     String deleteCart(Long cartId) throws BadRequestException;
 
-    String placeOrderFromCart(Long userId) throws BadRequestException;
+    String placeOrderFromCart(Long userId, Long adminId) throws BadRequestException;
 
     OrderDto getOrderDetailsById(Long orderId) throws BadRequestException;
 

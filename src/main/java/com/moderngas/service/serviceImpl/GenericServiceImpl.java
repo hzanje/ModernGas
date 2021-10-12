@@ -23,7 +23,6 @@ import com.moderngas.repository.GasRepo;
 import com.moderngas.repository.UserRepo;
 import com.moderngas.service.GenericService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.Authentication;
@@ -251,6 +250,7 @@ public class GenericServiceImpl implements GenericService {
             orderEntity = new OrderEntity();
             orderEntity.setCylinderType(CylinderType.getByStatus(orderDto.getCylinderType()));
             orderEntity.setUserId(orderDto.getUserId());
+            orderEntity.setAdminId(orderDto.getAdminId());
             orderEntity.setOrderStatus(OrderStatus.getByStatus(orderDto.getStatus()));
             orderEntity.setGasMaster(gasRepo.getOne(orderDto.getGasId()));
             orderEntity.setRefill(orderDto.isRefill());
@@ -273,6 +273,7 @@ public class GenericServiceImpl implements GenericService {
             orderDto.setRefill(orderEntity.isRefill());
             orderDto.setStatus(orderEntity.getOrderStatus().getName());
             orderDto.setUserId(orderEntity.getUserId());
+            orderDto.setAdminId(orderEntity.getAdminId());
             orderDto.setGasId(orderEntity.getGasMaster().getId());
             orderDto.setDateStatusDto(convertDateStatus(orderEntity));
         }
@@ -297,17 +298,20 @@ public class GenericServiceImpl implements GenericService {
     }
 
     @Override
-    public CartEntity convertDtoToCartEntity(CartDto cartDto) {
+    public CartEntity convertDtoToCartEntity(CartDto cartDto) throws BadRequestException {
         CartEntity cartEntity = null;
+        GasMaster gasMaster = gasRepo.findById(cartDto.getGasId())
+                .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_GAS));
         if (null != cartDto) {
             cartEntity = new CartEntity();
             cartEntity.setId(cartDto.getId());
             cartEntity.setCylinderType(CylinderType.getByStatus(cartDto.getCylinderType()));
             cartEntity.setQuantity(cartDto.getQuantity());
             cartEntity.setUserId(cartDto.getUserId());
+            cartEntity.setAdminId(cartDto.getAdminId());
             cartEntity.setPrice(cartDto.getPrice());
             cartEntity.setRefill(cartDto.isRefill());
-            cartEntity.setGasMaster(gasRepo.getOne(cartDto.getGasId()));
+            cartEntity.setGasMaster(gasMaster);
         }
         return cartEntity;
     }
@@ -321,6 +325,7 @@ public class GenericServiceImpl implements GenericService {
             cartDto.setCylinderType(cartEntity.getCylinderType().getName());
             cartDto.setQuantity(cartEntity.getQuantity());
             cartDto.setUserId(cartEntity.getUserId());
+            cartDto.setAdminId(cartEntity.getAdminId());
             cartDto.setPrice(cartEntity.getPrice());
             cartDto.setRefill(cartEntity.isRefill());
             if (null != cartEntity.getGasMaster()) {
@@ -384,15 +389,15 @@ public class GenericServiceImpl implements GenericService {
     }
 
     @Override
-    public List<DeliveryVehicle> convertDtoToDeliveryVehicle(DeliveryVehicleDto deliveryVehicleDto) {
-        List<DeliveryVehicle> deliveryVehicleList = new ArrayList<>();
+    public List<DeliveryVehicleEntity> convertDtoToDeliveryVehicle(DeliveryVehicleDto deliveryVehicleDto) {
+        List<DeliveryVehicleEntity> deliveryVehicleEntityList = new ArrayList<>();
         for (String vehicleName : deliveryVehicleDto.getNumbers()) {
-            DeliveryVehicle deliveryVehicle = new DeliveryVehicle();
-            deliveryVehicle.setNumber(vehicleName);
-            deliveryVehicle.setUserId(deliveryVehicleDto.getUserId());
-            deliveryVehicleList.add(deliveryVehicle);
+            DeliveryVehicleEntity deliveryVehicleEntity = new DeliveryVehicleEntity();
+            deliveryVehicleEntity.setNumber(vehicleName);
+            deliveryVehicleEntity.setUserId(deliveryVehicleDto.getUserId());
+            deliveryVehicleEntityList.add(deliveryVehicleEntity);
         }
-        return deliveryVehicleList;
+        return deliveryVehicleEntityList;
     }
 
     @Override
@@ -427,6 +432,6 @@ public class GenericServiceImpl implements GenericService {
     @Override
     public UserEntity getUserAdminDetails() throws BadRequestException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        return userRepo.findByMobileNumber((Long) auth.getPrincipal()).orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER));
+        return userRepo.findByMobileNumber(Long.parseLong((String) auth.getPrincipal())).orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER));
     }
 }

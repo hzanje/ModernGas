@@ -17,6 +17,8 @@ public class OrderDto {
 
     private Long userId;
 
+    private Long adminId;
+
     private Long gasId;
 
     private String gasName;

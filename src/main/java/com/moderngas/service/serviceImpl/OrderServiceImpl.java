@@ -1,15 +1,13 @@
 package com.moderngas.service.serviceImpl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.moderngas.constants.Constants;
 import com.moderngas.constants.ExceptionConstants;
 import com.moderngas.enums.CylinderType;
 import com.moderngas.enums.OrderStatus;
 import com.moderngas.exception.BadRequestException;
 import com.moderngas.jpaentity.CartEntity;
-import com.moderngas.jpaentity.DeliveryVehicle;
+import com.moderngas.jpaentity.DeliveryVehicleEntity;
 import com.moderngas.jpaentity.OrderEntity;
 import com.moderngas.jpaentity.UserEntity;
 import com.moderngas.pojo.user.CartDto;
@@ -25,7 +23,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -69,11 +66,14 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<OrderDto> getOrderListByUser(Long userId) throws BadRequestException {
+    public List<OrderDto> getOrderListByUser(Long userId, Long adminId) throws BadRequestException {
         UserEntity userEntity = userRepo.findById(userId)
                 .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER));
+        if (!userEntity.getEmployerId().equals(adminId)) {
+            throw new BadRequestException(ExceptionConstants.INVALID_USER_ADMIN);
+        }
         List<OrderDto> orderDtoList = new ArrayList<>();
-        List<OrderEntity> orderEntityList = orderRepo.getOrderEntitiesByUserId(userEntity.getId());
+        List<OrderEntity> orderEntityList = orderRepo.getOrderEntitiesByUserId(userEntity.getId(), adminId);
         if (!CollectionUtils.isEmpty(orderEntityList)) {
             orderDtoList = orderEntityList.stream()
                     .map(e -> genericService.convertOrderEntityToDto(e)).collect(Collectors.toList());
@@ -82,7 +82,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public String addCart(CartDto cartDto) {
+    public String addOrUpdateCart(CartDto cartDto) throws BadRequestException {
         log.info("OrderService >> Add Cart by User: {}", cartDto.getUserId());
         String response = Constants.FAILURE_STR;
         CartEntity cartEntity = genericService.convertDtoToCartEntity(cartDto);
@@ -94,11 +94,14 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<CartDto> getCartByUser(Long userId) throws BadRequestException {
+    public List<CartDto> getCartByUser(Long userId, Long adminId) throws BadRequestException {
         UserEntity userEntity = userRepo.findById(userId)
                 .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER));
+        if (!userEntity.getEmployerId().equals(adminId)) {
+            throw new BadRequestException(ExceptionConstants.INVALID_USER_ADMIN);
+        }
         List<CartDto> cartDtoList = new ArrayList<>();
-        List<CartEntity> cartEntityList = cartRepo.getCartEntitiesByUserIdOrderByUpdatedDate(userEntity.getId());
+        List<CartEntity> cartEntityList = cartRepo.getCartEntitiesByUserIdAndAdminIdOrderByUpdatedDate(userEntity.getId(), adminId);
         if (!CollectionUtils.isEmpty(cartEntityList)) {
             cartDtoList = cartEntityList.stream()
                     .map(e -> genericService.convertCartEntityToDto(e)).collect(Collectors.toList());
@@ -124,10 +127,13 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public String placeOrderFromCart(Long userId) throws BadRequestException {
+    public String placeOrderFromCart(Long userId, Long adminId) throws BadRequestException {
         log.info("OrderService >> Place Order From Cart By User: {}", userId);
         UserEntity userEntity = userRepo.findById(userId)
                 .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER));
+        if (!userEntity.getEmployerId().equals(adminId)) {
+            throw new BadRequestException(ExceptionConstants.INVALID_USER_ADMIN);
+        }
         String response = Constants.FAILURE_STR;
         List<CartEntity> cartEntityList = cartRepo.getCartEntitiesByUserIdOrderByUpdatedDate(userEntity.getId());
         if (!CollectionUtils.isEmpty(cartEntityList)) {
@@ -149,7 +155,7 @@ public class OrderServiceImpl implements OrderService {
         orderDto.setAddressDto(genericService.convertAddressEntityToDto(userEntity.getAddressEntity()));
         orderDto.setUserName(userEntity.getName());
         if (null != orderEntity.getDeliveryVehicleNumber()) {
-            Optional<DeliveryVehicle> deliveryVehicle = deliveryVehicleRepo.findById(orderEntity.getDeliveryVehicleNumber());
+            Optional<DeliveryVehicleEntity> deliveryVehicle = deliveryVehicleRepo.findById(orderEntity.getDeliveryVehicleNumber());
             orderDto.setDeliveryVehicle(deliveryVehicle.isPresent() ? deliveryVehicle.get().getNumber() : "");
         }
         return orderDto;

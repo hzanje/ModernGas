@@ -5,6 +5,13 @@ CREATE TABLE `cylinder`(
   `updated_date` DATETIME,
   `cylinder_code` TEXT(255) NOT NULL,
   `cylinder_status_id` BIGINT(20) NOT NULL,
+  `assigned_user_id` BIGINT(20),
   `user_id` BIGINT(20),
-  PRIMARY KEY (`id`)
+  `manufacturer` TEXT(255),
+  `manufacturing_date` DATETIME,
+  `expiry_date` DATETIME,
+  `last_service` DATETIME,
+  `next_service` DATETIME,
+  PRIMARY KEY (`id`),
+  CONSTRAINT `FK_USER_ID` FOREIGN KEY (`user_id`) REFERENCES `user`(`id`)
 );

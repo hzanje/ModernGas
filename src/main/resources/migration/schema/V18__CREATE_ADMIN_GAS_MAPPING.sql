@@ -8,5 +8,6 @@
   	`gas_name` VARCHAR(255) NOT NULL,
   	`description` LONGTEXT NULL,
   	`price` INT(11) NULL,
-  	PRIMARY KEY (`id`)
+  	PRIMARY KEY (`id`),
+  	CONSTRAINT `FK_ADMIN_GAS_ID` FOREIGN KEY (`admin_id`) REFERENCES `user`(`id`)
   );

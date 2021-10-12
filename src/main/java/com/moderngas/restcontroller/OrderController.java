@@ -5,19 +5,15 @@ import com.moderngas.pojo.user.CartDto;
 import com.moderngas.pojo.user.OrderDto;
 import com.moderngas.pojo.ResponseStatus;
 import com.moderngas.service.OrderService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping(value = "/order", produces = "application/json")
 public class OrderController {
@@ -25,56 +21,129 @@ public class OrderController {
     @Autowired
     private OrderService orderService;
 
-
-    @PostMapping("/placeOrder")
+    /**
+     * Place User Order For Specific Admin
+     *
+     * @param orderDto
+     * @return ResponseStatus
+     */
+    @PostMapping("/order")
     public ResponseEntity<ResponseStatus> placeOrder(@RequestBody OrderDto orderDto) {
+        log.info("OrderController :: placeOrder >>> Start");
         String response = orderService.placeOrder(orderDto);
         return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
     }
 
-    @GetMapping("/deleteOrder")
+    /**
+     * Delete User Order Record
+     *
+     * @param orderId
+     * @return ResponseStatus
+     * @throws BadRequestException
+     */
+    @DeleteMapping("/order")
     public ResponseEntity<ResponseStatus> deleteOrder(@RequestParam("id") Long orderId) throws BadRequestException {
+        log.info("OrderController :: deleteOrder >>> Start");
         String response = orderService.deleteOrder(orderId);
         return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
     }
 
-    @GetMapping("/getOrderListByUser")
-    public List<OrderDto> getOrderListByUser(@RequestParam("userId") Long userId) throws BadRequestException {
-        return orderService.getOrderListByUser(userId);
+    /**
+     * Get User Order List For Specific Admin
+     *
+     * @param userId
+     * @param adminId
+     * @return Order List
+     */
+    @GetMapping("/order")
+    public List<OrderDto> getOrderListByUser(@RequestParam("id") Long userId, @RequestParam("adminId") Long adminId) throws BadRequestException {
+        log.info("OrderController :: getOrderListByUser >>> Start");
+        return orderService.getOrderListByUser(userId, adminId);
     }
 
-    @PostMapping("/addCart")
-    public ResponseEntity<ResponseStatus> addCart(@RequestBody CartDto cartDto) {
-        String response = orderService.addCart(cartDto);
+    /**
+     * Add Or Update User Cart Record For Specific Admin
+     *
+     * @param cartDto
+     * @return ResponseStatus
+     * @throws BadRequestException
+     */
+    @PostMapping("/cart")
+    public ResponseEntity<ResponseStatus> addOrUpdateCart(@RequestBody CartDto cartDto) throws BadRequestException {
+        log.info("OrderController :: addOrUpdateCart >>> Start");
+        String response = orderService.addOrUpdateCart(cartDto);
         return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
     }
 
-    @GetMapping("/deleteCart")
+    /**
+     * Delete Cart Record
+     *
+     * @param cartId
+     * @return ResponseStatus
+     * @throws BadRequestException
+     */
+    @DeleteMapping("/cart")
     public ResponseEntity<ResponseStatus> deleteCart(@RequestParam("id") Long cartId) throws BadRequestException {
+        log.info("OrderController :: deleteCart >>> Start");
         String response = orderService.deleteCart(cartId);
         return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
     }
 
-    @GetMapping("/getCartListByUser")
-    public List<CartDto> getCartListByUser(@RequestParam("userId") Long userId) throws BadRequestException {
-        return orderService.getCartByUser(userId);
+    /**
+     * Get User Cart For Specific Admin
+     *
+     * @param userId
+     * @return Cart List
+     * @throws BadRequestException
+     */
+    @GetMapping("/cart")
+    public List<CartDto> getCartListByUser(@RequestParam("id") Long userId, @RequestParam("adminId") Long adminId) throws BadRequestException {
+        log.info("OrderController :: getCartListByUser >>> Start");
+        return orderService.getCartByUser(userId, adminId);
     }
 
+    /**
+     * Place All The Orders from Cart.
+     *
+     * @param userId
+     * @param adminId
+     * @return ResponseStatus
+     * @throws BadRequestException
+     */
     @GetMapping("/placeOrderFromCart")
-    public ResponseEntity<ResponseStatus> placeOrderFromCart(@RequestParam("userId") Long userId) throws BadRequestException {
-        String response = orderService.placeOrderFromCart(userId);
+    public ResponseEntity<ResponseStatus> placeOrderFromCart(@RequestParam("id") Long userId, @RequestParam("adminId") Long adminId) throws BadRequestException {
+        log.info("OrderController :: placeOrderFromCart >>> Start");
+        String response = orderService.placeOrderFromCart(userId, adminId);
         return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
     }
 
+    /**
+     * Get Order Details By Id.
+     *
+     * @param orderId
+     * @return Order Details
+     * @throws BadRequestException
+     */
     @GetMapping("/getOrderDetailsById")
     public OrderDto getOrderDetailsById(@RequestParam("orderId") Long orderId) throws BadRequestException {
+        log.info("OrderController :: getOrderDetailsById >>> Start");
         return orderService.getOrderDetailsById(orderId);
     }
 
+    /**
+     * Update the Order Status.
+     *
+     * @param orderId
+     * @param orderStatus
+     * @param vehicleId
+     * @return ResponseStatus
+     * @throws BadRequestException
+     */
     @PutMapping("/updateOrderStatus")
     public ResponseEntity<ResponseStatus> updateOrderStatus(@RequestParam(value = "orderId") Long orderId,
                                                             @RequestParam(value = "status") String orderStatus,
                                                             @RequestParam(value = "vehicleId", required = false) Long vehicleId) throws BadRequestException {
+        log.info("OrderController :: updateOrderStatus >>> Start");
         String response = orderService.updateOrderStatus(orderId, orderStatus, vehicleId);
         return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
     }

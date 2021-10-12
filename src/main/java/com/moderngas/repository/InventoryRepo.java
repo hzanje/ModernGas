@@ -22,14 +22,14 @@ public interface InventoryRepo extends JpaRepository<CylinderEntity, Long> {
     List<String> getAvailableCylinder(@Param("status") CylinderStatus status);
 
     @Modifying
-    @Query("UPDATE CylinderEntity SET cylinderStatus =:status, userId=:userId WHERE code IN (:codeList) ")
-    void updateCylinderToAssigned(@Param("userId") Long userId,
+    @Query("UPDATE CylinderEntity SET cylinderStatus =:status, assignedUserId=:assignedUserId WHERE code IN (:codeList) ")
+    void updateCylinderToAssigned(@Param("assignedUserId") Long userId,
                                   @Param("codeList") List<String> codeList,
                                   @Param("status") CylinderStatus status);
 
     @Modifying
-    @Query("UPDATE CylinderEntity SET cylinderStatus =:status, userId = NULL WHERE code IN (:codeList) AND userId=:userId")
-    void updateCylinderToEmpty(@Param("userId") Long userId,
+    @Query("UPDATE CylinderEntity SET cylinderStatus =:status, assignedUserId = NULL WHERE code IN (:codeList) AND assignedUserId=:assignedUserId")
+    void updateCylinderToEmpty(@Param("assignedUserId") Long assignedUserId,
                                @Param("codeList") List<String> codeList,
                                @Param("status") CylinderStatus status);
 
@@ -37,9 +37,9 @@ public interface InventoryRepo extends JpaRepository<CylinderEntity, Long> {
     Optional<CylinderEntity> checkIfCylinderCodeExist(@Param("code") String code);
 
     @Query("SELECT new com.moderngas.pojo.admin.InventoryCylinderDto(ce.id, ce.code, ce.cylinderStatus, ue.id, ue.name) FROM CylinderEntity ce " +
-            "LEFT JOIN UserEntity ue ON ce.userId = ue.id ")
+            "LEFT JOIN UserEntity ue ON ce.assignedUserId = ue.id ")
     List<InventoryCylinderDto> getInventoryCylinderForAdmin();
 
-    @Query("SELECT code FROM CylinderEntity WHERE userId=:userId")
-    List<String> getAssignedCylinderByUserId(@Param("userId") Long userId);
+    @Query("SELECT code FROM CylinderEntity WHERE assignedUserId=:assignedUserId")
+    List<String> getAssignedCylinderByUserId(@Param("assignedUserId") Long assignedUserId);
 }

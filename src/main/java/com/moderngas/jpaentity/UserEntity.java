@@ -49,6 +49,14 @@ public class UserEntity extends BaseEntity {
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
+    private Set<CylinderEntity> cylinderEntitySet;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
+    private Set<ResourceCentreEntity> resourceCentreEntitySet;
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     private Set<UserTokenEntity> userTokenSet;
 
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)

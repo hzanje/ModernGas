@@ -36,21 +36,49 @@ public class UserController {
     @Autowired
     private GenericService genericService;
 
+    /**
+     * Get All the Client/User with respect to its Admin.
+     *
+     * @param adminId
+     * @return
+     */
     @GetMapping(value = "/getAllClient")
-    public List<UserEntityDto> getAllClient() {
-        return userService.getAllUser();
+    public List<UserEntityDto> getAllClient(@RequestParam("adminId") Long adminId) {
+        return userService.getAllUserByAdmin(adminId);
     }
 
+    /**
+     * Get Client/User by Id.
+     *
+     * @param userId
+     * @return
+     * @throws BadRequestException
+     */
     @GetMapping(value = "/getClientById")
     public UserEntityDto getClientById(@RequestParam("userId") Long userId) throws BadRequestException {
         return userService.getUserById(userId);
     }
 
+    /**
+     * Get User By UserName(PhoneNumber)
+     *
+     * @param userName
+     * @return
+     */
     @GetMapping(value = "/getUser")
-    public UserEntityDto getUser(@RequestParam("userName") Long userName) {
+    public UserEntityDto getUser(@RequestParam("userName") Long userName) throws BadRequestException {
         return genericService.convertUserDataToDto(userService.getUserByLoginId(userName));
     }
 
+    /**
+     * Changes Password for the User in Application
+     *
+     * @param username
+     * @param oldPassword
+     * @param newPassword
+     * @return
+     * @throws BadRequestException
+     */
     @PostMapping(value = "/changePassword")
     public ResponseEntity<ResponseStatus> changePassword(@RequestParam("userName") final Long username,
                                                          @RequestParam("oldPassword") final String oldPassword,
@@ -59,34 +87,76 @@ public class UserController {
         return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
     }
 
+    /**
+     * Get UserDashboard By its respected Admin.
+     *
+     * @param userId
+     * @return
+     */
     @GetMapping(value = "/getUserDashboard")
-    public List<UserDashboardDto> getUserDashboard(@RequestParam("userId") Long userId) {
-        return userService.getUserDashboard(userId);
+    public List<UserDashboardDto> getUserDashboard(@RequestParam("id") Long userId,
+                                                   @RequestParam("adminId") Long adminId) throws BadRequestException {
+        return userService.getUserDashboard(userId, adminId);
     }
 
-    @GetMapping(value = "/getListByCategoryId")
-    public List<NameIdDto> getListByCategoryId(@RequestParam("id") Long id) {
-        return userService.getListByCategoryId(id);
+    /**
+     * Get List of Gas Master By Its Category Id.
+     *
+     * @param categoryId
+     * @return
+     */
+    @GetMapping(value = "/getGasListByCategoryId")
+    public List<NameIdDto> getGasListByCategoryId(@RequestParam("id") Long categoryId) {
+        return userService.getGasListByCategoryId(categoryId);
     }
 
+    /**
+     * Get Gas Details By Id For Specific Admin.
+     *
+     * @param id
+     * @param adminId
+     * @return
+     * @throws BadRequestException
+     */
     @GetMapping(value = "/getGasDetailsById")
-    public GasDto getGasDetailsById(@RequestParam("id") Long id) throws BadRequestException {
-        return userService.getGasDetailsById(id);
+    public GasDto getGasDetailsById(@RequestParam("id") Long id, @RequestParam("adminId") Long adminId) throws BadRequestException {
+        return userService.getGasDetailsById(id, adminId);
     }
-    
+
+    /**
+     * Update User Details.
+     *
+     * @param userEntityDto
+     * @return
+     */
     @PostMapping(value = "/updateUser")
     public ResponseEntity<ResponseStatus> updateUser(@RequestBody UserEntityDto userEntityDto) {
     	String response = userService.updateUser(genericService.convertDtoToUserData(userEntityDto));
     	return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
     }
 
+    /**
+     * Update User Address
+     *
+     * @param addressDtoStr
+     * @param userId
+     * @return
+     * @throws BadRequestException
+     */
     @PostMapping(value = "/updateAddress")
     public ResponseEntity<ResponseStatus> updateAddress(@RequestBody AddressDto addressDtoStr,
                                                         @RequestParam("userId") final Long userId) throws BadRequestException {
         String response = userService.updateAddress(genericService.convertDtoToAddressEntity(addressDtoStr), userId);
         return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
     }
-    
+
+    /**
+     * Get User Address by User Id.
+     *
+     * @param userId
+     * @return
+     * @throws BadRequestException
+     */
     @GetMapping(value="/getAddress")
     public ResponseEntity<JSONObject> getAddress(@RequestParam("userId") final Long userId) throws BadRequestException {
     	JSONObject obj=userService.getAddress(userId);

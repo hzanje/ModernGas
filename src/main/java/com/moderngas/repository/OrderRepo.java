@@ -6,7 +6,6 @@ import com.moderngas.jpaentity.OrderEntity;
 import com.moderngas.pojo.admin.OrderDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -20,7 +19,11 @@ import java.util.List;
 public interface OrderRepo extends JpaRepository<OrderEntity, Long> {
 
     @Query(value = QUERIES.ORDER_ENTRIES_BY_USER_ID)
-    List<OrderEntity> getOrderEntitiesByUserId(Long userId);
+    List<OrderEntity> getOrderEntitiesByUserId(@Param("userId") Long userId,
+                                               @Param("adminId") Long adminId);
+
+    @Query(value = QUERIES.ORDER_COUNT_BY_USER_ID)
+    int getOrderCountByUserId(@Param("userId") Long userId);
 
     @Query(" UPDATE OrderEntity SET activeFlag = 0 where id = :id")
     void deleteOrderById(@Param("id") Long orderId);
@@ -41,7 +44,9 @@ public interface OrderRepo extends JpaRepository<OrderEntity, Long> {
     private QUERIES() {
     }
 
-        private static final String ORDER_ENTRIES_BY_USER_ID = "FROM OrderEntity WHERE userId = :userId ORDER BY updatedDate ";
+        private static final String ORDER_ENTRIES_BY_USER_ID = "FROM OrderEntity WHERE userId = :userId AND adminId = :adminId ORDER BY updatedDate ";
+
+        private static final String ORDER_COUNT_BY_USER_ID  = "SELECT COUNT(*) FROM OrderEntity WHERE userId = :userId ORDER BY updatedDate ";
 
         private static final String ALL_ORDER_LIST_FOR_ADMIN = " FROM OrderEntity ord " +
                 " LEFT JOIN UserEntity u ON u.id = ord.userId " +
@@ -51,7 +56,7 @@ public interface OrderRepo extends JpaRepository<OrderEntity, Long> {
                 " AND (COALESCE(:cylinderType) IS NULL OR ord.cylinderType IN :cylinderType)" +
                 " AND (:search IS NULL OR u.name LIKE :search%)" +
                 " AND (:quantityOrder IS NULL)" +
-                " ORDER BY ord.createdDate DESC, ord.orderStatus ASC ";
+                " ORDER BY ord.orderStatus ASC ";
 
         private static final String ALL_ORDER_LIST_HEADER_FOR_ADMIN = "SELECT new com.moderngas.pojo.admin.OrderDto(" +
                 "ord.id, ord.cylinderType, ord.isRefill, u.id, u.name, ord.gasMaster.name, ord.gasMaster.categoryMaster.name," +

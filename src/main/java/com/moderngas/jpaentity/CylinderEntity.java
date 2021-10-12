@@ -2,12 +2,11 @@ package com.moderngas.jpaentity;
 
 import com.moderngas.enums.CylinderStatus;
 import lombok.Data;
+import net.minidev.json.annotate.JsonIgnore;
+import org.hibernate.annotations.CreationTimestamp;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.util.Date;
 
 @Data
 @Entity
@@ -17,8 +16,35 @@ public class CylinderEntity extends BaseEntity {
     @Column(name = "cylinder_code")
     private String code;
 
-    @Column(name = "user_id")
-    private Long userId;
+    @Column(name = "assigned_user_id")
+    private Long assignedUserId;
+
+    @Column(name = "manufacturer")
+    private String manufacturer;
+
+    @JsonIgnore
+    @CreationTimestamp
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "manufacturing_date", updatable = false)
+    private Date manufacturingDate;
+
+    @JsonIgnore
+    @CreationTimestamp
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "expiry_date", updatable = false)
+    private Date expiryDate;
+
+    @JsonIgnore
+    @CreationTimestamp
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "last_service")
+    private Date lastService;
+
+    @JsonIgnore
+    @CreationTimestamp
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "next_service")
+    private Date nextService;
 
     @Column(name = "cylinder_status_id")
     @Enumerated(EnumType.ORDINAL)
