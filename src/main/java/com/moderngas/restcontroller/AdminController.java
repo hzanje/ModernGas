@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @Slf4j
+@CrossOrigin
 @RestController
 @RequestMapping(value = "/admin", produces = "application/json")
 public class AdminController {

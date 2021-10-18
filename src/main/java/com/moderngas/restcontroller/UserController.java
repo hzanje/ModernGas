@@ -10,6 +10,7 @@ import com.moderngas.pojo.user.UserEntityDto;
 import com.moderngas.service.GenericService;
 import com.moderngas.service.UserService;
 
+import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONObject;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @CrossOrigin
 @RequestMapping(value = "/client", produces = "application/json")
@@ -44,6 +46,7 @@ public class UserController {
      */
     @GetMapping(value = "/getAllClient")
     public List<UserEntityDto> getAllClient(@RequestParam("adminId") Long adminId) {
+        log.info("UserController :: getAllClient >>> Start");
         return userService.getAllUserByAdmin(adminId);
     }
 
@@ -56,6 +59,7 @@ public class UserController {
      */
     @GetMapping(value = "/getClientById")
     public UserEntityDto getClientById(@RequestParam("userId") Long userId) throws BadRequestException {
+        log.info("UserController :: getClientById >>> Start");
         return userService.getUserById(userId);
     }
 
@@ -67,6 +71,7 @@ public class UserController {
      */
     @GetMapping(value = "/getUser")
     public UserEntityDto getUser(@RequestParam("userName") Long userName) throws BadRequestException {
+        log.info("UserController :: getUser >>> Start");
         return genericService.convertUserDataToDto(userService.getUserByLoginId(userName));
     }
 
@@ -83,6 +88,7 @@ public class UserController {
     public ResponseEntity<ResponseStatus> changePassword(@RequestParam("userName") final Long username,
                                                          @RequestParam("oldPassword") final String oldPassword,
                                                          @RequestParam("newPassword") final String newPassword) throws BadRequestException {
+        log.info("UserController :: changePassword >>> Start");
         String response = userService.changePassword(username, oldPassword, newPassword);
         return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
     }
@@ -96,6 +102,7 @@ public class UserController {
     @GetMapping(value = "/getUserDashboard")
     public List<UserDashboardDto> getUserDashboard(@RequestParam("id") Long userId,
                                                    @RequestParam("adminId") Long adminId) throws BadRequestException {
+        log.info("UserController :: getUserDashboard >>> Start");
         return userService.getUserDashboard(userId, adminId);
     }
 
@@ -107,6 +114,7 @@ public class UserController {
      */
     @GetMapping(value = "/getGasListByCategoryId")
     public List<NameIdDto> getGasListByCategoryId(@RequestParam("id") Long categoryId) {
+        log.info("UserController :: getGasListByCategoryId >>> Start");
         return userService.getGasListByCategoryId(categoryId);
     }
 
@@ -120,6 +128,7 @@ public class UserController {
      */
     @GetMapping(value = "/getGasDetailsById")
     public GasDto getGasDetailsById(@RequestParam("id") Long id, @RequestParam("adminId") Long adminId) throws BadRequestException {
+        log.info("UserController :: getGasDetailsById >>> Start");
         return userService.getGasDetailsById(id, adminId);
     }
 
@@ -131,7 +140,8 @@ public class UserController {
      */
     @PostMapping(value = "/updateUser")
     public ResponseEntity<ResponseStatus> updateUser(@RequestBody UserEntityDto userEntityDto) {
-    	String response = userService.updateUser(genericService.convertDtoToUserData(userEntityDto));
+        log.info("UserController :: updateUser >>> Start");
+        String response = userService.updateUser(genericService.convertDtoToUserData(userEntityDto));
     	return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
     }
 
@@ -146,6 +156,7 @@ public class UserController {
     @PostMapping(value = "/updateAddress")
     public ResponseEntity<ResponseStatus> updateAddress(@RequestBody AddressDto addressDtoStr,
                                                         @RequestParam("userId") final Long userId) throws BadRequestException {
+        log.info("UserController :: updateAddress >>> Start");
         String response = userService.updateAddress(genericService.convertDtoToAddressEntity(addressDtoStr), userId);
         return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
     }
@@ -159,7 +170,8 @@ public class UserController {
      */
     @GetMapping(value="/getAddress")
     public ResponseEntity<JSONObject> getAddress(@RequestParam("userId") final Long userId) throws BadRequestException {
-    	JSONObject obj=userService.getAddress(userId);
+        log.info("UserController :: getAddress >>> Start");
+        JSONObject obj=userService.getAddress(userId);
     	if(obj.containsKey("message")) {
     		return new ResponseEntity<>(obj, HttpStatus.BAD_REQUEST);
     	} else {

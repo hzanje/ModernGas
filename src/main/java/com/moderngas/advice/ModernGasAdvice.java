@@ -3,7 +3,6 @@ package com.moderngas.advice;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.moderngas.exception.BadRequestException;
 import com.moderngas.pojo.ResponseStatus;
-import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;

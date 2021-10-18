@@ -58,4 +58,6 @@ public interface GenericService {
     List<OnboardingDto> convertUserDateToOnboardingList(UserEntity userEntity) throws BadRequestException;
 
     UserEntity getUserAdminDetails() throws BadRequestException;
+
+    UserEntity getUserAndCheckUserAdmin(Long userId, Long adminId) throws BadRequestException;
 }

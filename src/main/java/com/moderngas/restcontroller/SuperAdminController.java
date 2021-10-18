@@ -4,15 +4,15 @@ import com.moderngas.exception.BadRequestException;
 import com.moderngas.pojo.ResponseStatus;
 import com.moderngas.pojo.superadmin.AdminEntityDto;
 import com.moderngas.service.SuperAdminService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+@Slf4j
+@CrossOrigin
 @RestController
 @RequestMapping(value = "/super", produces = "application/json")
 public class SuperAdminController {
@@ -23,6 +23,7 @@ public class SuperAdminController {
     @Secured("ROLE_SUPER_ADMIN")
     @PostMapping("/createAdmin")
     public ResponseEntity<ResponseStatus> createAdmin(@RequestBody AdminEntityDto adminEntityDto) throws BadRequestException {
+        log.info("SuperAdminController :: createAdmin >>> Start");
         String response = superAdminService.createAdmin(adminEntityDto);
         return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
     }

@@ -67,11 +67,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<OrderDto> getOrderListByUser(Long userId, Long adminId) throws BadRequestException {
-        UserEntity userEntity = userRepo.findById(userId)
-                .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER));
-        if (!userEntity.getEmployerId().equals(adminId)) {
-            throw new BadRequestException(ExceptionConstants.INVALID_USER_ADMIN);
-        }
+        UserEntity userEntity = genericService.getUserAndCheckUserAdmin(userId, adminId);
         List<OrderDto> orderDtoList = new ArrayList<>();
         List<OrderEntity> orderEntityList = orderRepo.getOrderEntitiesByUserId(userEntity.getId(), adminId);
         if (!CollectionUtils.isEmpty(orderEntityList)) {
@@ -95,11 +91,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<CartDto> getCartByUser(Long userId, Long adminId) throws BadRequestException {
-        UserEntity userEntity = userRepo.findById(userId)
-                .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER));
-        if (!userEntity.getEmployerId().equals(adminId)) {
-            throw new BadRequestException(ExceptionConstants.INVALID_USER_ADMIN);
-        }
+        UserEntity userEntity = genericService.getUserAndCheckUserAdmin(userId, adminId);
         List<CartDto> cartDtoList = new ArrayList<>();
         List<CartEntity> cartEntityList = cartRepo.getCartEntitiesByUserIdAndAdminIdOrderByUpdatedDate(userEntity.getId(), adminId);
         if (!CollectionUtils.isEmpty(cartEntityList)) {
@@ -129,11 +121,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public String placeOrderFromCart(Long userId, Long adminId) throws BadRequestException {
         log.info("OrderService >> Place Order From Cart By User: {}", userId);
-        UserEntity userEntity = userRepo.findById(userId)
-                .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER));
-        if (!userEntity.getEmployerId().equals(adminId)) {
-            throw new BadRequestException(ExceptionConstants.INVALID_USER_ADMIN);
-        }
+        UserEntity userEntity = genericService.getUserAndCheckUserAdmin(userId, adminId);
         String response = Constants.FAILURE_STR;
         List<CartEntity> cartEntityList = cartRepo.getCartEntitiesByUserIdOrderByUpdatedDate(userEntity.getId());
         if (!CollectionUtils.isEmpty(cartEntityList)) {

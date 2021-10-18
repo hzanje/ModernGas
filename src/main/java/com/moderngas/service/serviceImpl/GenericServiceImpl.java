@@ -434,4 +434,16 @@ public class GenericServiceImpl implements GenericService {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         return userRepo.findByMobileNumber(Long.parseLong((String) auth.getPrincipal())).orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER));
     }
+
+    @Override
+    public UserEntity getUserAndCheckUserAdmin(Long userId, Long adminId) throws BadRequestException {
+        UserEntity userEntity = userRepo.findById(userId)
+                .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER));
+        if (!userEntity.getEmployerId().equals(adminId)) {
+            throw new BadRequestException(ExceptionConstants.INVALID_USER_ADMIN);
+        }
+        return userEntity;
+    }
+
+
 }

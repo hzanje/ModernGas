@@ -10,17 +10,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 
 @Slf4j
+@CrossOrigin
 @RestController
 @RequestMapping(value = "/base", produces = "application/json")
 public class BaseController {
@@ -31,6 +27,12 @@ public class BaseController {
     @Autowired
     UserDetailsServiceImpl userDetailsService;
 
+    /**
+     * Check if User Exist in System.
+     *
+     * @param mobileNumber
+     * @return
+     */
     @GetMapping(value = "/checkUserExist")
     public ResponseEntity<ResponseStatus> checkUserExist(@RequestParam("mobileNumber") Long mobileNumber) {
         log.info("BaseController :: checkUserExist >>> Start ");
@@ -38,7 +40,13 @@ public class BaseController {
         return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
     }
 
-
+    /**
+     * API for Forget Password.
+     *
+     * @param userName
+     * @return
+     * @throws BadRequestException
+     */
     @GetMapping(value = "/forgetPassword")
     public ResponseEntity<ResponseStatus> forgetPassword(@RequestParam("userName") Long userName) throws BadRequestException {
         log.info("BaseController :: forgetPassword >>> Start ");
@@ -46,6 +54,14 @@ public class BaseController {
         return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
     }
 
+    /**
+     * Refresh Token For The User
+     *
+     * @param requestHeader
+     * @param response
+     * @return
+     * @throws BadRequestException
+     */
     @PutMapping(value = "/refreshToken")
     public ResponseEntity<ResponseStatus> refreshToken(@RequestHeader Map<String, String> requestHeader, HttpServletResponse response) throws BadRequestException {
         log.info("BaseController :: refreshToken >>> Start ");
@@ -54,6 +70,13 @@ public class BaseController {
         return new ResponseEntity<>(new ResponseStatus(Constants.SUCCESS_STR), HttpStatus.OK);
     }
 
+    /**
+     * Logout User From The System
+     *
+     * @param requestHeader
+     * @return
+     * @throws BadRequestException
+     */
     @GetMapping(value = "/logout")
     public ResponseEntity<ResponseStatus> logoutUser(@RequestHeader Map<String, String> requestHeader) throws BadRequestException {
         log.info("BaseController :: logout >>> Start ");
