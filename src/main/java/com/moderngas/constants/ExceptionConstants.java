@@ -18,4 +18,5 @@ public class ExceptionConstants {
     public static final String USER_ROLE_IS_EMPTY = "Please enter valid role";
     public static final String ADMIN_GAS_IS_EMPTY = "Gas is not associated with Admin";
     public static final String GAS_LIST_IS_EMPTY = "Gas List is Empty";
+    public static final String INVALID_RESOURCE_CENTRE = "Please enter valid Resource Centre";
 }

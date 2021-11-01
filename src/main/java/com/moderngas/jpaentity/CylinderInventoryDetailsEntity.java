@@ -10,9 +10,10 @@ import javax.persistence.*;
 @Table(name = "cylinder_inventory_details")
 public class CylinderInventoryDetailsEntity extends BaseEntity {
 
+    @Column(name = "is_transit")
     private boolean isTransit;
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cylinder_id", referencedColumnName = "id")
     private CylinderEntity cylinderEntity;
 

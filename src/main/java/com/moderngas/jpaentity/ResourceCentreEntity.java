@@ -17,9 +17,6 @@ public class ResourceCentreEntity extends BaseEntity {
     @Column(name = "alias")
     private String alias;
 
-    /*@Column(name = "user_id")
-    private Long userId;*/
-
     public ResourceCentreEntity(Long id, String name, String alias) {
         this.id = id;
         this.name = name;

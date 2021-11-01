@@ -3,6 +3,7 @@ package com.moderngas.repository;
 
 import com.moderngas.enums.CylinderStatus;
 import com.moderngas.jpaentity.CylinderEntity;
+import com.moderngas.pojo.NameIdDto;
 import com.moderngas.pojo.admin.InventoryCylinderDto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -36,10 +37,31 @@ public interface InventoryRepo extends JpaRepository<CylinderEntity, Long> {
     @Query(" FROM CylinderEntity WHERE code = :code")
     Optional<CylinderEntity> checkIfCylinderCodeExist(@Param("code") String code);
 
+    @Query(" FROM CylinderEntity WHERE code IN (:codeList)")
+    List<CylinderEntity> getCylinderFromCodeList(@Param("codeList") List<String> codeList);
+
     @Query("SELECT new com.moderngas.pojo.admin.InventoryCylinderDto(ce.id, ce.code, ce.cylinderStatus, ue.id, ue.name) FROM CylinderEntity ce " +
             "LEFT JOIN UserEntity ue ON ce.assignedUserId = ue.id ")
     List<InventoryCylinderDto> getInventoryCylinderForAdmin();
 
     @Query("SELECT code FROM CylinderEntity WHERE assignedUserId=:assignedUserId")
     List<String> getAssignedCylinderByUserId(@Param("assignedUserId") Long assignedUserId);
+
+    @Query(value = QUERIES.FETCH_CYLINDER_BY_RESOURCE_CENTRE)
+    List<NameIdDto> fetchCylinderFromResourceCentreById(@Param("resourceCentreId") Long resourceCentreId);
+
+    @Query(value = QUERIES.FETCH_CYLINDER_BY_RESOURCE_CENTRE_AND_STATUS)
+    List<NameIdDto> fetchCylinderFromResourceCentreByIdAndStatus(@Param("resourceCentreId") Long resourceCentreId,
+                                                                 @Param("cylinderStatus") CylinderStatus cylinderStatus);
+
+    class QUERIES {
+
+        private QUERIES() {
+        }
+
+        private static final String FETCH_CYLINDER_BY_RESOURCE_CENTRE = "SELECT new com.moderngas.pojo.NameIdDto(cid.cylinderEntity.id, cid.cylinderEntity.code) FROM CylinderInventoryDetailsEntity cid WHERE cid.resourceCentreEntity.id = :resourceCentreId";
+
+        private static final String FETCH_CYLINDER_BY_RESOURCE_CENTRE_AND_STATUS = FETCH_CYLINDER_BY_RESOURCE_CENTRE + " AND cid.cylinderEntity.cylinderStatus = :cylinderStatus ";
+    }
+
 }

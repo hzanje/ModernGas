@@ -180,7 +180,7 @@ public class AdminController {
 
     @Secured("ROLE_ADMIN")
     @GetMapping("/resourceCentre")
-    public List<ResourceCentreDto> getResourceCentre() throws BadRequestException {
+    public List<ResourceCentreDto> getResourceCentre(@RequestParam(value = "id", required = false) Long id) throws BadRequestException {
         log.info("AdminController :: getResourceCentre >>> Start");
         return resourceCentreService.getResourceCentre();
     }

@@ -30,5 +30,13 @@ public class UserEntityDto {
 
     private boolean isOnboarding;
 
+    //ResourceCentre
+
+    // Employer Dto
+        // id
+        // name
+        // company Name
+        // address
+
 
 }

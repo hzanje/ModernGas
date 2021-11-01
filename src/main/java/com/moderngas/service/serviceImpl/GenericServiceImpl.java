@@ -152,6 +152,9 @@ public class GenericServiceImpl implements GenericService {
 
     @Override
     public UserEntityDto convertUserDataToDto(UserEntity userEntity) {
+        // Get Roles by token
+
+        // Check roles and populate data as per roles.
         if (null != userEntity) {
             UserEntityDto userEntityDto = new UserEntityDto();
             userEntityDto.setId(userEntity.getId());
@@ -236,7 +239,6 @@ public class GenericServiceImpl implements GenericService {
                 UserDashboardDto userDashboardDto = new UserDashboardDto();
                 userDashboardDto.setId(categoryMaster.getId());
                 userDashboardDto.setName(categoryMaster.getName());
-                userDashboardDto.setCategory(true);
                 userDashboardDtoList.add(userDashboardDto);
             }
         }

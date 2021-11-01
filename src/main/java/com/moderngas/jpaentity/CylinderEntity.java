@@ -49,4 +49,7 @@ public class CylinderEntity extends BaseEntity {
     @Column(name = "cylinder_status_id")
     @Enumerated(EnumType.ORDINAL)
     private CylinderStatus cylinderStatus;
+
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "cylinderEntity")
+    private CylinderInventoryDetailsEntity cylinderInventoryDetailsEntity;
 }

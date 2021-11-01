@@ -11,7 +11,5 @@ public class UserDashboardDto {
 
     private String name;
 
-    private boolean isCategory;
-
     List<String> imageURlList;
 }

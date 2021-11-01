@@ -208,7 +208,6 @@ public class UserServiceImpl implements UserService {
         UserDashboardDto userDashboardDto = new UserDashboardDto();
         userDashboardDto.setId(gasMaster.getId());
         userDashboardDto.setName(gasMaster.getName());
-        userDashboardDto.setCategory(false);
         userDashboardDtoList.add(userDashboardDto);
         }
         return userDashboardDtoList;
