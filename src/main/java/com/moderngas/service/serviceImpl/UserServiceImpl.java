@@ -72,7 +72,7 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public String addUser(UserEntityDto userEntityDto) {
+    public String addUser(UserEntityDto userEntityDto) throws BadRequestException {
         log.info("UserService >> Create New User");
         /* Add new Client to DataBase */
         String response = Constants.FAILURE_STR;
@@ -102,7 +102,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserEntityDto> getAllUserByAdmin(Long adminId) {
+    public List<UserEntityDto> getAllUserByAdmin(Long adminId) throws BadRequestException {
         List<UserEntityDto> userEntityDtoList = new ArrayList<>();
         if (null != adminId) {
             List<UserEntity> userEntityList = userRepo.getAllUserByAdmin(adminId);
@@ -192,7 +192,7 @@ public class UserServiceImpl implements UserService {
     public List<UserDashboardDto> getUserDashboard(Long userId, Long adminId) throws BadRequestException {
         UserEntity userEntity = userRepo.findById(userId)
                 .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER));
-        if (!userEntity.getEmployerId().equals(adminId)) {
+        if (!userEntity.getAdminIdSet().contains(adminId)) {
             throw new BadRequestException(ExceptionConstants.INVALID_USER_ADMIN);
         }
         List<UserDashboardDto> userDashboardDtoList = new ArrayList<>();

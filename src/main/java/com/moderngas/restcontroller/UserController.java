@@ -45,7 +45,7 @@ public class UserController {
      * @return
      */
     @GetMapping(value = "/getAllClient")
-    public List<UserEntityDto> getAllClient(@RequestParam("adminId") Long adminId) {
+    public List<UserEntityDto> getAllClient(@RequestParam("adminId") Long adminId) throws BadRequestException {
         log.info("UserController :: getAllClient >>> Start");
         return userService.getAllUserByAdmin(adminId);
     }
@@ -139,7 +139,7 @@ public class UserController {
      * @return
      */
     @PostMapping(value = "/updateUser")
-    public ResponseEntity<ResponseStatus> updateUser(@RequestBody UserEntityDto userEntityDto) {
+    public ResponseEntity<ResponseStatus> updateUser(@RequestBody UserEntityDto userEntityDto) throws BadRequestException {
         log.info("UserController :: updateUser >>> Start");
         String response = userService.updateUser(genericService.convertDtoToUserData(userEntityDto));
     	return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);

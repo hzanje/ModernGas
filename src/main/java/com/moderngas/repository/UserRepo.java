@@ -18,7 +18,8 @@ import java.util.Optional;
 @Transactional
 public interface UserRepo extends JpaRepository<UserEntity, Long> {
 
-    @Query("FROM UserEntity u WHERE u.employerId = :adminId")
+
+    @Query("FROM UserEntity u WHERE :adminId member of u.adminIdSet")
     List<UserEntity> getAllUserByAdmin(@Param("adminId") Long adminId);
 
     Optional<UserEntity> findByMobileNumber(Long userName);

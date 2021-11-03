@@ -18,6 +18,7 @@ import com.moderngas.service.ResourceCentreService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -55,6 +56,7 @@ public class ResourceCentreServiceImpl implements ResourceCentreService {
         return Constants.SUCCESS_STR;
     }
 
+    @Secured("ROLE_OPERATOR")
     @Override
     public List<ResourceCentreDto> getResourceCentre() throws BadRequestException {
         UserEntity userEntity = genericService.getUserAdminDetails();
@@ -82,6 +84,7 @@ public class ResourceCentreServiceImpl implements ResourceCentreService {
                 cylinderInventoryEntity = cylinderEntity.getCylinderInventoryDetailsEntity();
             }
             cylinderInventoryEntity.setTransit(false);
+            cylinderInventoryEntity.setDeliveryVehicleEntity(null);
             cylinderInventoryEntity.setResourceCentreEntity(resourceCentreEntity);
             cylinderInventoryEntity.setCylinderEntity(cylinderEntity);
             cylinderEntity.setCylinderInventoryDetailsEntity(cylinderInventoryEntity);
@@ -102,5 +105,16 @@ public class ResourceCentreServiceImpl implements ResourceCentreService {
             cylinderCodeIdList = inventoryRepo.fetchCylinderFromResourceCentreByIdAndStatus(resourceCentreEntity.getId(), cylinderStatusEnum);
         }
         return cylinderCodeIdList;
+    }
+
+    @Override
+    public String fillCylinder(List<String> cylinderCodes) throws BadRequestException {
+        List<CylinderEntity> cylinderEntityList = inventoryRepo.getCylinderFromCodeList(cylinderCodes);
+        if (CollectionUtils.isEmpty(cylinderEntityList)) {
+            throw new BadRequestException(ExceptionConstants.INVALID_CYLINDER_CODE);
+        }
+        cylinderEntityList.forEach(c -> c.setCylinderStatus(CylinderStatus.CYLINDER_STATUS_FILLED));
+        inventoryRepo.saveAll(cylinderEntityList);
+        return Constants.SUCCESS_STR;
     }
 }

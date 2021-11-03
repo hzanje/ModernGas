@@ -3,6 +3,7 @@ package com.moderngas.jpaentity;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -36,8 +37,13 @@ public class UserEntity extends BaseEntity {
     @Column(name = "is_forget_password", columnDefinition = "tinyint(1) DEFAULT 0")
     private boolean isForgetPassword = false;
 
-    @Column(name = "employer_id")
+    @Transient
     private Long employerId;
+
+    @ElementCollection
+    @CollectionTable(name = "user_admin_mapping", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "admin_id")
+    private Set<Long> adminIdSet = new HashSet<>();
 
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)

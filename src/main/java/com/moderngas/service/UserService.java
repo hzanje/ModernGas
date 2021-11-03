@@ -19,11 +19,11 @@ import java.util.List;
 
 public interface UserService {
 
-    String addUser(UserEntityDto userEntityDto);
+    String addUser(UserEntityDto userEntityDto) throws BadRequestException;
 
     String updateUser(UserEntity userEntity);
 
-    List<UserEntityDto> getAllUserByAdmin(Long adminId);
+    List<UserEntityDto> getAllUserByAdmin(Long adminId) throws BadRequestException;
 
     UserEntityDto getUserById(Long userId) throws BadRequestException;
 

@@ -1,6 +1,7 @@
 package com.moderngas.pojo.user;
 
 
+import com.moderngas.pojo.admin.ResourceCentreDto;
 import lombok.Data;
 
 import java.util.List;
@@ -22,21 +23,14 @@ public class UserEntityDto {
 
     private String contactPerson;
 
-    private List<String> role;
-
-    private Long employerId;
+    private List<String> roles;
 
     private boolean isForgetPassword;
 
-    private boolean isOnboarding;
+    private boolean isOnboard;
 
-    //ResourceCentre
+    private List<ResourceCentreDto> resourceCentreDtoList;
 
-    // Employer Dto
-        // id
-        // name
-        // company Name
-        // address
-
+    private AdminDto adminDto;
 
 }

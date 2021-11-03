@@ -35,4 +35,17 @@ public class OperatorController {
         return resourceCentreService.fetchCylinderFromResourceCentre(resourceCentreId, cylinderStatus);
     }
 
+    /**
+     * Mark Cylinder As Filled State.
+     *
+     * @param cylinderCodes
+     * @return
+     * @throws BadRequestException
+     */
+    @PutMapping("/fillCylinder")
+    public String fillCylinder(@RequestBody List<String> cylinderCodes) throws BadRequestException {
+        log.info("EmployeeController :: fillCylinder >>> Start ");
+        return resourceCentreService.fillCylinder(cylinderCodes);
+    }
+
 }

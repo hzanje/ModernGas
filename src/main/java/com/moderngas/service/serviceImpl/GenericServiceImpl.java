@@ -14,14 +14,12 @@ import com.moderngas.pojo.admin.FilterDto;
 import com.moderngas.pojo.admin.OnboardingDto;
 import com.moderngas.pojo.superadmin.AdminEntityDto;
 import com.moderngas.pojo.superadmin.GasNameCylinderTypeDto;
-import com.moderngas.pojo.user.AddressDto;
-import com.moderngas.pojo.user.CartDto;
-import com.moderngas.pojo.user.OrderDto;
-import com.moderngas.pojo.user.UserDashboardDto;
-import com.moderngas.pojo.user.UserEntityDto;
+import com.moderngas.pojo.user.*;
+import com.moderngas.repository.DeliveryVehicleRepo;
 import com.moderngas.repository.GasRepo;
 import com.moderngas.repository.UserRepo;
 import com.moderngas.service.GenericService;
+import com.moderngas.service.ResourceCentreService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
@@ -45,25 +43,40 @@ public class GenericServiceImpl implements GenericService {
     private PasswordEncoder passwordEncoder;
 
     @Autowired
+    private ResourceCentreService resourceCentreService;
+
+    @Autowired
     private GasRepo gasRepo;
 
     @Autowired
     private UserRepo userRepo;
 
+    @Autowired
+    private DeliveryVehicleRepo deliveryVehicleRepo;
+
     @Override
-    public UserEntity convertDtoToUserData(UserEntityDto userEntityDto) {
-        UserEntity userEntity = null;
-        if (null != userEntityDto) {
-            userEntity = new UserEntity();
+    public UserEntity convertDtoToUserData(UserEntityDto userEntityDto) throws BadRequestException {
+        if (null == userEntityDto) {
+            throw new BadRequestException(ExceptionConstants.INVALID_REQUEST_DATA);
+        }
+        UserEntity adminEntity = getUserAdminDetails();
+        UserEntity userEntity = userRepo.findByMobileNumber(userEntityDto.getMobileNumber())
+                .orElse(new UserEntity());
+        if (null == userEntity.getId()) {
             userEntity.setName(userEntityDto.getName());
             userEntity.setEmail(userEntityDto.getEmail());
             userEntity.setMobileNumber(userEntityDto.getMobileNumber());
             userEntity.setCompanyName(userEntityDto.getCompanyName());
-            userEntity.setRoleEntitySet(addUserRole(userEntityDto.getRole(), userEntity.getRoleEntitySet()));
+            userEntity.setRoleEntitySet(addUserRole(userEntityDto.getRoles(), userEntity.getRoleEntitySet()));
             userEntity.setContactPerson(userEntityDto.getContactPerson());
             if (null != userEntityDto.getPassword() && !userEntityDto.getPassword().isEmpty()) {
                 userEntity.setPassword(encodeUserPassword(userEntityDto.getPassword()));
             }
+            userEntity.setAdminIdSet(new HashSet<>(Arrays.asList(adminEntity.getId())));
+        } else {
+            Set<Long> updatedAdminIdList = userEntity.getAdminIdSet();
+            updatedAdminIdList.add(adminEntity.getId());
+            userEntity.setAdminIdSet(updatedAdminIdList);
         }
         return userEntity;
     }
@@ -151,10 +164,7 @@ public class GenericServiceImpl implements GenericService {
     }
 
     @Override
-    public UserEntityDto convertUserDataToDto(UserEntity userEntity) {
-        // Get Roles by token
-
-        // Check roles and populate data as per roles.
+    public UserEntityDto convertUserDataToDto(UserEntity userEntity) throws BadRequestException {
         if (null != userEntity) {
             UserEntityDto userEntityDto = new UserEntityDto();
             userEntityDto.setId(userEntity.getId());
@@ -162,14 +172,33 @@ public class GenericServiceImpl implements GenericService {
             userEntityDto.setEmail(userEntity.getEmail());
             userEntityDto.setMobileNumber(userEntity.getMobileNumber());
             userEntityDto.setCompanyName(userEntity.getCompanyName());
-            userEntityDto.setOnboarding(userEntity.isOnboarding());
+            userEntityDto.setOnboard(userEntity.isOnboarding());
             userEntityDto.setForgetPassword(userEntity.isForgetPassword());
-            userEntityDto.setRole(userEntity.getRoleEntitySet()
+            userEntityDto.setRoles(userEntity.getRoleEntitySet()
                     .stream().map(UserRoleEntity::getRole).collect(Collectors.toList()));
             userEntityDto.setContactPerson(userEntity.getContactPerson());
+            userEntityDto = setResourceCentreForOperatorUser(userEntityDto);
+            userEntityDto = setAdminDtoForSingleAdminUser(userEntityDto, userEntity);
             return userEntityDto;
         }
         return null;
+    }
+
+    private UserEntityDto setAdminDtoForSingleAdminUser(UserEntityDto userEntityDto, UserEntity userEntity) throws BadRequestException {
+        if (!CollectionUtils.isEmpty(userEntityDto.getRoles()) && userEntityDto.getRoles().size() == 1) {
+            UserEntity adminEntity = userRepo.findById(userEntity.getAdminIdSet().iterator().next())
+                    .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER_ADMIN));
+            userEntityDto.setAdminDto(new AdminDto(adminEntity.getId(), adminEntity.getName(),
+                    adminEntity.getCompanyName(), convertAddressEntityToDto(adminEntity.getAddressEntity())));
+        }
+        return userEntityDto;
+    }
+
+    private UserEntityDto setResourceCentreForOperatorUser(UserEntityDto userEntityDto) throws BadRequestException {
+        if (userEntityDto.getRoles().contains(UserRole.USER_ROLE_OPERATOR.getRole())) {
+            userEntityDto.setResourceCentreDtoList(resourceCentreService.getResourceCentre());
+        }
+        return userEntityDto;
     }
 
     @Override
@@ -362,7 +391,7 @@ public class GenericServiceImpl implements GenericService {
         switch (orderStatus) {
 
             case ORDER_STATUS_LOADED: orderEntity.setLoadedDate(new Date());
-                orderEntity.setDeliveryVehicleNumber(deliveryVehicleId);
+                orderEntity.setDeliveryVehicle(deliveryVehicleRepo.getVehicleById(deliveryVehicleId));
                 break;
 
             case ORDER_STATUS_DEVLIVERED: orderEntity.setDeliveredDate(new Date());
@@ -441,7 +470,7 @@ public class GenericServiceImpl implements GenericService {
     public UserEntity getUserAndCheckUserAdmin(Long userId, Long adminId) throws BadRequestException {
         UserEntity userEntity = userRepo.findById(userId)
                 .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER));
-        if (!userEntity.getEmployerId().equals(adminId)) {
+        if (!userEntity.getAdminIdSet().contains(adminId)) {
             throw new BadRequestException(ExceptionConstants.INVALID_USER_ADMIN);
         }
         return userEntity;

@@ -83,15 +83,15 @@ public class AdminController {
     @Secured("ROLE_ADMIN")
     @PostMapping("/addCylinder/{id}")
     public ResponseEntity<ResponseStatus> addCylinder(@PathVariable("id") Long userId,
-                                                      @RequestBody CylinderCodeStatusListDto cylinderCodeStatusListDto) throws BadRequestException {
+                                                      @RequestBody List<CylinderCodeStatusDto> cylinderCodeStatusDtoList) throws BadRequestException {
         log.info("AdminController :: addCylinder >>> Start ");
-        String response = inventoryService.addCylinder(userId, cylinderCodeStatusListDto);
+        String response = inventoryService.addCylinder(userId, cylinderCodeStatusDtoList);
         return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
     }
 
     @Secured("ROLE_ADMIN")
     @PostMapping(value = "/addUser")
-    public ResponseEntity<ResponseStatus> addUser(@RequestBody UserEntityDto userEntityDto) {
+    public ResponseEntity<ResponseStatus> addUser(@RequestBody UserEntityDto userEntityDto) throws BadRequestException {
         log.info("AdminController :: userEntityDto >>> Start");
         String response = userService.addUser(userEntityDto);
         return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);

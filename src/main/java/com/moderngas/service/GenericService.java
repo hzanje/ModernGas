@@ -23,11 +23,11 @@ import java.util.List;
 
 public interface GenericService {
 
-    UserEntity convertDtoToUserData(UserEntityDto userEntityDto);
+    UserEntity convertDtoToUserData(UserEntityDto userEntityDto) throws BadRequestException;
 
     UserEntity convertDtoToUserData(AdminEntityDto adminEntityDto) throws BadRequestException;
 
-    UserEntityDto convertUserDataToDto(UserEntity clientEntity);
+    UserEntityDto convertUserDataToDto(UserEntity clientEntity) throws BadRequestException;
 
     String encodeUserPassword(String password);
 

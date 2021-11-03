@@ -1,7 +1,6 @@
 package com.moderngas.restcontroller;
 
 import com.moderngas.exception.BadRequestException;
-import com.moderngas.pojo.admin.CylinderCodeListDto;
 import com.moderngas.service.EmployeeService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,34 +17,35 @@ public class EmployeeController {
     @Autowired
     private EmployeeService employeeService;
 
+
     /**
      * Assigned Cylinder to Order.
      *
      * @param orderId
-     * @param codeListDto
+     * @param cylinderCodes
      * @return
      * @throws BadRequestException
      */
     @PutMapping("/assign/{orderId}")
     public String assignCylinderToUser(@PathVariable("orderId") Long orderId,
-                                       @RequestBody CylinderCodeListDto codeListDto) throws BadRequestException {
+                                       @RequestBody List<String> cylinderCodes) throws BadRequestException {
         log.info("EmployeeController :: assignCylinderToUser >>> Start ");
-        return employeeService.assignCylinderToUser(orderId, codeListDto);
+        return employeeService.assignCylinderToUser(orderId, cylinderCodes);
     }
 
     /**
      * Receive Cylinder From User.
      *
      * @param orderId
-     * @param codeListDto
+     * @param cylinderCodes
      * @return
      * @throws BadRequestException
      */
     @PutMapping("/receive/{orderId}")
     public String receiveCylinderFromUser(@PathVariable("orderId") Long orderId,
-                                          @RequestBody CylinderCodeListDto codeListDto) throws BadRequestException {
+                                          @RequestBody List<String> cylinderCodes) throws BadRequestException {
         log.info("EmployeeController :: receiveCylinderFromUser >>> Start ");
-        return employeeService.receiveCylinderFromUser(orderId, codeListDto);
+        return employeeService.receiveCylinderFromUser(orderId, cylinderCodes);
     }
 
     /**
@@ -70,18 +70,5 @@ public class EmployeeController {
     public List<String> getAssignedCylinder(@RequestParam(value = "id") Long userId) throws BadRequestException {
         log.info("EmployeeController :: getAssignedCylinder >>> Start ");
         return employeeService.getAssignedCylinderByUserId(userId);
-    }
-
-    /**
-     * Mark Cylinder As Filled State.
-     *
-     * @param cylinderCode
-     * @return
-     * @throws BadRequestException
-     */
-    @PutMapping("/fill/{cylinderCode}")
-    public String fillCylinder(@PathVariable("cylinderCode") String cylinderCode) throws BadRequestException {
-        log.info("EmployeeController :: fillCylinder >>> Start ");
-        return employeeService.fillCylinder(cylinderCode);
     }
 }

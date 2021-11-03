@@ -142,9 +142,8 @@ public class OrderServiceImpl implements OrderService {
         OrderDto orderDto = genericService.convertOrderEntityToDto(orderEntity);
         orderDto.setAddressDto(genericService.convertAddressEntityToDto(userEntity.getAddressEntity()));
         orderDto.setUserName(userEntity.getName());
-        if (null != orderEntity.getDeliveryVehicleNumber()) {
-            Optional<DeliveryVehicleEntity> deliveryVehicle = deliveryVehicleRepo.findById(orderEntity.getDeliveryVehicleNumber());
-            orderDto.setDeliveryVehicle(deliveryVehicle.isPresent() ? deliveryVehicle.get().getNumber() : "");
+        if (null != orderEntity.getDeliveryVehicle()) {
+            orderDto.setDeliveryVehicle(orderEntity.getDeliveryVehicle() == null ? "" : orderEntity.getDeliveryVehicle().getName());
         }
         return orderDto;
     }
