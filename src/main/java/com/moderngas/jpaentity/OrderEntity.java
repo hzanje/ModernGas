@@ -5,13 +5,7 @@ import com.moderngas.enums.OrderStatus;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.Date;
 
 @Entity
@@ -61,6 +55,10 @@ public class OrderEntity extends BaseEntity {
     private Date cancellationDate;
 
     @Column(name = "price")
-    private int price;
+    private float price;
+
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "address_id", referencedColumnName = "id")
+    private AddressEntity addressEntity;
 
 }

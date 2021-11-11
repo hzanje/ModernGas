@@ -9,5 +9,8 @@ CREATE TABLE `address` (
   `landmark` varchar(255) DEFAULT NULL,
   `pincode` int(11) DEFAULT NULL,
   `state` varchar(255) DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  `is_primary` tinyint(1) DEFAULT '0',
+  `user_id` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  CONSTRAINT `FK_USER_ADDRESS_ID` FOREIGN KEY (`user_id`) REFERENCES `user`(`id`)
 );

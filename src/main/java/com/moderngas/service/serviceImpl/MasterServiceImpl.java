@@ -3,6 +3,7 @@ package com.moderngas.service.serviceImpl;
 import com.moderngas.enums.CylinderStatus;
 import com.moderngas.enums.CylinderType;
 import com.moderngas.enums.OrderStatus;
+import com.moderngas.enums.UserPrivilege;
 import com.moderngas.pojo.NameIdDto;
 import com.moderngas.repository.GasRepo;
 import com.moderngas.service.MasterService;
@@ -50,5 +51,14 @@ public class MasterServiceImpl implements MasterService {
     @Override
     public List<NameIdDto> getGasList() {
         return gasRepo.getGasMasterNameIdList();
+    }
+
+    @Override
+    public List<String> getPrivilegeList() {
+        List<String> privilegeList = new ArrayList<>();
+        for (UserPrivilege userPrivilege : UserPrivilege.values()) {
+            privilegeList.add(userPrivilege.getPrivilege());
+        }
+        return privilegeList;
     }
 }

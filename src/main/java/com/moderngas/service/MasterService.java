@@ -13,4 +13,7 @@ public interface MasterService {
     List<String> getCylinderType();
 
     List<NameIdDto> getGasList();
+
+    List<String> getPrivilegeList();
+
 }

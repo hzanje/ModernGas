@@ -20,6 +20,7 @@ import com.moderngas.pojo.user.UserEntityDto;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
+import java.util.Set;
 
 public interface GenericService {
 
@@ -34,6 +35,8 @@ public interface GenericService {
     String generateRandomPassword() throws NoSuchAlgorithmException;
 
     AddressEntity convertDtoToAddressEntity(AddressDto addressDto);
+
+    Set<AddressDto> convertAddressEntitySetToDto(Set<AddressEntity> addressEntity);
 
     AddressDto convertAddressEntityToDto(AddressEntity addressEntity);
 

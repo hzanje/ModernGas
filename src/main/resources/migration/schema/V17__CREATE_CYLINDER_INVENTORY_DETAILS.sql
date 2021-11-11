@@ -3,7 +3,7 @@ CREATE TABLE `cylinder_inventory_details`(
   `active_flag` TINYINT(1),
   `created_date` DATETIME,
   `updated_date` DATETIME,
-  `isTransit` TINYINT(1) DEFAULT 0 NULL,
+  `is_transit` TINYINT(1) DEFAULT 0 NULL,
   `cylinder_id` BIGINT(20) NOT NULL,
   `delivery_vehicle_id` BIGINT(20) NULL,
   `resource_centre_id` BIGINT(20) NULL,

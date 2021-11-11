@@ -8,7 +8,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
-import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -17,9 +17,16 @@ public class UserDetailsImpl implements UserDetails {
     private String userName;
     private String password;
     private boolean active;
-    private List<GrantedAuthority> authorities;
+    private Set<GrantedAuthority> authorities;
 
     public UserDetailsImpl() {
+    }
+
+    public UserDetailsImpl(String userName, String password, boolean active, Set<GrantedAuthority> authorities) {
+        this.userName = userName;
+        this.password = password;
+        this.active = active;
+        this.authorities = authorities;
     }
 
     public UserDetailsImpl(UserEntity userEntity) {
@@ -28,7 +35,7 @@ public class UserDetailsImpl implements UserDetails {
         this.active = userEntity.isActiveFlag();
         this.authorities = userEntity.getRoleEntitySet().stream().map(UserRoleEntity::getRole)
                 .map(SimpleGrantedAuthority :: new)
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
     }
 
     @Override

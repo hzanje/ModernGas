@@ -140,7 +140,7 @@ public class OrderServiceImpl implements OrderService {
         UserEntity userEntity = userRepo.findById(orderEntity.getUserId())
                 .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER));
         OrderDto orderDto = genericService.convertOrderEntityToDto(orderEntity);
-        orderDto.setAddressDto(genericService.convertAddressEntityToDto(userEntity.getAddressEntity()));
+        orderDto.setAddressDto(genericService.convertAddressEntityToDto(orderEntity.getAddressEntity()));
         orderDto.setUserName(userEntity.getName());
         if (null != orderEntity.getDeliveryVehicle()) {
             orderDto.setDeliveryVehicle(orderEntity.getDeliveryVehicle() == null ? "" : orderEntity.getDeliveryVehicle().getName());

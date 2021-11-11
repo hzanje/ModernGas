@@ -1,8 +1,11 @@
 package com.moderngas.pojo.superadmin;
 
+import com.moderngas.jpaentity.AddressEntity;
+import com.moderngas.jpaentity.ContactPersonEntity;
 import lombok.Data;
 
 import java.util.List;
+import java.util.Set;
 
 @Data
 public class AdminEntityDto {
@@ -19,10 +22,10 @@ public class AdminEntityDto {
 
     private String companyName;
 
-    private String contactPerson;
-
     private List<String> roles;
 
     private List<GasNameCylinderTypeDto> gasNameCylinderTypes;
+
+    private Set<ContactPersonEntity> contactPersonSet;
 
 }

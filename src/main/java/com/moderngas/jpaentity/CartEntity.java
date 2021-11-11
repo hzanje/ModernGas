@@ -42,5 +42,5 @@ public class CartEntity extends BaseEntity {
     private int quantity;
 
     @Column(name = "price")
-    private int price;
+    private float price;
 }

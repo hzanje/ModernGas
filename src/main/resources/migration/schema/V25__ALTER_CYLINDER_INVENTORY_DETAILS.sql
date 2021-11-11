@@ -1,1 +1,0 @@
-ALTER TABLE `cylinder_inventory_details` CHANGE `isTransit` `is_transit` tinyint(1) DEFAULT 0 NULL;

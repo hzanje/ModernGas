@@ -222,7 +222,9 @@ public class UserServiceImpl implements UserService {
     public String updateAddress(AddressEntity addressEntity, Long userId) throws BadRequestException {
         UserEntity userEntity = userRepo.findById(userId)
                 .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER));
-        userEntity.setAddressEntity(addressEntity);
+        Set<AddressEntity> addressEntitySet = userEntity.getAddressEntitySet();
+        addressEntitySet.add(addressEntity);
+        userEntity.setAddressEntitySet(addressEntitySet);
         userRepo.save(userEntity);
         return Constants.SUCCESS_STR;
     }
@@ -232,11 +234,11 @@ public class UserServiceImpl implements UserService {
 		UserEntity userEntity = userRepo.findById(userId)
                 .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER));
 		JSONObject obj=new JSONObject();
-        AddressEntity address = userEntity.getAddressEntity();
-        if (address==null) {
+        Set<AddressEntity> addressSet = userEntity.getAddressEntitySet();
+        if (addressSet==null) {
             obj.put("message", "Address does not exist");
         } else {
-            obj.put("address", genericService.convertAddressEntityToDto(address));
+            obj.put("address", genericService.convertAddressEntitySetToDto(addressSet));
         }
 		return obj;
 	}

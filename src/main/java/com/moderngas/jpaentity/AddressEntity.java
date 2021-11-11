@@ -31,4 +31,7 @@ public class AddressEntity extends BaseEntity {
     @Column(name = "state")
     private String state;
 
+    @Column(name = "is_primary")
+    private boolean isPrimary;
+
 }

@@ -68,7 +68,7 @@ public class GenericServiceImpl implements GenericService {
             userEntity.setMobileNumber(userEntityDto.getMobileNumber());
             userEntity.setCompanyName(userEntityDto.getCompanyName());
             userEntity.setRoleEntitySet(addUserRole(userEntityDto.getRoles(), userEntity.getRoleEntitySet()));
-            userEntity.setContactPerson(userEntityDto.getContactPerson());
+            userEntity.setContactPersonSet(userEntityDto.getContactPersonSet());
             if (null != userEntityDto.getPassword() && !userEntityDto.getPassword().isEmpty()) {
                 userEntity.setPassword(encodeUserPassword(userEntityDto.getPassword()));
             }
@@ -105,7 +105,7 @@ public class GenericServiceImpl implements GenericService {
         userEntity.setMobileNumber(adminEntityDto.getMobileNumber());
         userEntity.setCompanyName(adminEntityDto.getCompanyName());
         userEntity.setRoleEntitySet(addUserRole(adminEntityDto.getRoles(), userEntity.getRoleEntitySet()));
-        userEntity.setContactPerson(adminEntityDto.getContactPerson());
+        userEntity.setContactPersonSet(adminEntityDto.getContactPersonSet());
         userEntity.setAdminGasMappings(gasMappingByNameAndType(adminEntityDto.getGasNameCylinderTypes()));
         return userEntity;
     }
@@ -176,7 +176,7 @@ public class GenericServiceImpl implements GenericService {
             userEntityDto.setForgetPassword(userEntity.isForgetPassword());
             userEntityDto.setRoles(userEntity.getRoleEntitySet()
                     .stream().map(UserRoleEntity::getRole).collect(Collectors.toList()));
-            userEntityDto.setContactPerson(userEntity.getContactPerson());
+            userEntityDto.setContactPersonSet(userEntity.getContactPersonSet());
             userEntityDto = setResourceCentreForOperatorUser(userEntityDto);
             userEntityDto = setAdminDtoForSingleAdminUser(userEntityDto, userEntity);
             return userEntityDto;
@@ -189,15 +189,15 @@ public class GenericServiceImpl implements GenericService {
             UserEntity adminEntity = userRepo.findById(userEntity.getAdminIdSet().iterator().next())
                     .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER_ADMIN));
             userEntityDto.setAdminDto(new AdminDto(adminEntity.getId(), adminEntity.getName(),
-                    adminEntity.getCompanyName(), convertAddressEntityToDto(adminEntity.getAddressEntity())));
+                    adminEntity.getCompanyName(), convertAddressEntitySetToDto(adminEntity.getAddressEntitySet())));
         }
         return userEntityDto;
     }
 
     private UserEntityDto setResourceCentreForOperatorUser(UserEntityDto userEntityDto) throws BadRequestException {
-        if (userEntityDto.getRoles().contains(UserRole.USER_ROLE_OPERATOR.getRole())) {
+        /*if (userEntityDto.getRoles().contains(UserRole.USER_ROLE_OPERATOR.getRole())) {
             userEntityDto.setResourceCentreDtoList(resourceCentreService.getResourceCentre());
-        }
+        }*/
         return userEntityDto;
     }
 
@@ -242,21 +242,30 @@ public class GenericServiceImpl implements GenericService {
         addressEntity.setCity(addressDto.getCity());
         addressEntity.setState(addressDto.getState());
         addressEntity.setPincode(addressDto.getPincode());
+        addressEntity.setPrimary(addressDto.isPrimary());
         return addressEntity;
+    }
+
+    @Override
+    public Set<AddressDto> convertAddressEntitySetToDto(Set<AddressEntity> addressEntitySet) {
+        Set<AddressDto> addressDtoSet = new HashSet<>();
+        for (AddressEntity addressEntity : addressEntitySet) {
+            addressDtoSet.add(convertAddressEntityToDto(addressEntity));
+        }
+        return addressDtoSet;
     }
 
     @Override
     public AddressDto convertAddressEntityToDto(AddressEntity addressEntity) {
         AddressDto addressDto = new AddressDto();
-        if(addressEntity!=null) {
-            addressDto.setId(addressEntity.getId());
-            addressDto.setAddress1(addressEntity.getAddress1());
-            addressDto.setAddress2(addressEntity.getAddress2());
-            addressDto.setLandmark(addressEntity.getLandmark());
-            addressDto.setCity(addressEntity.getCity());
-            addressDto.setState(addressEntity.getState());
-            addressDto.setPincode(addressEntity.getPincode());
-        }
+        addressDto.setId(addressEntity.getId());
+        addressDto.setAddress1(addressEntity.getAddress1());
+        addressDto.setAddress2(addressEntity.getAddress2());
+        addressDto.setLandmark(addressEntity.getLandmark());
+        addressDto.setCity(addressEntity.getCity());
+        addressDto.setState(addressEntity.getState());
+        addressDto.setPincode(addressEntity.getPincode());
+        addressDto.setPrimary(addressEntity.isPrimary());
         return addressDto;
     }
 
@@ -286,6 +295,7 @@ public class GenericServiceImpl implements GenericService {
             orderEntity.setGasMaster(gasRepo.getOne(orderDto.getGasId()));
             orderEntity.setRefill(orderDto.isRefill());
             orderEntity.setRefillCount(orderDto.getRefillCount());
+            orderEntity.setAddressEntity(convertDtoToAddressEntity(orderDto.getAddressDto()));
         }
         return orderEntity;
     }

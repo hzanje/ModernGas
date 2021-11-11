@@ -1,1 +1,0 @@
-ALTER TABLE cart ADD admin_id BIGINT NULL;

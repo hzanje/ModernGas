@@ -4,6 +4,7 @@ import com.moderngas.pojo.NameIdDto;
 import com.moderngas.service.MasterService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -42,5 +43,12 @@ public class MasterController {
     public List<NameIdDto> getGasList() {
         log.info("MasterController :: getGasList >>> Start");
         return masterService.getGasList();
+    }
+
+    @Secured("USER_ADMIN")
+    @GetMapping("/privilege")
+    public List<String> getPrivilegeList() {
+        log.info("MasterController :: getPrivilegeList >>> Start");
+        return masterService.getPrivilegeList();
     }
 }

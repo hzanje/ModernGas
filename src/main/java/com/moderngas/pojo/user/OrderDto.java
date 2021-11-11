@@ -29,7 +29,7 @@ public class OrderDto {
 
     private int refillCount;
 
-    private int price;
+    private float price;
 
     private String status;
 

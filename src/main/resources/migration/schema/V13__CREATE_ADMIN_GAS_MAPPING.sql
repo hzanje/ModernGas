@@ -6,8 +6,10 @@
   	`admin_id` BIGINT(20) NOT NULL,
   	`gas_id` BIGINT(20) NOT NULL,
   	`gas_name` VARCHAR(255) NOT NULL,
-  	`description` LONGTEXT NULL,
-  	`price` INT(11) NULL,
+  	`category_id` BIGINT(20) NOT NULL,
+  	`category_name` VARCHAR(255) NOT NULL,
+  	`description` longtext NOT NULL,
+  	`price` float(11) NOT NULL,
   	PRIMARY KEY (`id`),
   	CONSTRAINT `FK_ADMIN_GAS_ID` FOREIGN KEY (`admin_id`) REFERENCES `user`(`id`)
   );

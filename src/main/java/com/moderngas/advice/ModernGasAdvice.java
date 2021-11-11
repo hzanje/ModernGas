@@ -26,6 +26,7 @@ public class ModernGasAdvice {
     @ExceptionHandler({MissingServletRequestParameterException.class})
     public ResponseEntity<ResponseStatus> handleMissingServletRequestParameterException(MissingServletRequestParameterException exception) {
         ResponseStatus status = new ResponseStatus();
+
         status.setStatus(String.format("Required parameter %s is not present", exception.getParameterName()));
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(status);
     }

@@ -52,6 +52,20 @@ public class AdminController {
     @Autowired
     private AdminService adminService;
 
+    /**
+     * Get All Order List By Parameter
+     *
+     * @param assembler
+     * @param size
+     * @param page
+     * @param status
+     * @param cylinderType
+     * @param search
+     * @param quantityOrder
+     * @return
+     * @throws JsonProcessingException
+     * @throws BadRequestException
+     */
     @Secured("ROLE_ADMIN")
     @GetMapping("/order")
     public HttpEntity<PagedModel<EntityModel<OrderDto>>> getAllOrderList(PagedResourcesAssembler<OrderDto> assembler,
@@ -73,6 +87,12 @@ public class AdminController {
         return new ResponseEntity<>(model, HttpStatus.OK);
     }
 
+    /**
+     * Get Sorting Order
+     *
+     * @param quantityOrder
+     * @return
+     */
     private Sort getSortingOrder(String quantityOrder) {
         if (quantityOrder.equals(Constants.FILTER_ORDERING_MIN_MAX)) {
             return Sort.by(Sort.Direction.ASC, "createdDate");
@@ -80,6 +100,14 @@ public class AdminController {
         return Sort.by(Sort.Direction.DESC, "createdDate");
     }
 
+    /**
+     * Add Cylinder for Specific Admin by Cylinder Code
+     *
+     * @param userId
+     * @param cylinderCodeStatusDtoList
+     * @return
+     * @throws BadRequestException
+     */
     @Secured("ROLE_ADMIN")
     @PostMapping("/addCylinder/{id}")
     public ResponseEntity<ResponseStatus> addCylinder(@PathVariable("id") Long userId,
@@ -89,6 +117,13 @@ public class AdminController {
         return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
     }
 
+    /**
+     * Add User By Roles - Admin Only
+     *
+     * @param userEntityDto
+     * @return ResponseEntity
+     * @throws BadRequestException
+     */
     @Secured("ROLE_ADMIN")
     @PostMapping(value = "/addUser")
     public ResponseEntity<ResponseStatus> addUser(@RequestBody UserEntityDto userEntityDto) throws BadRequestException {
@@ -96,6 +131,7 @@ public class AdminController {
         String response = userService.addUser(userEntityDto);
         return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
     }
+
 
     @Secured("ROLE_ADMIN")
     @GetMapping("/filter")

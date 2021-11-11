@@ -1,1 +1,0 @@
-ALTER TABLE orders ADD admin_id BIGINT NULL;
