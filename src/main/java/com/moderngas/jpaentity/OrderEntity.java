@@ -2,8 +2,10 @@ package com.moderngas.jpaentity;
 
 import com.moderngas.enums.CylinderType;
 import com.moderngas.enums.OrderStatus;
+import com.moderngas.service.serviceImpl.MyGenerator;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -13,6 +15,11 @@ import java.util.Date;
 @NoArgsConstructor
 @Table(name = "orders")
 public class OrderEntity extends BaseEntity {
+
+    @Column(name = "order_number")
+    @SequenceGenerator(name = MyGenerator.generatorName)
+    @GenericGenerator(name = MyGenerator.generatorName, strategy = "a.b.c.MyGenerator")
+    private String orderNumber;
 
     @Column(name = "quantity")
     private int quantity;

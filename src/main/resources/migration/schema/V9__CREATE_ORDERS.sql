@@ -17,6 +17,7 @@ CREATE TABLE `orders` (
   `delivery_vehicle` BIGINT(20) NULL,
   `admin_id` bigint(20) DEFAULT NULL,
   `address_id` bigint(20) DEFAULT NULL,
+  `order_number` varchar(100) NOT NULL,
   PRIMARY KEY (`id`),
   CONSTRAINT `FK_ORDER_GAS_MASTER` FOREIGN KEY (gas_id) REFERENCES `gas_master`(`id`),
   CONSTRAINT `FK_ORDER_ADDRESS` FOREIGN KEY (address_id) REFERENCES `address`(`id`)
