@@ -133,6 +133,11 @@ public class AdminController {
     }
 
 
+    /**
+     * Get Filter for Admin
+     *
+     * @return
+     */
     @Secured("ROLE_ADMIN")
     @GetMapping("/filter")
     public FilterDto getFilters() {

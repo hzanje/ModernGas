@@ -13,6 +13,9 @@ import javax.persistence.Table;
 @Table(name = "address")
 public class AddressEntity extends BaseEntity {
 
+    @Column(name = "name")
+    private String name;
+
     @Column(name = "pincode")
     private int pincode;
 

@@ -7,6 +7,8 @@ public class AddressDto {
 
     private Long id;
 
+    private String name;
+
     private int pincode;
 
     private String landmark;

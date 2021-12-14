@@ -236,6 +236,7 @@ public class GenericServiceImpl implements GenericService {
     public AddressEntity convertDtoToAddressEntity(AddressDto addressDto) {
         AddressEntity addressEntity = new AddressEntity();
         addressEntity.setId(addressDto.getId());
+        addressEntity.setName(addressDto.getName());
         addressEntity.setAddress1(addressDto.getAddress1());
         addressEntity.setAddress2(addressDto.getAddress2());
         addressEntity.setLandmark(addressDto.getLandmark());
@@ -259,6 +260,7 @@ public class GenericServiceImpl implements GenericService {
     public AddressDto convertAddressEntityToDto(AddressEntity addressEntity) {
         AddressDto addressDto = new AddressDto();
         addressDto.setId(addressEntity.getId());
+        addressDto.setName(addressEntity.getName());
         addressDto.setAddress1(addressEntity.getAddress1());
         addressDto.setAddress2(addressEntity.getAddress2());
         addressDto.setLandmark(addressEntity.getLandmark());
