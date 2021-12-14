@@ -31,7 +31,7 @@ public interface UserService {
 
     UserEntity getUserByLoginId(Long username) throws BadRequestException;
 
-    String changePassword(Long username, String oldPassword, String newPassword) throws BadRequestException;
+    String changePassword(Long username, String newPassword) throws BadRequestException;
 
     String forgetPassword(Long userName) throws BadRequestException;
 

@@ -79,17 +79,15 @@ public class UserController {
      * Changes Password for the User in Application
      *
      * @param username
-     * @param oldPassword
      * @param newPassword
      * @return
      * @throws BadRequestException
      */
     @PostMapping(value = "/changePassword")
     public ResponseEntity<ResponseStatus> changePassword(@RequestParam("userName") final Long username,
-                                                         @RequestParam("oldPassword") final String oldPassword,
                                                          @RequestParam("newPassword") final String newPassword) throws BadRequestException {
         log.info("UserController :: changePassword >>> Start");
-        String response = userService.changePassword(username, oldPassword, newPassword);
+        String response = userService.changePassword(username, newPassword);
         return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
     }
 

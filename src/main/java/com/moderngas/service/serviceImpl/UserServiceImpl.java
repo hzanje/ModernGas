@@ -8,7 +8,6 @@ import com.moderngas.repository.*;
 import com.moderngas.security.JwtProperties;
 import com.moderngas.constants.Constants;
 import com.moderngas.constants.ExceptionConstants;
-import com.moderngas.enums.CylinderType;
 import com.moderngas.exception.BadRequestException;
 import com.moderngas.pojo.admin.DeliveryVehicleDto;
 import com.moderngas.pojo.admin.UserDetails;
@@ -137,19 +136,19 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String changePassword(Long username, String oldPassword, String newPassword) throws BadRequestException {
+    public String changePassword(Long username, String newPassword) throws BadRequestException {
         log.info("UserService >> Changes password for User: {}", username);
-        String result = Constants.FAILURE_STR;
         UserEntity userEntity = userRepo.findByMobileNumber(username)
                 .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER));
-        if (passwordEncoder.matches(oldPassword, userEntity.getPassword())) {
-            userEntity.setPassword(passwordEncoder.encode(newPassword));
+        userEntity.setPassword(passwordEncoder.encode(newPassword));
+        if (userEntity.isOnboarding()) {
             userEntity.setOnboarding(false);
-            userEntity.setForgetPassword(false);
-            userRepo.save(userEntity);
-            result = Constants.SUCCESS_STR;
         }
-        return result;
+        if (userEntity.isForgetPassword()) {
+            userEntity.setForgetPassword(false);
+        }
+        userRepo.save(userEntity);
+        return Constants.SUCCESS_STR;
     }
 
     @Override
