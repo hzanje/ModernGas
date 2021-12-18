@@ -166,7 +166,7 @@ public class UserController {
      * @return
      * @throws BadRequestException
      */
-    @GetMapping(value="/getAddress")
+    @GetMapping(value="/address")
     public ResponseEntity<JSONObject> getAddress(@RequestParam("userId") final Long userId) throws BadRequestException {
         log.info("UserController :: getAddress >>> Start");
         JSONObject obj=userService.getAddress(userId);
