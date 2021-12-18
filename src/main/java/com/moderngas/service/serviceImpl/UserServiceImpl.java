@@ -275,7 +275,7 @@ public class UserServiceImpl implements UserService {
         GasMaster gasMaster = gasRepo.findById(id)
                 .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_GAS));
         GasDto gasDto = new GasDto();
-        gasDto.setCategory(gasDto.getCategory());
+        gasDto.setCategory(gasMaster.getCategoryMaster().getName());
         gasDto.setId(adminGasMapping.getGasId());
         gasDto.setName(adminGasMapping.getGasName());
         gasDto.setAvailableCylinderType(adminGasMapping.getAdminGasCylinderTypeMapping()
