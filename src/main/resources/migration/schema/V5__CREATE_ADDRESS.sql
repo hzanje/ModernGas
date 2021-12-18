@@ -4,6 +4,7 @@ CREATE TABLE `address` (
   `created_date` datetime DEFAULT NULL,
   `updated_date` datetime DEFAULT NULL,
   `name` varchar(255) DEFAULT NULL,
+  `mobile_number` bigint(20) DEFAULT NULL,
   `address_1` varchar(255) DEFAULT NULL,
   `address_2` varchar(255) DEFAULT NULL,
   `city` varchar(255) DEFAULT NULL,

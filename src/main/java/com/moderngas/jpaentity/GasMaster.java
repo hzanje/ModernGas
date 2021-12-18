@@ -29,10 +29,5 @@ public class GasMaster extends BaseEntity {
     @JoinColumn(name = "type_id", referencedColumnName = "id")
     private CategoryMaster categoryMaster;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinTable(name = "gas_image_mapping", joinColumns = {@JoinColumn(name = "gas_id")}
-    , inverseJoinColumns = {@JoinColumn(name = "image_id")})
-    private Set<GasImageEntity> gasImageEntityList;
-
 
 }

@@ -3,10 +3,7 @@ package com.moderngas.restcontroller;
 import com.moderngas.exception.BadRequestException;
 import com.moderngas.pojo.*;
 import com.moderngas.pojo.ResponseStatus;
-import com.moderngas.pojo.user.AddressDto;
-import com.moderngas.pojo.user.GasDto;
-import com.moderngas.pojo.user.UserDashboardDto;
-import com.moderngas.pojo.user.UserEntityDto;
+import com.moderngas.pojo.user.*;
 import com.moderngas.service.GenericService;
 import com.moderngas.service.UserService;
 
@@ -24,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.LinkedHashSet;
 import java.util.List;
 
 @Slf4j
@@ -93,27 +91,29 @@ public class UserController {
 
     /**
      * Get UserDashboard By its respected Admin.
+     * It will fetch the list of products. User will be able to view all categories
      *
      * @param userId
      * @return
      */
     @GetMapping(value = "/getUserDashboard")
-    public List<UserDashboardDto> getUserDashboard(@RequestParam("id") Long userId,
-                                                   @RequestParam("adminId") Long adminId) throws BadRequestException {
+    public LinkedHashSet<UserDashboardDto> getUserDashboard(@RequestParam("id") Long userId,
+                                                            @RequestParam("adminId") Long adminId) throws BadRequestException {
         log.info("UserController :: getUserDashboard >>> Start");
         return userService.getUserDashboard(userId, adminId);
     }
 
     /**
-     * Get List of Gas Master By Its Category Id.
+     * Get List of Gas Master By Its Category Id By its respected Admin.
      *
      * @param categoryId
      * @return
      */
     @GetMapping(value = "/getGasListByCategoryId")
-    public List<NameIdDto> getGasListByCategoryId(@RequestParam("id") Long categoryId) {
+    public List<GasNameIdDto> getGasListByCategoryId(@RequestParam("id") Long categoryId,
+                                                     @RequestParam("adminId") Long adminId) throws BadRequestException {
         log.info("UserController :: getGasListByCategoryId >>> Start");
-        return userService.getGasListByCategoryId(categoryId);
+        return userService.getGasListByCategoryId(categoryId, adminId);
     }
 
     /**

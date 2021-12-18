@@ -101,14 +101,14 @@ public class AdminController {
     }
 
     /**
-     * Add Cylinder for Specific Admin by Cylinder Code
+     * Add Cylinder for Specific Admin and User by Cylinder Code
      *
      * @param userId
      * @param cylinderCodeStatusDtoList
      * @return
      * @throws BadRequestException
      */
-    @Secured("ROLE_ADMIN")
+    @Secured({"ROLE_ADMIN", "ROLE_USER"})
     @PostMapping("/addCylinder/{id}")
     public ResponseEntity<ResponseStatus> addCylinder(@PathVariable("id") Long userId,
                                                       @RequestBody List<CylinderCodeStatusDto> cylinderCodeStatusDtoList) throws BadRequestException {
@@ -134,7 +134,7 @@ public class AdminController {
 
 
     /**
-     * Get Filter for Admin
+     * Get Filter for Admin in Order Tab
      *
      * @return
      */
@@ -145,6 +145,13 @@ public class AdminController {
         return genericService.getFilterList();
     }
 
+    /**
+     * Add delivery vehicles by admin to assigned the particular order.
+     *
+     * @param deliveryVehicleDto
+     * @return
+     * @throws BadRequestException
+     */
     @Secured("ROLE_ADMIN")
     @PostMapping("/vehicle")
     public ResponseEntity<ResponseStatus> addVehicle(@RequestBody DeliveryVehicleDto deliveryVehicleDto) throws BadRequestException {
@@ -153,6 +160,12 @@ public class AdminController {
         return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
     }
 
+    /**
+     * Get Vehicle ()
+     *
+     * @param userId
+     * @return
+     */
     @Secured("ROLE_ADMIN")
     @GetMapping("/vehicle")
     public List<NameIdDto> getVehicle(@RequestParam("id") Long userId) {

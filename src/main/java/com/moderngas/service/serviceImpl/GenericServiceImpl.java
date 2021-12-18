@@ -272,17 +272,16 @@ public class GenericServiceImpl implements GenericService {
     }
 
     @Override
-    public List<UserDashboardDto> convertCategoryToDto(List<CategoryMaster> categoryMasterList) {
-        List<UserDashboardDto> userDashboardDtoList = new ArrayList<>();
+    public LinkedHashSet<UserDashboardDto> convertCategoryToDto(List<CategoryMaster> categoryMasterList, LinkedHashSet<UserDashboardDto> userDashboardDtoSet) {
         if (!CollectionUtils.isEmpty(categoryMasterList)) {
             for (CategoryMaster categoryMaster : categoryMasterList) {
                 UserDashboardDto userDashboardDto = new UserDashboardDto();
                 userDashboardDto.setId(categoryMaster.getId());
                 userDashboardDto.setName(categoryMaster.getName());
-                userDashboardDtoList.add(userDashboardDto);
+                userDashboardDtoSet.add(userDashboardDto);
             }
         }
-        return userDashboardDtoList;
+        return userDashboardDtoSet;
     }
 
     @Override
@@ -488,5 +487,8 @@ public class GenericServiceImpl implements GenericService {
         return userEntity;
     }
 
-
+    @Override
+    public Set<UserDashboardDto> convertGasMappingToDashboardDto(List<AdminGasMapping> adminGasMappingList) {
+        return adminGasMappingList.stream().map(e -> new UserDashboardDto(e.getCategoryId(), e.getCategoryName(), null)).collect(Collectors.toSet());
+    }
 }

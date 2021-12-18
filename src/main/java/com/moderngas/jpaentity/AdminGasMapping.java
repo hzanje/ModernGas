@@ -37,4 +37,9 @@ public class AdminGasMapping extends BaseEntity {
     @JoinColumn(name = "admin_gas_id", referencedColumnName = "id", nullable = false)
     private Set<AdminGasCylinderTypeMapping> adminGasCylinderTypeMapping;
 
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinTable(name = "gas_image_mapping", joinColumns = {@JoinColumn(name = "admin_gas_id")}
+            , inverseJoinColumns = {@JoinColumn(name = "image_id")})
+    private Set<GasImageEntity> gasImageEntityList;
+
 }

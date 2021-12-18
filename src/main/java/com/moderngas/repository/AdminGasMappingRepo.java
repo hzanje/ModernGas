@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import javax.transaction.Transactional;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -15,5 +16,12 @@ public interface AdminGasMappingRepo extends JpaRepository<AdminGasMapping, Long
 
     @Query("SELECT agm FROM UserEntity u INNER JOIN u.adminGasMappings agm WHERE u.id = :adminId AND agm.gasId = :id")
     Optional<AdminGasMapping> getGasMappingByAdminId(@Param("id") Long id,
-                                                    @Param("adminId") Long adminId);
+                                                        @Param("adminId") Long adminId);
+
+    @Query("SELECT agm FROM UserEntity u INNER JOIN u.adminGasMappings agm WHERE u.id = :id")
+    List<AdminGasMapping> getAllGasMappingByAdminId(@Param("id") Long id);
+
+    @Query("SELECT agm FROM UserEntity u INNER JOIN u.adminGasMappings agm WHERE u.id = :adminId AND agm.categoryId = :id")
+    List<AdminGasMapping> getGasMappingListByCategoryId(@Param("id") Long categoryId,
+                                                        @Param("adminId") Long adminId);
 }

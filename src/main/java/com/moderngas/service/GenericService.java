@@ -2,12 +2,7 @@ package com.moderngas.service;
 
 import com.moderngas.enums.OrderStatus;
 import com.moderngas.exception.BadRequestException;
-import com.moderngas.jpaentity.AddressEntity;
-import com.moderngas.jpaentity.CartEntity;
-import com.moderngas.jpaentity.CategoryMaster;
-import com.moderngas.jpaentity.DeliveryVehicleEntity;
-import com.moderngas.jpaentity.OrderEntity;
-import com.moderngas.jpaentity.UserEntity;
+import com.moderngas.jpaentity.*;
 import com.moderngas.pojo.admin.DeliveryVehicleDto;
 import com.moderngas.pojo.admin.FilterDto;
 import com.moderngas.pojo.admin.OnboardingDto;
@@ -19,7 +14,9 @@ import com.moderngas.pojo.user.UserDashboardDto;
 import com.moderngas.pojo.user.UserEntityDto;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 public interface GenericService {
@@ -40,7 +37,7 @@ public interface GenericService {
 
     AddressDto convertAddressEntityToDto(AddressEntity addressEntity);
 
-    List<UserDashboardDto> convertCategoryToDto(List<CategoryMaster> categoryMasterList);
+    LinkedHashSet<UserDashboardDto> convertCategoryToDto(List<CategoryMaster> categoryMasterList, LinkedHashSet<UserDashboardDto> hashSet);
 
     OrderEntity convertDtoToOrderEntity(OrderDto orderDto);
 
@@ -63,4 +60,6 @@ public interface GenericService {
     UserEntity getUserAdminDetails() throws BadRequestException;
 
     UserEntity getUserAndCheckUserAdmin(Long userId, Long adminId) throws BadRequestException;
+
+    Set<UserDashboardDto> convertGasMappingToDashboardDto(List<AdminGasMapping> adminGasMappingList);
 }

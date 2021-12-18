@@ -16,6 +16,9 @@ public class AddressEntity extends BaseEntity {
     @Column(name = "name")
     private String name;
 
+    @Column(name = "mobile_number")
+    private Long mobileNumber;
+
     @Column(name = "pincode")
     private int pincode;
 
