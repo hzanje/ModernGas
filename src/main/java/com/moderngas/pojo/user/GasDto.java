@@ -12,7 +12,7 @@ public class GasDto {
 
     private String name;
 
-    private Long cylinderType;
+    private String category;
 
     private boolean isRefill;
 
@@ -25,6 +25,4 @@ public class GasDto {
     private List<String> imageList;
 
     private List<CylinderTypeDto> availableCylinderType;
-
-    private List<CylinderTypeDto> purchasedCylinderType;
 }
