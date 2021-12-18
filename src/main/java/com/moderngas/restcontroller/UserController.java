@@ -145,7 +145,7 @@ public class UserController {
      * @return
      * @throws BadRequestException
      */
-    @PostMapping(value = "/address")
+    @PostMapping(value = "/address/{userId}")
     public ResponseEntity<ResponseStatus> updateAddress(@RequestBody AddressDto addressDtoStr,
                                                         @PathVariable("userId") final Long userId) throws BadRequestException {
         log.info("UserController :: updateAddress >>> Start");
