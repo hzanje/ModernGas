@@ -13,13 +13,7 @@ import net.minidev.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -153,7 +147,7 @@ public class UserController {
      */
     @PostMapping(value = "/address")
     public ResponseEntity<ResponseStatus> updateAddress(@RequestBody AddressDto addressDtoStr,
-                                                        @RequestParam("userId") final Long userId) throws BadRequestException {
+                                                        @PathVariable("userId") final Long userId) throws BadRequestException {
         log.info("UserController :: updateAddress >>> Start");
         String response = userService.updateAddress(genericService.convertDtoToAddressEntity(addressDtoStr), userId);
         return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
