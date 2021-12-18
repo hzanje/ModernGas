@@ -9,6 +9,8 @@ public class AddressDto {
 
     private String name;
 
+    private Long mobileNumber;
+
     private int pincode;
 
     private String landmark;

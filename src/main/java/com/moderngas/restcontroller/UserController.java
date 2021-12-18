@@ -144,14 +144,14 @@ public class UserController {
     }
 
     /**
-     * Update User Address
+     * Add or Update User Address
      *
      * @param addressDtoStr
      * @param userId
      * @return
      * @throws BadRequestException
      */
-    @PostMapping(value = "/updateAddress")
+    @PostMapping(value = "/address")
     public ResponseEntity<ResponseStatus> updateAddress(@RequestBody AddressDto addressDtoStr,
                                                         @RequestParam("userId") final Long userId) throws BadRequestException {
         log.info("UserController :: updateAddress >>> Start");

@@ -237,6 +237,7 @@ public class GenericServiceImpl implements GenericService {
         AddressEntity addressEntity = new AddressEntity();
         addressEntity.setId(addressDto.getId());
         addressEntity.setName(addressDto.getName());
+        addressEntity.setMobileNumber(addressDto.getMobileNumber());
         addressEntity.setAddress1(addressDto.getAddress1());
         addressEntity.setAddress2(addressDto.getAddress2());
         addressEntity.setLandmark(addressDto.getLandmark());
@@ -351,8 +352,6 @@ public class GenericServiceImpl implements GenericService {
             cartEntity.setQuantity(cartDto.getQuantity());
             cartEntity.setUserId(cartDto.getUserId());
             cartEntity.setAdminId(cartDto.getAdminId());
-            cartEntity.setPrice(cartDto.getPrice());
-            cartEntity.setRefill(cartDto.isRefill());
             cartEntity.setGasMaster(gasMaster);
         }
         return cartEntity;
@@ -368,8 +367,6 @@ public class GenericServiceImpl implements GenericService {
             cartDto.setQuantity(cartEntity.getQuantity());
             cartDto.setUserId(cartEntity.getUserId());
             cartDto.setAdminId(cartEntity.getAdminId());
-            cartDto.setPrice(cartEntity.getPrice());
-            cartDto.setRefill(cartEntity.isRefill());
             if (null != cartEntity.getGasMaster()) {
                 cartDto.setGasId(cartEntity.getGasMaster().getId());
                 cartDto.setGasName(cartEntity.getGasMaster().getName());
