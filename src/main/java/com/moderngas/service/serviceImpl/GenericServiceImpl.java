@@ -262,6 +262,7 @@ public class GenericServiceImpl implements GenericService {
         AddressDto addressDto = new AddressDto();
         addressDto.setId(addressEntity.getId());
         addressDto.setName(addressEntity.getName());
+        addressDto.setMobileNumber(addressEntity.getMobileNumber());
         addressDto.setAddress1(addressEntity.getAddress1());
         addressDto.setAddress2(addressEntity.getAddress2());
         addressDto.setLandmark(addressEntity.getLandmark());

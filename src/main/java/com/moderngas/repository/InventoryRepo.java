@@ -5,6 +5,7 @@ import com.moderngas.enums.CylinderStatus;
 import com.moderngas.jpaentity.CylinderEntity;
 import com.moderngas.pojo.NameIdDto;
 import com.moderngas.pojo.admin.InventoryCylinderDto;
+import com.moderngas.pojo.user.InventoryDetailsDto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -12,8 +13,10 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import javax.transaction.Transactional;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Repository
 @Transactional
@@ -53,6 +56,12 @@ public interface InventoryRepo extends JpaRepository<CylinderEntity, Long> {
     @Query(value = QUERIES.FETCH_CYLINDER_BY_RESOURCE_CENTRE_AND_STATUS)
     List<NameIdDto> fetchCylinderFromResourceCentreByIdAndStatus(@Param("resourceCentreId") Long resourceCentreId,
                                                                  @Param("cylinderStatus") CylinderStatus cylinderStatus);
+
+    @Query("SELECT new com.moderngas.pojo.user.InventoryDetailsDto(ce.id, ce.code, ue.id, ue.name, ue.name) FROM UserEntity ue INNER JOIN ue.cylinderEntitySet ce WHERE ce.assignedUserId = :id ")
+    Set<InventoryDetailsDto> getInventoryCylinderAssignedToUser(@Param("id") Long id);
+
+    @Query("SELECT new com.moderngas.pojo.user.InventoryDetailsDto(ce.id, ce.code, ue.id, ue.name, ue.name) FROM UserEntity ue INNER JOIN ue.cylinderEntitySet ce WHERE ue.id = :id ")
+    Set<InventoryDetailsDto> getInventoryCylinderOwnedByUser(@Param("id") Long id);
 
     class QUERIES {
 

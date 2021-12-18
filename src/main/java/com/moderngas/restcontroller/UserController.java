@@ -5,6 +5,7 @@ import com.moderngas.pojo.*;
 import com.moderngas.pojo.ResponseStatus;
 import com.moderngas.pojo.user.*;
 import com.moderngas.service.GenericService;
+import com.moderngas.service.InventoryService;
 import com.moderngas.service.UserService;
 
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @RestController
@@ -29,6 +31,9 @@ public class UserController {
 
     @Autowired
     private GenericService genericService;
+
+    @Autowired
+    private InventoryService inventoryService;
 
     /**
      * Get All the Client/User with respect to its Admin.
@@ -169,6 +174,12 @@ public class UserController {
     	} else {
     		return new ResponseEntity<>(obj, HttpStatus.OK);
     	}
+    }
+
+    @GetMapping(value = "inventory")
+    public Set<InventoryDetailsDto> getUserInventory(@RequestParam("id") Long id,
+                                                     @RequestParam("adminId") Long adminId) throws BadRequestException {
+        return inventoryService.getUserInventory(id, adminId);
     }
 
 }
