@@ -234,6 +234,12 @@ public class UserServiceImpl implements UserService {
 	}
 
     @Override
+    public String deleteUserAddress(Long id) {
+        userRepo.deleteAddressById(id);
+        return Constants.SUCCESS_STR;
+    }
+
+    @Override
     public String refreshToken(String existingToken) throws BadRequestException {
         UserEntity userEntity = userRepo.getUserDetailsByToken(existingToken.replace(JwtProperties.TOKEN_PREFIX,""));
         if (null == userEntity) {

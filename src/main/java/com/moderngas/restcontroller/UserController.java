@@ -176,10 +176,15 @@ public class UserController {
     	}
     }
 
+    @DeleteMapping(value = "address")
+    public ResponseEntity<ResponseStatus> deleteUserAddress(@RequestParam("id") Long id) {
+        String response = userService.deleteUserAddress(id);
+        return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
+    }
+
     @GetMapping(value = "inventory")
     public Set<InventoryDetailsDto> getUserInventory(@RequestParam("id") Long id,
                                                      @RequestParam("adminId") Long adminId) throws BadRequestException {
         return inventoryService.getUserInventory(id, adminId);
     }
-
 }

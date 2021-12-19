@@ -39,6 +39,8 @@ public interface UserService {
     
     JSONObject getAddress(Long userId) throws BadRequestException;
 
+    String deleteUserAddress(Long id);
+
     String refreshToken(String existingToken) throws BadRequestException;
 
     List<GasNameIdDto> getGasListByCategoryId(Long categoryId, Long adminId);
@@ -56,4 +58,6 @@ public interface UserService {
     UserDetails getUserDetailsForAdmin(Long id) throws BadRequestException;
 
     String logout(String token) throws BadRequestException;
+
+
 }

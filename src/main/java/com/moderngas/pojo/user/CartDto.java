@@ -21,4 +21,6 @@ public class CartDto {
 
     private int quantity;
 
+    private float price;
+
 }

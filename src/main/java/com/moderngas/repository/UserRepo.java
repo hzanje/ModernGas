@@ -6,6 +6,7 @@ import com.moderngas.pojo.user.UserSearchDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -38,6 +39,10 @@ public interface UserRepo extends JpaRepository<UserEntity, Long> {
 
     @Query("FROM UserEntity u INNER JOIN u.userTokenSet ut WHERE ut.token = :token")
     UserEntity getUserDetailsByToken(@Param("token") String existingToken);
+
+    @Modifying
+    @Query("DELETE AddressEntity a WHERE a.id = :id")
+    void deleteAddressById(@Param("id") Long id);
 
     class QUERIES {
 
