@@ -19,6 +19,6 @@ public interface CartRepo extends JpaRepository<CartEntity, Long> {
     List<CartEntity> getCartEntitiesByUserIdAndAdminIdOrderByUpdatedDate(Long userId, Long adminId);
 
     @Modifying
-    @Query("DELETE FROM CartEntity WHERE userId = :userId")
-    void deleteByUserId(@Param("userId") Long userId);
+    @Query("DELETE FROM CartEntity WHERE userId = :userId AND adminId = :adminId")
+    void deleteByUserId(@Param("userId") Long userId, @Param("adminId") Long adminId);
 }

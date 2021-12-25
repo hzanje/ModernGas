@@ -123,11 +123,11 @@ public class OrderServiceImpl implements OrderService {
         log.info("OrderService >> Place Order From Cart By User: {}", userId);
         UserEntity userEntity = genericService.getUserAndCheckUserAdmin(userId, adminId);
         String response = Constants.FAILURE_STR;
-        List<CartEntity> cartEntityList = cartRepo.getCartEntitiesByUserIdOrderByUpdatedDate(userEntity.getId());
+        List<CartEntity> cartEntityList = cartRepo.getCartEntitiesByUserIdAndAdminIdOrderByUpdatedDate(userEntity.getId(), adminId);
         if (!CollectionUtils.isEmpty(cartEntityList)) {
             List<OrderEntity> orderEntityList = genericService.convertCartToOrderEntity(cartEntityList, addressId);
             orderRepo.saveAll(orderEntityList);
-            cartRepo.deleteByUserId(userId);
+            cartRepo.deleteByUserId(userId, adminId);
             response = Constants.SUCCESS_STR;
         }
         return response;

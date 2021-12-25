@@ -392,13 +392,16 @@ public class GenericServiceImpl implements GenericService {
             OrderEntity orderEntity = new OrderEntity();
             orderEntity.setCylinderType(cartEntity.getCylinderType());
             orderEntity.setUserId(cartEntity.getUserId());
-            orderEntity.setOrderStatus(OrderStatus.getByStatus("Ordered"));
+            orderEntity.setAdminId(cartEntity.getAdminId());
+            orderEntity.setOrderStatus(OrderStatus.ORDER_STATUS_CREATED);
             orderEntity.setGasMaster(cartEntity.getGasMaster());
+            orderEntity.setPrice(cartEntity.getPrice());
             orderEntity.setRefill(cartEntity.isRefill());
             orderEntity.setRefillCount(cartEntity.getRefillCount());
             orderEntity.setQuantity(cartEntity.getQuantity());
             orderEntity.setAddressEntity(addressRepo.findById(addressId)
                     .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER_ADDRESS)));
+            orderEntity.setOrderNumber("");
             orderEntityList.add(orderEntity);
         }
         return orderEntityList;
