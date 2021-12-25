@@ -94,6 +94,27 @@ public class ResourceCentreServiceImpl implements ResourceCentreService {
     }
 
     @Override
+    public String removeCylinderFromResourceCentre(Long resourceCentreId, List<String> cylinderCodes) throws BadRequestException {
+        UserEntity userEntity = genericService.getUserAdminDetails();
+        resourceCentreRepo.findById(resourceCentreId)
+                .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_RESOURCE_CENTRE));
+        List<CylinderEntity> cylinderEntityList = inventoryRepo.getCylinderFromCodeList(cylinderCodes);
+        if (CollectionUtils.isEmpty(cylinderEntityList)) {
+            return Constants.FAILURE_STR;
+        }
+        for (CylinderEntity cylinderEntity : cylinderEntityList) {
+            CylinderInventoryDetailsEntity cylinderInventoryEntity = new CylinderInventoryDetailsEntity();
+            if (null != cylinderEntity.getCylinderInventoryDetailsEntity()) {
+                cylinderInventoryEntity = cylinderEntity.getCylinderInventoryDetailsEntity();
+            }
+            cylinderInventoryEntity.setTransit(true);
+            cylinderEntity.setCylinderInventoryDetailsEntity(cylinderInventoryEntity);
+        }
+        inventoryRepo.saveAll(cylinderEntityList);
+        return Constants.SUCCESS_STR;
+    }
+
+    @Override
     public List<NameIdDto> fetchCylinderFromResourceCentre(Long resourceCentreId, String cylinderStatus) throws BadRequestException {
         ResourceCentreEntity resourceCentreEntity = resourceCentreRepo.findById(resourceCentreId)
                 .orElseThrow(() -> new BeanCreationException(ExceptionConstants.INVALID_RESOURCE_CENTRE));
@@ -116,5 +137,10 @@ public class ResourceCentreServiceImpl implements ResourceCentreService {
         cylinderEntityList.forEach(c -> c.setCylinderStatus(CylinderStatus.CYLINDER_STATUS_FILLED));
         inventoryRepo.saveAll(cylinderEntityList);
         return Constants.SUCCESS_STR;
+    }
+
+    @Override
+    public String checkCylinderCode(String code) throws BadRequestException {
+        return null;
     }
 }

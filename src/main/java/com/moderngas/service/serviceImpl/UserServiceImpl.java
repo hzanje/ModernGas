@@ -29,6 +29,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import javax.mail.Address;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -38,6 +39,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserRepo userRepo;
+
+    @Autowired
+    private AddressRepo addressRepo;
 
     @Autowired
     private GenericService genericService;
@@ -182,13 +186,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public LinkedHashSet<UserDashboardDto> getUserDashboard(Long userId, Long adminId) throws BadRequestException {
+    public Set<UserDashboardDto> getUserDashboard(Long userId, Long adminId) throws BadRequestException {
         UserEntity userEntity = userRepo.findById(userId)
                 .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER));
         if (!userEntity.getAdminIdSet().contains(adminId)) {
             throw new BadRequestException(ExceptionConstants.INVALID_USER_ADMIN);
         }
-        LinkedHashSet<UserDashboardDto> userDashboardSet = new LinkedHashSet();
+        Set<UserDashboardDto> userDashboardSet = new LinkedHashSet();
 
         /* Get all Category*/
         List<CategoryMaster> categoryMasterList = gasRepo.getAllCategory();
@@ -209,9 +213,16 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String updateAddress(AddressEntity addressEntity, Long userId) throws BadRequestException {
+    public String addOrUpdateAddress(AddressDto addressDto, Long userId) throws BadRequestException {
         UserEntity userEntity = userRepo.findById(userId)
                 .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER));
+        AddressEntity addressEntity = new AddressEntity();
+        if (null != addressDto.getId()) {
+            addressEntity = addressRepo.findById(addressDto.getId())
+                    .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER_ADDRESS));
+        }
+        addressEntity = genericService.convertDtoToAddressEntity(addressDto, addressEntity);
+        addressRepo.save(addressEntity);
         Set<AddressEntity> addressEntitySet = userEntity.getAddressEntitySet();
         addressEntitySet.add(addressEntity);
         userEntity.setAddressEntitySet(addressEntitySet);
@@ -235,7 +246,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String deleteUserAddress(Long id) {
-        userRepo.deleteAddressById(id);
+        addressRepo.deleteById(id);
         return Constants.SUCCESS_STR;
     }
 

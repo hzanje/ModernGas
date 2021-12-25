@@ -1,7 +1,6 @@
 package com.moderngas.restcontroller;
 
 import com.moderngas.exception.BadRequestException;
-import com.moderngas.pojo.*;
 import com.moderngas.pojo.ResponseStatus;
 import com.moderngas.pojo.user.*;
 import com.moderngas.service.GenericService;
@@ -16,7 +15,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -96,7 +94,7 @@ public class UserController {
      * @return
      */
     @GetMapping(value = "/getUserDashboard")
-    public LinkedHashSet<UserDashboardDto> getUserDashboard(@RequestParam("id") Long userId,
+    public Set<UserDashboardDto> getUserDashboard(@RequestParam("id") Long userId,
                                                             @RequestParam("adminId") Long adminId) throws BadRequestException {
         log.info("UserController :: getUserDashboard >>> Start");
         return userService.getUserDashboard(userId, adminId);
@@ -145,16 +143,16 @@ public class UserController {
     /**
      * Add or Update User Address
      *
-     * @param addressDtoStr
+     * @param addressDto
      * @param userId
      * @return
      * @throws BadRequestException
      */
     @PostMapping(value = "/address/{userId}")
-    public ResponseEntity<ResponseStatus> updateAddress(@RequestBody AddressDto addressDtoStr,
+    public ResponseEntity<ResponseStatus> addOrUpdateAddress(@RequestBody AddressDto addressDto,
                                                         @PathVariable("userId") final Long userId) throws BadRequestException {
         log.info("UserController :: updateAddress >>> Start");
-        String response = userService.updateAddress(genericService.convertDtoToAddressEntity(addressDtoStr), userId);
+        String response = userService.addOrUpdateAddress(addressDto, userId);
         return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
     }
 
@@ -176,13 +174,13 @@ public class UserController {
     	}
     }
 
-    @DeleteMapping(value = "address")
+    @DeleteMapping(value = "/address")
     public ResponseEntity<ResponseStatus> deleteUserAddress(@RequestParam("id") Long id) {
         String response = userService.deleteUserAddress(id);
         return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
     }
 
-    @GetMapping(value = "inventory")
+    @GetMapping(value = "/inventory")
     public Set<InventoryDetailsDto> getUserInventory(@RequestParam("id") Long id,
                                                      @RequestParam("adminId") Long adminId) throws BadRequestException {
         return inventoryService.getUserInventory(id, adminId);

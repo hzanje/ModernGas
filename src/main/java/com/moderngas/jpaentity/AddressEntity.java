@@ -6,12 +6,14 @@ import lombok.NoArgsConstructor;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import java.io.Serializable;
+import java.util.Objects;
 
 @Entity
 @Data
 @NoArgsConstructor
 @Table(name = "address")
-public class AddressEntity extends BaseEntity {
+public class AddressEntity extends BaseEntity implements Serializable {
 
     @Column(name = "name")
     private String name;

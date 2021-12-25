@@ -12,7 +12,7 @@ import java.util.List;
 
 public interface OrderService {
 
-    String placeOrder(OrderDto orderDto);
+    String placeOrder(OrderDto orderDto) throws BadRequestException;
 
     List<OrderDto> getOrderListByUser(Long userId, Long adminId) throws BadRequestException;
 
@@ -24,7 +24,7 @@ public interface OrderService {
 
     String deleteCart(Long cartId) throws BadRequestException;
 
-    String placeOrderFromCart(Long userId, Long adminId) throws BadRequestException;
+    String placeOrderFromCart(Long userId, Long adminId, Long addressId) throws BadRequestException;
 
     OrderDto getOrderDetailsById(Long orderId) throws BadRequestException;
 

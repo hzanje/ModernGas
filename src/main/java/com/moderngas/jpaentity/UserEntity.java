@@ -39,7 +39,7 @@ public class UserEntity extends BaseEntity {
     @Column(name = "admin_id")
     private Set<Long> adminIdSet = new HashSet<>();
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(cascade = {CascadeType.DETACH, CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.REMOVE}, fetch = FetchType.EAGER, orphanRemoval = true)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private Set<AddressEntity> addressEntitySet;
 

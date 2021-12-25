@@ -14,9 +14,7 @@ import com.moderngas.pojo.user.UserDashboardDto;
 import com.moderngas.pojo.user.UserEntityDto;
 
 import java.security.NoSuchAlgorithmException;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
 public interface GenericService {
@@ -31,15 +29,15 @@ public interface GenericService {
 
     String generateRandomPassword() throws NoSuchAlgorithmException;
 
-    AddressEntity convertDtoToAddressEntity(AddressDto addressDto);
+    AddressEntity convertDtoToAddressEntity(AddressDto addressDto, AddressEntity addressEntity);
 
     Set<AddressDto> convertAddressEntitySetToDto(Set<AddressEntity> addressEntity);
 
     AddressDto convertAddressEntityToDto(AddressEntity addressEntity);
 
-    LinkedHashSet<UserDashboardDto> convertCategoryToDto(List<CategoryMaster> categoryMasterList, LinkedHashSet<UserDashboardDto> hashSet);
+    Set<UserDashboardDto> convertCategoryToDto(List<CategoryMaster> categoryMasterList, Set<UserDashboardDto> hashSet);
 
-    OrderEntity convertDtoToOrderEntity(OrderDto orderDto);
+    OrderEntity convertDtoToOrderEntity(OrderDto orderDto) throws BadRequestException;
 
     OrderDto convertOrderEntityToDto(OrderEntity orderEntity);
 
@@ -47,7 +45,7 @@ public interface GenericService {
 
     CartDto convertCartEntityToDto(CartEntity cartEntity);
 
-    List<OrderEntity> convertCartToOrderEntity(List<CartEntity> cartEntityList);
+    List<OrderEntity> convertCartToOrderEntity(List<CartEntity> cartEntityList, Long addressId) throws BadRequestException;
 
     OrderEntity changeOrderStatus(OrderEntity orderEntity, OrderStatus orderStatus, Long deliveryVehicleId);
 

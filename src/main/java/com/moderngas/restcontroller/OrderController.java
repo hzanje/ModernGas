@@ -29,7 +29,7 @@ public class OrderController {
      * @return ResponseStatus
      */
     @PostMapping("/order")
-    public ResponseEntity<ResponseStatus> placeOrder(@RequestBody OrderDto orderDto) {
+    public ResponseEntity<ResponseStatus> placeOrder(@RequestBody OrderDto orderDto) throws BadRequestException {
         log.info("OrderController :: placeOrder >>> Start");
         String response = orderService.placeOrder(orderDto);
         return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
@@ -112,9 +112,11 @@ public class OrderController {
      * @throws BadRequestException
      */
     @GetMapping("/placeOrderFromCart")
-    public ResponseEntity<ResponseStatus> placeOrderFromCart(@RequestParam("id") Long userId, @RequestParam("adminId") Long adminId) throws BadRequestException {
+    public ResponseEntity<ResponseStatus> placeOrderFromCart(@RequestParam("id") Long userId,
+                                                             @RequestParam("adminId") Long adminId,
+                                                             @RequestParam("addressId") Long addressId) throws BadRequestException {
         log.info("OrderController :: placeOrderFromCart >>> Start");
-        String response = orderService.placeOrderFromCart(userId, adminId);
+        String response = orderService.placeOrderFromCart(userId, adminId, addressId);
         return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
     }
 

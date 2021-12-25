@@ -54,7 +54,7 @@ public class OrderServiceImpl implements OrderService {
     private DeliveryVehicleRepo deliveryVehicleRepo;
 
     @Override
-    public String placeOrder(OrderDto orderDto) {
+    public String placeOrder(OrderDto orderDto) throws BadRequestException {
         log.info("OrderService >> Place Order By User: {}", orderDto.getUserId());
         String response = Constants.FAILURE_STR;
         OrderEntity orderEntity = genericService.convertDtoToOrderEntity(orderDto);
@@ -119,13 +119,13 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public String placeOrderFromCart(Long userId, Long adminId) throws BadRequestException {
+    public String placeOrderFromCart(Long userId, Long adminId, Long addressId) throws BadRequestException {
         log.info("OrderService >> Place Order From Cart By User: {}", userId);
         UserEntity userEntity = genericService.getUserAndCheckUserAdmin(userId, adminId);
         String response = Constants.FAILURE_STR;
         List<CartEntity> cartEntityList = cartRepo.getCartEntitiesByUserIdOrderByUpdatedDate(userEntity.getId());
         if (!CollectionUtils.isEmpty(cartEntityList)) {
-            List<OrderEntity> orderEntityList = genericService.convertCartToOrderEntity(cartEntityList);
+            List<OrderEntity> orderEntityList = genericService.convertCartToOrderEntity(cartEntityList, addressId);
             orderRepo.saveAll(orderEntityList);
             cartRepo.deleteByUserId(userId);
             response = Constants.SUCCESS_STR;

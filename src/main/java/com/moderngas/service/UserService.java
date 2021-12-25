@@ -14,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 public interface UserService {
 
@@ -33,9 +34,9 @@ public interface UserService {
 
     String forgetPassword(Long userName) throws BadRequestException;
 
-    LinkedHashSet<UserDashboardDto> getUserDashboard(Long userId, Long adminId) throws BadRequestException;
+    Set<UserDashboardDto> getUserDashboard(Long userId, Long adminId) throws BadRequestException;
 
-    String updateAddress(AddressEntity addressEntity, Long userId) throws BadRequestException;
+    String addOrUpdateAddress(AddressDto addressDto, Long userId) throws BadRequestException;
     
     JSONObject getAddress(Long userId) throws BadRequestException;
 

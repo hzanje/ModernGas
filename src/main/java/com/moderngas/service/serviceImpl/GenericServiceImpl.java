@@ -15,6 +15,7 @@ import com.moderngas.pojo.admin.OnboardingDto;
 import com.moderngas.pojo.superadmin.AdminEntityDto;
 import com.moderngas.pojo.superadmin.GasNameCylinderTypeDto;
 import com.moderngas.pojo.user.*;
+import com.moderngas.repository.AddressRepo;
 import com.moderngas.repository.DeliveryVehicleRepo;
 import com.moderngas.repository.GasRepo;
 import com.moderngas.repository.UserRepo;
@@ -53,6 +54,9 @@ public class GenericServiceImpl implements GenericService {
 
     @Autowired
     private DeliveryVehicleRepo deliveryVehicleRepo;
+
+    @Autowired
+    private AddressRepo addressRepo;
 
     @Override
     public UserEntity convertDtoToUserData(UserEntityDto userEntityDto) throws BadRequestException {
@@ -233,8 +237,7 @@ public class GenericServiceImpl implements GenericService {
     }
 
     @Override
-    public AddressEntity convertDtoToAddressEntity(AddressDto addressDto) {
-        AddressEntity addressEntity = new AddressEntity();
+    public AddressEntity convertDtoToAddressEntity(AddressDto addressDto, AddressEntity addressEntity) {
         addressEntity.setId(addressDto.getId());
         addressEntity.setName(addressDto.getName());
         addressEntity.setMobileNumber(addressDto.getMobileNumber());
@@ -274,7 +277,7 @@ public class GenericServiceImpl implements GenericService {
     }
 
     @Override
-    public LinkedHashSet<UserDashboardDto> convertCategoryToDto(List<CategoryMaster> categoryMasterList, LinkedHashSet<UserDashboardDto> userDashboardDtoSet) {
+    public Set<UserDashboardDto> convertCategoryToDto(List<CategoryMaster> categoryMasterList, Set<UserDashboardDto> userDashboardDtoSet) {
         if (!CollectionUtils.isEmpty(categoryMasterList)) {
             for (CategoryMaster categoryMaster : categoryMasterList) {
                 UserDashboardDto userDashboardDto = new UserDashboardDto();
@@ -287,7 +290,9 @@ public class GenericServiceImpl implements GenericService {
     }
 
     @Override
-    public OrderEntity convertDtoToOrderEntity(OrderDto orderDto) {
+    public OrderEntity convertDtoToOrderEntity(OrderDto orderDto) throws BadRequestException {
+        UserEntity userEntity = userRepo.findById(orderDto.getUserId())
+                .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER));
         OrderEntity orderEntity = null;
         if (null != orderDto) {
             orderEntity = new OrderEntity();
@@ -298,7 +303,9 @@ public class GenericServiceImpl implements GenericService {
             orderEntity.setGasMaster(gasRepo.getOne(orderDto.getGasId()));
             orderEntity.setRefill(orderDto.isRefill());
             orderEntity.setRefillCount(orderDto.getRefillCount());
-            orderEntity.setAddressEntity(convertDtoToAddressEntity(orderDto.getAddressDto()));
+            orderEntity.setAddressEntity(userEntity.getAddressEntitySet().stream()
+                    .filter(e -> e.getId().equals(orderDto.getAddressDto().getId())).findFirst()
+                    .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER_ADDRESS)));
         }
         return orderEntity;
     }
@@ -379,7 +386,7 @@ public class GenericServiceImpl implements GenericService {
     }
 
     @Override
-    public List<OrderEntity> convertCartToOrderEntity(List<CartEntity> cartEntityList) {
+    public List<OrderEntity> convertCartToOrderEntity(List<CartEntity> cartEntityList, Long addressId) throws BadRequestException {
         List<OrderEntity> orderEntityList = new ArrayList<>();
         for (CartEntity cartEntity : cartEntityList) {
             OrderEntity orderEntity = new OrderEntity();
@@ -390,6 +397,8 @@ public class GenericServiceImpl implements GenericService {
             orderEntity.setRefill(cartEntity.isRefill());
             orderEntity.setRefillCount(cartEntity.getRefillCount());
             orderEntity.setQuantity(cartEntity.getQuantity());
+            orderEntity.setAddressEntity(addressRepo.findById(addressId)
+                    .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER_ADDRESS)));
             orderEntityList.add(orderEntity);
         }
         return orderEntityList;
