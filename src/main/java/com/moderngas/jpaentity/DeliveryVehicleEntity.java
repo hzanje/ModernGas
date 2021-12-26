@@ -3,6 +3,7 @@ package com.moderngas.jpaentity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -12,6 +13,7 @@ import javax.persistence.Table;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
+@Where(clause = "active_flag = 1")
 @Table(name = "delivery_vehicle")
 public class DeliveryVehicleEntity extends BaseEntity {
 

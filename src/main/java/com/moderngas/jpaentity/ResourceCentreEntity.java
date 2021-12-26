@@ -2,12 +2,16 @@ package com.moderngas.jpaentity;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 
 @NoArgsConstructor
 @Data
 @Entity
+@SQLDelete(sql = "UPDATE resource_centre a SET active_flag = 0 WHERE id = ? ")
+@Where(clause = "active_flag = 1")
 @Table(name = "resource_centre")
 public class ResourceCentreEntity extends BaseEntity {
 

@@ -2,11 +2,13 @@ package com.moderngas.jpaentity;
 
 import com.moderngas.enums.InventoryStatus;
 import lombok.Data;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 
 @Data
 @Entity
+@Where(clause = "active_flag = 1")
 @Table(name = "cylinder_inventory_details")
 public class CylinderInventoryDetailsEntity extends BaseEntity {
 

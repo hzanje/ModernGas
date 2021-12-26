@@ -4,12 +4,14 @@ import com.moderngas.enums.CylinderStatus;
 import lombok.Data;
 import net.minidev.json.annotate.JsonIgnore;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.util.Date;
 
 @Data
 @Entity
+@Where(clause = "active_flag = 1")
 @Table(name = "cylinder")
 public class CylinderEntity extends BaseEntity {
 

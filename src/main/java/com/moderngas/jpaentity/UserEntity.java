@@ -1,6 +1,7 @@
 package com.moderngas.jpaentity;
 
 import lombok.*;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.util.HashSet;
@@ -9,6 +10,7 @@ import java.util.Set;
 @Entity
 @Data
 @NoArgsConstructor
+@Where(clause = "active_flag = 1")
 @Table(name = "user")
 public class UserEntity extends BaseEntity {
 
@@ -41,6 +43,7 @@ public class UserEntity extends BaseEntity {
 
     @OneToMany(cascade = {CascadeType.DETACH, CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.REMOVE}, fetch = FetchType.EAGER, orphanRemoval = true)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
+    //@Where(clause = "active_flag = 1")
     private Set<AddressEntity> addressEntitySet;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)

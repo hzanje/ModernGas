@@ -2,6 +2,7 @@ package com.moderngas.jpaentity;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.util.Set;
@@ -9,6 +10,7 @@ import java.util.Set;
 @Entity
 @Data
 @NoArgsConstructor
+@Where(clause = "active_flag = 1")
 @Table(name = "admin_gas_mapping")
 public class AdminGasMapping extends BaseEntity {
 
