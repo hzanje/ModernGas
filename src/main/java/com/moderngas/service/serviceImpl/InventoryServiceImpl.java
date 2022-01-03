@@ -12,11 +12,10 @@ import com.moderngas.pojo.user.InventoryDetailsDto;
 import com.moderngas.repository.InventoryRepo;
 import com.moderngas.repository.UserRepo;
 import com.moderngas.service.InventoryService;
+import com.moderngas.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import com.moderngas.service.UserService;
 import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;

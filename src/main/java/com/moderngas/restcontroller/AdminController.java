@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.moderngas.constants.Constants;
 import com.moderngas.exception.BadRequestException;
 import com.moderngas.pojo.ResponseStatus;
-import com.moderngas.pojo.NameIdDto;
 import com.moderngas.pojo.admin.*;
 import com.moderngas.pojo.user.UserEntityDto;
 import com.moderngas.pojo.user.UserSearchDto;
@@ -29,7 +28,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @Slf4j
-@CrossOrigin
 @RestController
 @RequestMapping(value = "/admin", produces = "application/json")
 public class AdminController {
@@ -69,12 +67,12 @@ public class AdminController {
     @Secured("ROLE_ADMIN")
     @GetMapping("/order")
     public HttpEntity<PagedModel<EntityModel<OrderDto>>> getAllOrderList(PagedResourcesAssembler<OrderDto> assembler,
-               @RequestParam(value = "size",defaultValue = "0") Integer size,
-               @RequestParam(value = "page", defaultValue = "0") Integer page,
-               @RequestParam(value = "status", required = false) String status,
-               @RequestParam(value = "cylinderType", required = false) List<String> cylinderType,
-               @RequestParam(value = "search", required = false) String search,
-               @RequestParam(value = "quantityOrdering", required = false) String quantityOrder) throws JsonProcessingException, BadRequestException {
+                                                                         @RequestParam(value = "size", defaultValue = "0") Integer size,
+                                                                         @RequestParam(value = "page", defaultValue = "0") Integer page,
+                                                                         @RequestParam(value = "status", required = false) String status,
+                                                                         @RequestParam(value = "cylinderType", required = false) List<String> cylinderType,
+                                                                         @RequestParam(value = "search", required = false) String search,
+                                                                         @RequestParam(value = "quantityOrdering", required = false) String quantityOrder) throws JsonProcessingException, BadRequestException {
 
         log.info("AdminController :: getAllOrderList >>> Start");
         Sort sortOrdering = getSortingOrder(quantityOrder);
@@ -140,9 +138,9 @@ public class AdminController {
      */
     @Secured("ROLE_ADMIN")
     @GetMapping("/filter")
-    public FilterDto getFilters() {
+    public ResponseEntity<?> getFilters() {
         log.info("AdminController :: getFilters >>> Start");
-        return genericService.getFilterList();
+        return new ResponseEntity<>(genericService.getFilterList(), HttpStatus.OK);
     }
 
     /**
@@ -167,23 +165,30 @@ public class AdminController {
      * @return
      */
     @Secured("ROLE_ADMIN")
-    @GetMapping("/vehicle")
-    public List<NameIdDto> getVehicle(@RequestParam("id") Long userId) {
+    @GetMapping("/vehicle/{id}")
+    public ResponseEntity<?> getVehicle(@PathVariable("id") Long userId) {
         log.info("AdminController :: getVehicle >>> Start");
-        return userService.getVehicleNumberList(userId);
+        return new ResponseEntity<>(userService.getVehicleNumberList(userId), HttpStatus.OK);
     }
 
+    /**
+     * Get Cylinder Inventory List.
+     *
+     * @param adminId
+     * @return
+     */
     @Secured("ROLE_ADMIN")
     @GetMapping("/inventory")
-    public List<InventoryCylinderDto> getInventoryCylinderForAdmin(@RequestParam("id") Long adminId) {
+    public ResponseEntity<?> getInventoryCylinderForAdmin(@RequestParam("id") Long adminId) {
         log.info("AdminController :: getInventoryCylinderForAdmin >>> Start");
-        return inventoryService.getInventoryCylinderForAdmin(adminId);
+        return new ResponseEntity<>(inventoryService.getInventoryCylinderForAdmin(adminId), HttpStatus.OK);
     }
+
 
     @Secured("ROLE_ADMIN")
     @GetMapping("/search")
     public HttpEntity<PagedModel<EntityModel<UserSearchDto>>> searchUser(PagedResourcesAssembler<UserSearchDto> assembler,
-                                                                         @RequestParam(value = "size",defaultValue = "0") Integer size,
+                                                                         @RequestParam(value = "size", defaultValue = "0") Integer size,
                                                                          @RequestParam(value = "page", defaultValue = "0") Integer page,
                                                                          @RequestParam(value = "name") String name) throws BadRequestException {
 
@@ -197,26 +202,53 @@ public class AdminController {
         return new ResponseEntity<>(model, HttpStatus.OK);
     }
 
+    /**
+     * Get User details for Admin as per specific Admin
+     *
+     * @param id
+     * @return
+     * @throws BadRequestException
+     */
     @Secured("ROLE_ADMIN")
     @GetMapping("/userDetails")
-    public UserDetails getUserDetails(@RequestParam("id") Long id) throws BadRequestException {
+    public ResponseEntity<?> getUserDetails(@RequestParam("id") Long id) throws BadRequestException {
         log.info("AdminController :: getUserDetails >>> Start");
-        return userService.getUserDetailsForAdmin(id);
+        return new ResponseEntity<>(userService.getUserDetailsForAdmin(id), HttpStatus.OK);
     }
 
+    /**
+     * Get all the Orders as per Admin
+     *
+     * @param id
+     * @return
+     * @throws BadRequestException
+     */
     @GetMapping("/userOrder")
-    public List<OrderDto> getUserOrder(@RequestParam("id") Long id) throws BadRequestException {
+    public ResponseEntity<List<OrderDto>> getUserOrder(@RequestParam("id") Long id) throws BadRequestException {
         log.info("AdminController :: getUserOrder >>> Start");
-        return orderService.getUserOrderListForAdminInUserDetails(id);
+        return new ResponseEntity<>(orderService.getUserOrderListForAdminInUserDetails(id), HttpStatus.OK);
     }
 
-    //@Secured("ROLE_ADMIN")
+    /**
+     * Get All Details for Admin Onboarding.
+     *
+     * @param id
+     * @return
+     * @throws BadRequestException
+     */
     @GetMapping("/onboarding")
-    public List<OnboardingDto> getAdminOnboardingDetails(@RequestParam("id") Long id) throws BadRequestException {
+    public ResponseEntity<?> getAdminOnboardingDetails(@RequestParam("id") Long id) throws BadRequestException {
         log.info("AdminController :: getAdminOnboardingDetails >>> Start");
-        return adminService.getOnboardingDetails(id);
+        return new ResponseEntity<>(adminService.getOnboardingDetails(id), HttpStatus.OK);
     }
 
+    /**
+     * Save the details for Onboarding (Gas Description and Price)
+     *
+     * @param onboardingDtoList
+     * @return
+     * @throws BadRequestException
+     */
     @PostMapping("/onboarding")
     public ResponseEntity<ResponseStatus> saveAdminOnBoardingDetails(@RequestBody OnboardingDtoList onboardingDtoList) throws BadRequestException {
         log.info("AdminController :: saveAdminOnBoardingDetails >>> Start");
@@ -224,6 +256,13 @@ public class AdminController {
         return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
     }
 
+    /**
+     * Add Or Update Resource Centre by Admin
+     *
+     * @param resourceCentreDtoList
+     * @return
+     * @throws BadRequestException
+     */
     @Secured("ROLE_ADMIN")
     @PostMapping("/resourceCentre")
     public ResponseEntity<ResponseStatus> addOrUpdateResourceCentre(@RequestBody List<ResourceCentreDto> resourceCentreDtoList) throws BadRequestException {
@@ -232,16 +271,30 @@ public class AdminController {
         return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
     }
 
+    /**
+     * Get the resource centre by Admin
+     *
+     * @param id
+     * @return
+     * @throws BadRequestException
+     */
     @Secured("ROLE_ADMIN")
     @GetMapping("/resourceCentre")
-    public List<ResourceCentreDto> getResourceCentre(@RequestParam(value = "id", required = false) Long id) throws BadRequestException {
+    public ResponseEntity<?> getResourceCentre(@RequestParam(value = "id", required = false) Long id) throws BadRequestException {
         log.info("AdminController :: getResourceCentre >>> Start");
-        return resourceCentreService.getResourceCentre();
+        return new ResponseEntity<>(resourceCentreService.getResourceCentre(), HttpStatus.OK);
     }
 
+    /**
+     * Delete the resource centre for specific admin
+     *
+     * @param id
+     * @return
+     * @throws BadRequestException
+     */
     @Secured("ROLE_ADMIN")
-    @DeleteMapping("/resourceCentre")
-    public ResponseEntity<ResponseStatus> deleteResourceCentre(@RequestParam("id") Long id) throws BadRequestException {
+    @DeleteMapping("/resourceCentre/{id}")
+    public ResponseEntity<ResponseStatus> deleteResourceCentre(@PathVariable("id") Long id) throws BadRequestException {
         log.info("AdminController :: deleteResourceCentre >>> Start");
         String response = resourceCentreService.deleteResourceCentre(id);
         return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);

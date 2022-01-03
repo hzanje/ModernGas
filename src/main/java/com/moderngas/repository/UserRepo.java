@@ -40,18 +40,13 @@ public interface UserRepo extends JpaRepository<UserEntity, Long> {
     @Query("FROM UserEntity u INNER JOIN u.userTokenSet ut WHERE ut.token = :token")
     UserEntity getUserDetailsByToken(@Param("token") String existingToken);
 
-    @Modifying
-    @Query("DELETE AddressEntity a WHERE a.id = :id")
-    void deleteAddressById(@Param("id") Long id);
-
     class QUERIES {
+
+        private static final String ALL_USER_BY_NAME = "SELECT new com.moderngas.pojo.user.UserSearchDto(u.id, u.name, u.companyName) FROM UserEntity u WHERE u.name LIKE :name% ORDER BY u.name ASC ";
+        private static final String ALL_USER_BY_NAME_COUNT = "SELECT COUNT(u.id) FROM UserEntity u WHERE u.name LIKE :name% ORDER BY u.name ASC ";
 
         private QUERIES() {
         }
-
-        private static final String ALL_USER_BY_NAME = "SELECT new com.moderngas.pojo.user.UserSearchDto(u.id, u.name, u.companyName) FROM UserEntity u WHERE u.name LIKE :name% ORDER BY u.name ASC ";
-
-        private static final String ALL_USER_BY_NAME_COUNT = "SELECT COUNT(u.id) FROM UserEntity u WHERE u.name LIKE :name% ORDER BY u.name ASC ";
 
     }
 }

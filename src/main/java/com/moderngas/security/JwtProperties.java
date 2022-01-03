@@ -1,5 +1,8 @@
 package com.moderngas.security;
 
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor
 public class JwtProperties {
 
     public static final String SECRET = "@bhishek#567B";

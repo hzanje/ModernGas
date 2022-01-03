@@ -1,10 +1,10 @@
 package com.moderngas.restcontroller;
 
-import com.moderngas.security.JwtProperties;
-import com.moderngas.security.UserDetailsServiceImpl;
 import com.moderngas.constants.Constants;
 import com.moderngas.exception.BadRequestException;
 import com.moderngas.pojo.ResponseStatus;
+import com.moderngas.security.JwtProperties;
+import com.moderngas.security.UserDetailsServiceImpl;
 import com.moderngas.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,16 +16,14 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 
 @Slf4j
-@CrossOrigin
 @RestController
 @RequestMapping(value = "/base", produces = "application/json")
 public class BaseController {
 
     @Autowired
-    private UserService userService;
-
-    @Autowired
     UserDetailsServiceImpl userDetailsService;
+    @Autowired
+    private UserService userService;
 
     /**
      * Check if User Exist in System.
@@ -33,8 +31,8 @@ public class BaseController {
      * @param mobileNumber
      * @return
      */
-    @GetMapping(value = "/checkUserExist")
-    public ResponseEntity<ResponseStatus> checkUserExist(@RequestParam("mobileNumber") Long mobileNumber) {
+    @GetMapping(value = "/checkUserExist/{mobileNumber}")
+    public ResponseEntity<ResponseStatus> checkUserExist(@PathVariable("mobileNumber") Long mobileNumber) {
         log.info("BaseController :: checkUserExist >>> Start ");
         String response = userService.checkUserExist(mobileNumber);
         return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);

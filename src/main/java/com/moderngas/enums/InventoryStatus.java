@@ -1,7 +1,7 @@
 package com.moderngas.enums;
 
 import com.moderngas.exception.BadRequestException;
-import org.springframework.util.StringUtils;
+import org.springframework.util.ObjectUtils;
 
 public enum InventoryStatus {
 
@@ -10,16 +10,12 @@ public enum InventoryStatus {
 
     private final String name;
 
-    public String getName() {
-        return name;
-    }
-
     InventoryStatus(String name) {
         this.name = name;
     }
 
     public static InventoryStatus getByStatus(String status) {
-        if (!StringUtils.isEmpty(status)) {
+        if (!ObjectUtils.isEmpty(status)) {
             for (InventoryStatus inventoryStatus : InventoryStatus.values()) {
                 if (inventoryStatus.getName().equals(status)) {
                     return inventoryStatus;
@@ -30,7 +26,7 @@ public enum InventoryStatus {
     }
 
     public static boolean isExist(String status) {
-        if (!StringUtils.isEmpty(status)) {
+        if (!ObjectUtils.isEmpty(status)) {
             for (InventoryStatus inventoryStatus : InventoryStatus.values()) {
                 if (inventoryStatus.getName().equals(status)) {
                     return true;
@@ -41,9 +37,13 @@ public enum InventoryStatus {
     }
 
     public static InventoryStatus getByOrdinal(Integer ord) throws BadRequestException {
-        if((ord < 0 ) || (ord > InventoryStatus.values().length-1)) {
+        if ((ord < 0) || (ord > InventoryStatus.values().length - 1)) {
             throw new BadRequestException(String.format("%d is not a valid User Type", ord));
         }
         return InventoryStatus.values()[ord];
+    }
+
+    public String getName() {
+        return name;
     }
 }

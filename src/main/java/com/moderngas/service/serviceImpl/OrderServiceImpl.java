@@ -7,16 +7,11 @@ import com.moderngas.enums.CylinderType;
 import com.moderngas.enums.OrderStatus;
 import com.moderngas.exception.BadRequestException;
 import com.moderngas.jpaentity.CartEntity;
-import com.moderngas.jpaentity.DeliveryVehicleEntity;
 import com.moderngas.jpaentity.OrderEntity;
 import com.moderngas.jpaentity.UserEntity;
 import com.moderngas.pojo.user.CartDto;
 import com.moderngas.pojo.user.OrderDto;
-import com.moderngas.repository.CartRepo;
-import com.moderngas.repository.DeliveryVehicleRepo;
-import com.moderngas.repository.GasRepo;
-import com.moderngas.repository.OrderRepo;
-import com.moderngas.repository.UserRepo;
+import com.moderngas.repository.*;
 import com.moderngas.service.GenericService;
 import com.moderngas.service.OrderService;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +23,6 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -72,7 +66,7 @@ public class OrderServiceImpl implements OrderService {
         List<OrderEntity> orderEntityList = orderRepo.getOrderEntitiesByUserId(userEntity.getId(), adminId);
         if (!CollectionUtils.isEmpty(orderEntityList)) {
             orderDtoList = orderEntityList.stream()
-                    .map(e -> genericService.convertOrderEntityToDto(e)).collect(Collectors.toList());
+                    .map(e -> genericService.convertOrderEntityToDto(e)).toList();
         }
         return orderDtoList;
     }
@@ -96,7 +90,7 @@ public class OrderServiceImpl implements OrderService {
         List<CartEntity> cartEntityList = cartRepo.getCartEntitiesByUserIdAndAdminIdOrderByUpdatedDate(userEntity.getId(), adminId);
         if (!CollectionUtils.isEmpty(cartEntityList)) {
             cartDtoList = cartEntityList.stream()
-                    .map(e -> genericService.convertCartEntityToDto(e)).collect(Collectors.toList());
+                    .map(e -> genericService.convertCartEntityToDto(e)).toList();
         }
         return cartDtoList;
     }

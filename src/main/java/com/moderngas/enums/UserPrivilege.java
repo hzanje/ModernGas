@@ -1,5 +1,6 @@
 package com.moderngas.enums;
 
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 public enum UserPrivilege {
@@ -13,16 +14,12 @@ public enum UserPrivilege {
 
     private final String privilege;
 
-    public String getPrivilege() {
-        return privilege;
-    }
-
     UserPrivilege(String privilege) {
         this.privilege = privilege;
     }
 
     public static UserPrivilege getByPrivilege(String privilege) {
-        if (!StringUtils.isEmpty(privilege)) {
+        if (!ObjectUtils.isEmpty(privilege)) {
             for (UserPrivilege userPrivilege : UserPrivilege.values()) {
                 if (userPrivilege.getPrivilege().equals(privilege)) {
                     return userPrivilege;
@@ -30,5 +27,9 @@ public enum UserPrivilege {
             }
         }
         return null;
+    }
+
+    public String getPrivilege() {
+        return privilege;
     }
 }

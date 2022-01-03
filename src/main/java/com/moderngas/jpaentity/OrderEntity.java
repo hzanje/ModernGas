@@ -17,14 +17,14 @@ import java.util.Date;
 public class OrderEntity extends BaseEntity {
 
     @Column(name = "order_number")
-    @SequenceGenerator(name = MyGenerator.generatorName)
-    @GenericGenerator(name = MyGenerator.generatorName, strategy = "a.b.c.MyGenerator")
+    @SequenceGenerator(name = MyGenerator.GENERATOR_NAME)
+    @GenericGenerator(name = MyGenerator.GENERATOR_NAME, strategy = "a.b.c.MyGenerator")
     private String orderNumber;
 
     @Column(name = "quantity")
     private int quantity;
 
-    @Column(name = "is_refill", columnDefinition = "tinyint(1) DEFAULT 0" )
+    @Column(name = "is_refill", columnDefinition = "tinyint(1) DEFAULT 0")
     private boolean isRefill;
 
     @Column(name = "refill_count")

@@ -11,9 +11,7 @@ import java.util.List;
 @NoArgsConstructor
 public class UserDashboardDto {
 
-    private Long id;
-
-    private String name;
-
     List<String> imageURlList;
+    private Long id;
+    private String name;
 }

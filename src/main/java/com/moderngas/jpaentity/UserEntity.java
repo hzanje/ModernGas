@@ -1,6 +1,7 @@
 package com.moderngas.jpaentity;
 
-import lombok.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
@@ -14,25 +15,19 @@ import java.util.Set;
 @Table(name = "user")
 public class UserEntity extends BaseEntity {
 
+    @Column(name = "is_onboarding", columnDefinition = "tinyint(1) DEFAULT 1")
+    protected boolean isOnboarding = true;
     @Column(name = "name")
     private String name;
-
     @Column(name = "mobile_number")
     private Long mobileNumber;
-
     @Column(name = "email")
     private String email;
-
     @Lob
     @Column(name = "password")
     private String password;
-
     @Column(name = "company_name")
     private String companyName;
-
-    @Column(name = "is_onboarding", columnDefinition = "tinyint(1) DEFAULT 1" )
-    protected boolean isOnboarding = true;
-
     @Column(name = "is_forget_password", columnDefinition = "tinyint(1) DEFAULT 0")
     private boolean isForgetPassword = false;
 
@@ -69,7 +64,6 @@ public class UserEntity extends BaseEntity {
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     private Set<UserTokenEntity> userTokenSet;
-
 
 
 }

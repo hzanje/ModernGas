@@ -21,6 +21,7 @@ import com.moderngas.repository.GasRepo;
 import com.moderngas.repository.UserRepo;
 import com.moderngas.service.GenericService;
 import com.moderngas.service.ResourceCentreService;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
@@ -29,6 +30,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import java.security.NoSuchAlgorithmException;
@@ -87,7 +89,7 @@ public class GenericServiceImpl implements GenericService {
 
     @Override
     public UserEntity convertDtoToUserData(AdminEntityDto adminEntityDto) throws BadRequestException {
-        if (StringUtils.isEmpty(adminEntityDto.getMobileNumber())) {
+        if (ObjectUtils.isEmpty(adminEntityDto.getMobileNumber())) {
             throw new BadRequestException(ExceptionConstants.USER_MOBILE_IS_EMPTY);
         }
         UserEntity userEntity = new UserEntity();
@@ -95,10 +97,10 @@ public class GenericServiceImpl implements GenericService {
         if (user.isPresent()) {
             userEntity = user.get();
         }
-        if (StringUtils.isEmpty(adminEntityDto.getEmail())) {
+        if (ObjectUtils.isEmpty(adminEntityDto.getEmail())) {
             throw new BadRequestException(ExceptionConstants.USER_EMAIL_IS_EMPTY);
         }
-        if (StringUtils.isEmpty(adminEntityDto.getRoles())) {
+        if (ObjectUtils.isEmpty(adminEntityDto.getRoles())) {
             throw new BadRequestException(ExceptionConstants.USER_ROLE_IS_EMPTY);
         }
         if (CollectionUtils.isEmpty(adminEntityDto.getGasNameCylinderTypes())) {
@@ -120,13 +122,13 @@ public class GenericServiceImpl implements GenericService {
         }
         Set<AdminGasMapping> adminGasMappingSet = new HashSet<>();
         List<GasMaster> gasMasterList = gasRepo.getGasMasterByIdList(
-                gasNameCylinderTypes.stream().map(e -> e.getId()).collect(Collectors.toList()));
+                gasNameCylinderTypes.stream().map(e -> e.getId()).toList());
 
         for (GasNameCylinderTypeDto nameType : gasNameCylinderTypes) {
             GasMaster gasMaster = gasMasterList.stream().filter(
                     g -> g.getId().equals(nameType.getId())).findFirst()
                     .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_GAS));
-            AdminGasMapping adminGasMapping  = new AdminGasMapping();
+            AdminGasMapping adminGasMapping = new AdminGasMapping();
             adminGasMapping.setGasId(gasMaster.getId());
             adminGasMapping.setGasName(gasMaster.getName());
             adminGasMapping.setCategoryId(gasMaster.getCategoryMaster().getId());
@@ -179,7 +181,7 @@ public class GenericServiceImpl implements GenericService {
             userEntityDto.setOnboard(userEntity.isOnboarding());
             userEntityDto.setForgetPassword(userEntity.isForgetPassword());
             userEntityDto.setRoles(userEntity.getRoleEntitySet()
-                    .stream().map(UserRoleEntity::getRole).collect(Collectors.toList()));
+                    .stream().map(UserRoleEntity::getRole).toList());
             userEntityDto.setContactPersonSet(userEntity.getContactPersonSet());
             userEntityDto = setResourceCentreForOperatorUser(userEntityDto);
             userEntityDto = setAdminDtoForSingleAdminUser(userEntityDto, userEntity);
@@ -199,9 +201,9 @@ public class GenericServiceImpl implements GenericService {
     }
 
     private UserEntityDto setResourceCentreForOperatorUser(UserEntityDto userEntityDto) throws BadRequestException {
-        /*if (userEntityDto.getRoles().contains(UserRole.USER_ROLE_OPERATOR.getRole())) {
+        if (userEntityDto.getRoles().contains(UserRole.USER_ROLE_EMPLOYEE.getRole())) {
             userEntityDto.setResourceCentreDtoList(resourceCentreService.getResourceCentre());
-        }*/
+        }
         return userEntityDto;
     }
 
@@ -222,14 +224,14 @@ public class GenericServiceImpl implements GenericService {
         char[] password = new char[8];
 
         /* Create password with 1 Capital letter, 1 small Letter
-        * 1 interger and 1 special character  */
+         * 1 interger and 1 special character  */
         password[0] = smallLetters.charAt(random.nextInt(smallLetters.length()));
         password[1] = numbers.charAt(random.nextInt(numbers.length()));
         password[6] = capitalLetters.charAt(random.nextInt(capitalLetters.length()));
         password[7] = specialCharacters.charAt(random.nextInt(specialCharacters.length()));
 
         /* Remaining character of password is generated  */
-        for(int i = 2; i< 6 ; i++) {
+        for (int i = 2; i < 6; i++) {
             password[i] = combinedChars.charAt(random.nextInt(combinedChars.length()));
         }
         log.info("GenericService >> Random Password is : {}", new String(password));
@@ -290,23 +292,21 @@ public class GenericServiceImpl implements GenericService {
     }
 
     @Override
-    public OrderEntity convertDtoToOrderEntity(OrderDto orderDto) throws BadRequestException {
+    public OrderEntity convertDtoToOrderEntity(@NonNull OrderDto orderDto) throws BadRequestException {
         UserEntity userEntity = userRepo.findById(orderDto.getUserId())
                 .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER));
-        OrderEntity orderEntity = null;
-        if (null != orderDto) {
-            orderEntity = new OrderEntity();
-            orderEntity.setCylinderType(CylinderType.getByStatus(orderDto.getCylinderType()));
-            orderEntity.setUserId(orderDto.getUserId());
-            orderEntity.setAdminId(orderDto.getAdminId());
-            orderEntity.setOrderStatus(OrderStatus.getByStatus(orderDto.getStatus()));
-            orderEntity.setGasMaster(gasRepo.getOne(orderDto.getGasId()));
-            orderEntity.setRefill(orderDto.isRefill());
-            orderEntity.setRefillCount(orderDto.getRefillCount());
-            orderEntity.setAddressEntity(userEntity.getAddressEntitySet().stream()
-                    .filter(e -> e.getId().equals(orderDto.getAddressDto().getId())).findFirst()
-                    .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER_ADDRESS)));
-        }
+        OrderEntity orderEntity = new OrderEntity();
+        orderEntity.setCylinderType(CylinderType.getByStatus(orderDto.getCylinderType()));
+        orderEntity.setUserId(orderDto.getUserId());
+        orderEntity.setAdminId(orderDto.getAdminId());
+        orderEntity.setOrderStatus(OrderStatus.getByStatus(orderDto.getStatus()));
+        orderEntity.setGasMaster(gasRepo.findById(orderDto.getGasId())
+                .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_GAS)));
+        orderEntity.setRefill(orderDto.isRefill());
+        orderEntity.setRefillCount(orderDto.getRefillCount());
+        orderEntity.setAddressEntity(userEntity.getAddressEntitySet().stream()
+                .filter(e -> e.getId().equals(orderDto.getAddressDto().getId())).findFirst()
+                .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER_ADDRESS)));
         return orderEntity;
     }
 
@@ -349,19 +349,16 @@ public class GenericServiceImpl implements GenericService {
     }
 
     @Override
-    public CartEntity convertDtoToCartEntity(CartDto cartDto) throws BadRequestException {
-        CartEntity cartEntity = null;
+    public CartEntity convertDtoToCartEntity(@NonNull CartDto cartDto) throws BadRequestException {
         GasMaster gasMaster = gasRepo.findById(cartDto.getGasId())
                 .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_GAS));
-        if (null != cartDto) {
-            cartEntity = new CartEntity();
-            cartEntity.setId(cartDto.getId());
-            cartEntity.setCylinderType(CylinderType.getByStatus(cartDto.getCylinderType()));
-            cartEntity.setQuantity(cartDto.getQuantity());
-            cartEntity.setUserId(cartDto.getUserId());
-            cartEntity.setAdminId(cartDto.getAdminId());
-            cartEntity.setGasMaster(gasMaster);
-        }
+        CartEntity cartEntity = new CartEntity();
+        cartEntity.setId(cartDto.getId());
+        cartEntity.setCylinderType(CylinderType.getByStatus(cartDto.getCylinderType()));
+        cartEntity.setQuantity(cartDto.getQuantity());
+        cartEntity.setUserId(cartDto.getUserId());
+        cartEntity.setAdminId(cartDto.getAdminId());
+        cartEntity.setGasMaster(gasMaster);
         return cartEntity;
     }
 
@@ -412,18 +409,22 @@ public class GenericServiceImpl implements GenericService {
         log.info("GenericService >> Changes Status: {} for User: {}", orderStatus.getName(), orderEntity.getUserId());
         switch (orderStatus) {
 
-            case ORDER_STATUS_LOADED: orderEntity.setLoadedDate(new Date());
+            case ORDER_STATUS_LOADED:
+                orderEntity.setLoadedDate(new Date());
                 orderEntity.setDeliveryVehicle(deliveryVehicleRepo.getVehicleById(deliveryVehicleId));
                 break;
 
-            case ORDER_STATUS_DEVLIVERED: orderEntity.setDeliveredDate(new Date());
+            case ORDER_STATUS_DEVLIVERED:
+                orderEntity.setDeliveredDate(new Date());
                 break;
 
-            case ORDER_STATUS_CANCELLED: orderEntity.setActiveFlag(false);
+            case ORDER_STATUS_CANCELLED:
+                orderEntity.setActiveFlag(false);
                 orderEntity.setCancellationDate(new Date());
                 break;
 
-            default: break;
+            default:
+                break;
         }
         orderEntity.setOrderStatus(orderStatus);
         return orderEntity;
@@ -478,7 +479,7 @@ public class GenericServiceImpl implements GenericService {
     private List<CylinderTypeDto> getCylinderType(Set<AdminGasCylinderTypeMapping> adminGasCylinderTypeMapping) {
         return adminGasCylinderTypeMapping.stream()
                 .map(e -> new CylinderTypeDto(e.getCylinderType().getName(), e.getCylinderType().getDescription()))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Secured("ROLE_ADMIN")
@@ -500,6 +501,6 @@ public class GenericServiceImpl implements GenericService {
 
     @Override
     public Set<UserDashboardDto> convertGasMappingToDashboardDto(List<AdminGasMapping> adminGasMappingList) {
-        return adminGasMappingList.stream().map(e -> new UserDashboardDto(e.getCategoryId(), e.getCategoryName(), null)).collect(Collectors.toSet());
+        return adminGasMappingList.stream().map(e -> new UserDashboardDto(null, e.getCategoryId(), e.getCategoryName())).collect(Collectors.toSet());
     }
 }

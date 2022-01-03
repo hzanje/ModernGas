@@ -1,7 +1,7 @@
 package com.moderngas.enums;
 
 import com.moderngas.exception.BadRequestException;
-import org.springframework.util.StringUtils;
+import org.springframework.util.ObjectUtils;
 
 public enum CylinderStatus {
 
@@ -11,16 +11,12 @@ public enum CylinderStatus {
 
     private final String name;
 
-    public String getName() {
-        return name;
-    }
-
     CylinderStatus(String name) {
         this.name = name;
     }
 
     public static CylinderStatus getByStatus(String status) {
-        if (!StringUtils.isEmpty(status)) {
+        if (!ObjectUtils.isEmpty(status)) {
             for (CylinderStatus cylinderStatus : CylinderStatus.values()) {
                 if (cylinderStatus.getName().equals(status)) {
                     return cylinderStatus;
@@ -31,7 +27,7 @@ public enum CylinderStatus {
     }
 
     public static boolean isExist(String status) {
-        if (!StringUtils.isEmpty(status)) {
+        if (!ObjectUtils.isEmpty(status)) {
             for (CylinderStatus cylinderStatus : CylinderStatus.values()) {
                 if (cylinderStatus.getName().equals(status)) {
                     return true;
@@ -42,9 +38,13 @@ public enum CylinderStatus {
     }
 
     public static CylinderStatus getByOrdinal(Integer ord) throws BadRequestException {
-        if((ord < 0 ) || (ord > CylinderStatus.values().length-1)) {
+        if ((ord < 0) || (ord > CylinderStatus.values().length - 1)) {
             throw new BadRequestException(String.format("%d is not a valid User Type", ord));
         }
         return CylinderStatus.values()[ord];
+    }
+
+    public String getName() {
+        return name;
     }
 }

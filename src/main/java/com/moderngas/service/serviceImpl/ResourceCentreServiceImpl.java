@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
@@ -71,7 +72,6 @@ public class ResourceCentreServiceImpl implements ResourceCentreService {
 
     @Override
     public String addCylinderToResourceCentre(Long resourceCentreId, List<String> cylinderCodes) throws BadRequestException {
-        UserEntity userEntity = genericService.getUserAdminDetails();
         ResourceCentreEntity resourceCentreEntity = resourceCentreRepo.findById(resourceCentreId)
                 .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_RESOURCE_CENTRE));
         List<CylinderEntity> cylinderEntityList = inventoryRepo.getCylinderFromCodeList(cylinderCodes);
@@ -95,7 +95,6 @@ public class ResourceCentreServiceImpl implements ResourceCentreService {
 
     @Override
     public String removeCylinderFromResourceCentre(Long resourceCentreId, List<String> cylinderCodes) throws BadRequestException {
-        UserEntity userEntity = genericService.getUserAdminDetails();
         resourceCentreRepo.findById(resourceCentreId)
                 .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_RESOURCE_CENTRE));
         List<CylinderEntity> cylinderEntityList = inventoryRepo.getCylinderFromCodeList(cylinderCodes);
@@ -119,7 +118,7 @@ public class ResourceCentreServiceImpl implements ResourceCentreService {
         ResourceCentreEntity resourceCentreEntity = resourceCentreRepo.findById(resourceCentreId)
                 .orElseThrow(() -> new BeanCreationException(ExceptionConstants.INVALID_RESOURCE_CENTRE));
         List<NameIdDto> cylinderCodeIdList;
-        if (StringUtils.isEmpty(cylinderStatus)) {
+        if (ObjectUtils.isEmpty(cylinderStatus)) {
             cylinderCodeIdList = inventoryRepo.fetchCylinderFromResourceCentreById(resourceCentreEntity.getId());
         } else {
             CylinderStatus cylinderStatusEnum = CylinderStatus.getByStatus(cylinderStatus);

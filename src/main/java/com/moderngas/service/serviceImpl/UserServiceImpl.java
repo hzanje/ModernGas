@@ -2,34 +2,31 @@ package com.moderngas.service.serviceImpl;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.moderngas.jpaentity.*;
-import com.moderngas.pojo.CylinderTypeDto;
-import com.moderngas.pojo.user.*;
-import com.moderngas.repository.*;
-import com.moderngas.security.JwtProperties;
 import com.moderngas.constants.Constants;
 import com.moderngas.constants.ExceptionConstants;
 import com.moderngas.exception.BadRequestException;
+import com.moderngas.jpaentity.*;
+import com.moderngas.pojo.CylinderTypeDto;
+import com.moderngas.pojo.NameIdDto;
 import com.moderngas.pojo.admin.DeliveryVehicleDto;
 import com.moderngas.pojo.admin.UserDetails;
-import com.moderngas.pojo.NameIdDto;
+import com.moderngas.pojo.user.*;
+import com.moderngas.repository.*;
+import com.moderngas.security.JwtProperties;
 import com.moderngas.service.EmailService;
 import com.moderngas.service.GenericService;
 import com.moderngas.service.UserService;
-
 import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONObject;
-
-import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
-import javax.mail.Address;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -85,12 +82,12 @@ public class UserServiceImpl implements UserService {
     public String updateUser(UserEntity userEntity) {
         log.info("UserService >> Update User");
         String response = Constants.FAILURE_STR;
-        Optional<UserEntity> user=userRepo.findByMobileNumber(userEntity.getMobileNumber());
-        if(user.isPresent()) {
-        	UserEntity tempUser=user.get();
-        	tempUser.setName(userEntity.getName());
-        	tempUser.setEmail(userEntity.getEmail());
-        	tempUser.setCompanyName(userEntity.getCompanyName());
+        Optional<UserEntity> user = userRepo.findByMobileNumber(userEntity.getMobileNumber());
+        if (user.isPresent()) {
+            UserEntity tempUser = user.get();
+            tempUser.setName(userEntity.getName());
+            tempUser.setEmail(userEntity.getEmail());
+            tempUser.setCompanyName(userEntity.getCompanyName());
 
             userRepo.save(tempUser);
             response = Constants.SUCCESS_STR;
@@ -154,7 +151,7 @@ public class UserServiceImpl implements UserService {
         log.info("UserService >> Forget Password by User: {}", userName);
         String result = Constants.FAILURE_STR;
         /* Check if User Exits */
-        UserEntity userEntity =userRepo.findByMobileNumber(userName)
+        UserEntity userEntity = userRepo.findByMobileNumber(userName)
                 .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER));
         try {
             if (null != userEntity && null != userEntity.getEmail()) {
@@ -209,7 +206,7 @@ public class UserServiceImpl implements UserService {
         List<AdminGasMapping> adminGasMappingList = adminGasMappingRepo.getGasMappingListByCategoryId(categoryId, adminId);
         return adminGasMappingList.stream()
                 .map(e -> new GasNameIdDto(e.getGasId(), e.getGasName(), ""))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
@@ -230,19 +227,19 @@ public class UserServiceImpl implements UserService {
         return Constants.SUCCESS_STR;
     }
 
-	@Override
-	public JSONObject getAddress(Long userId) throws BadRequestException {
-		UserEntity userEntity = userRepo.findById(userId)
+    @Override
+    public JSONObject getAddress(Long userId) throws BadRequestException {
+        UserEntity userEntity = userRepo.findById(userId)
                 .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER));
-		JSONObject obj=new JSONObject();
+        JSONObject obj = new JSONObject();
         Set<AddressEntity> addressSet = userEntity.getAddressEntitySet();
-        if (addressSet==null) {
+        if (addressSet == null) {
             obj.put("message", "Address does not exist");
         } else {
             obj.put("address", genericService.convertAddressEntitySetToDto(addressSet));
         }
-		return obj;
-	}
+        return obj;
+    }
 
     @Override
     public String deleteUserAddress(Long id) {
@@ -252,7 +249,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String refreshToken(String existingToken) throws BadRequestException {
-        UserEntity userEntity = userRepo.getUserDetailsByToken(existingToken.replace(JwtProperties.TOKEN_PREFIX,""));
+        UserEntity userEntity = userRepo.getUserDetailsByToken(existingToken.replace(JwtProperties.TOKEN_PREFIX, ""));
         if (null == userEntity) {
             throw new BadRequestException(ExceptionConstants.INVALID_USER_TOKEN);
         }
@@ -274,7 +271,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String logout(String token) throws BadRequestException {
-        UserEntity userEntity = userRepo.getUserDetailsByToken(token.replace(JwtProperties.TOKEN_PREFIX,""));
+        UserEntity userEntity = userRepo.getUserDetailsByToken(token.replace(JwtProperties.TOKEN_PREFIX, ""));
         if (null == userEntity) {
             throw new BadRequestException(ExceptionConstants.INVALID_USER_TOKEN);
         }
@@ -297,14 +294,10 @@ public class UserServiceImpl implements UserService {
         gasDto.setName(adminGasMapping.getGasName());
         gasDto.setAvailableCylinderType(adminGasMapping.getAdminGasCylinderTypeMapping()
                 .stream().map(e -> new CylinderTypeDto(e.getCylinderType().getName(), e.getCylinderType().getDescription()))
-                .collect(Collectors.toList()));
+                .toList());
         gasDto.setDescription(adminGasMapping.getDescription());
         gasDto.setPrice(adminGasMapping.getPrice());
         gasDto.setAvailable(adminGasMapping.isActiveFlag());
-        /*if (!CollectionUtils.isEmpty(gasMaster.getGasImageEntityList())) {
-            gasDto.setImageList(gasMaster.getGasImageEntityList().stream()
-                    .map(GasImageEntity::getImageUrl).collect(Collectors.toList()));
-        }*/
         return gasDto;
     }
 
@@ -334,7 +327,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Page<UserSearchDto> searchUserByName(Pageable pageable, String name) throws BadRequestException {
-        if (StringUtils.isEmpty(name)) {
+        if (ObjectUtils.isEmpty(name)) {
             throw new BadRequestException(ExceptionConstants.INVALID_REQUEST_DATA);
         }
         return userRepo.searchUserByName(pageable, name);

@@ -14,8 +14,6 @@ import java.util.List;
 @Transactional
 public interface CartRepo extends JpaRepository<CartEntity, Long> {
 
-    List<CartEntity> getCartEntitiesByUserIdOrderByUpdatedDate(Long userId);
-
     List<CartEntity> getCartEntitiesByUserIdAndAdminIdOrderByUpdatedDate(Long userId, Long adminId);
 
     @Modifying

@@ -1,5 +1,6 @@
 package com.moderngas.enums;
 
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 public enum UserRole {
@@ -11,16 +12,12 @@ public enum UserRole {
 
     private final String role;
 
-    public String getRole() {
-        return role;
-    }
-
     UserRole(String role) {
         this.role = role;
     }
 
     public static UserRole getByRole(String role) {
-        if (!StringUtils.isEmpty(role)) {
+        if (!ObjectUtils.isEmpty(role)) {
             for (UserRole userRole : UserRole.values()) {
                 if (userRole.getRole().equals("ROLE_" + role)) {
                     return userRole;
@@ -31,7 +28,7 @@ public enum UserRole {
     }
 
     public static boolean isExist(String role) {
-        if (!StringUtils.isEmpty(role)) {
+        if (!ObjectUtils.isEmpty(role)) {
             for (UserRole userRole : UserRole.values()) {
                 if (userRole.getRole().equals("ROLE_" + role)) {
                     return true;
@@ -39,5 +36,9 @@ public enum UserRole {
             }
         }
         return false;
+    }
+
+    public String getRole() {
+        return role;
     }
 }

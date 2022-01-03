@@ -41,13 +41,8 @@ public interface OrderRepo extends JpaRepository<OrderEntity, Long> {
 
     class QUERIES {
 
-    private QUERIES() {
-    }
-
         private static final String ORDER_ENTRIES_BY_USER_ID = "FROM OrderEntity WHERE userId = :userId AND adminId = :adminId ORDER BY updatedDate ";
-
-        private static final String ORDER_COUNT_BY_USER_ID  = "SELECT COUNT(*) FROM OrderEntity WHERE userId = :userId ORDER BY updatedDate ";
-
+        private static final String ORDER_COUNT_BY_USER_ID = "SELECT COUNT(*) FROM OrderEntity WHERE userId = :userId ORDER BY updatedDate ";
         private static final String ALL_ORDER_LIST_FOR_ADMIN = " FROM OrderEntity ord " +
                 " LEFT JOIN UserEntity u ON u.id = ord.userId " +
                 " WHERE :adminId member of u.adminIdSet" +
@@ -57,17 +52,17 @@ public interface OrderRepo extends JpaRepository<OrderEntity, Long> {
                 " AND (:search IS NULL OR u.name LIKE :search%)" +
                 " AND (:quantityOrder IS NULL)" +
                 " ORDER BY ord.orderStatus ASC ";
-
         private static final String ALL_ORDER_LIST_HEADER_FOR_ADMIN = "SELECT new com.moderngas.pojo.admin.OrderDto(" +
                 "ord.id, ord.cylinderType, ord.isRefill, u.id, u.name, ord.gasMaster.name, ord.gasMaster.categoryMaster.name," +
                 " ord.orderStatus, ord.quantity, ord.createdDate) " + ALL_ORDER_LIST_FOR_ADMIN;
-
         private static final String ALL_ORDER_LIST_FOR_ADMIN_COUNT = "SELECT COUNT(ord.id) " + ALL_ORDER_LIST_FOR_ADMIN;
-
         private static final String ORDER_LIST_FOR_ADMIN_IN_USER_DETAILS = "SELECT new com.moderngas.pojo.admin.OrderDto(" +
                 "ord.id, ord.cylinderType, ord.isRefill, u.id, u.name, ord.gasMaster.name, ord.gasMaster.categoryMaster.name," +
                 " ord.orderStatus, ord.quantity, ord.createdDate) FROM OrderEntity ord LEFT JOIN UserEntity u ON u.id = ord.userId " +
                 " WHERE ord.userId =:userId ORDER BY ord.createdDate DESC";
+
+        private QUERIES() {
+        }
 
     }
 }

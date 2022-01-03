@@ -15,12 +15,10 @@ import java.util.List;
 
 @Repository
 @Transactional
-public interface GasRepo extends JpaRepository<GasMaster,Long> {
+public interface GasRepo extends JpaRepository<GasMaster, Long> {
 
     @Query(" FROM CategoryMaster")
     List<CategoryMaster> getAllCategory();
-
-    GasMaster getGasMasterByNameEquals(String name);
 
     @Query("SELECT new com.moderngas.pojo.NameIdDto(gm.id, gm.name) FROM GasMaster gm WHERE gm.categoryMaster.id = :categoryId AND activeFlag = 1")
     List<NameIdDto> getGasMasterByCategoryId(@Param("categoryId") Long categoryId);

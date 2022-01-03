@@ -13,7 +13,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import javax.transaction.Transactional;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -65,12 +64,11 @@ public interface InventoryRepo extends JpaRepository<CylinderEntity, Long> {
 
     class QUERIES {
 
+        private static final String FETCH_CYLINDER_BY_RESOURCE_CENTRE = "SELECT new com.moderngas.pojo.NameIdDto(cid.cylinderEntity.id, cid.cylinderEntity.code) FROM CylinderInventoryDetailsEntity cid WHERE cid.resourceCentreEntity.id = :resourceCentreId";
+        private static final String FETCH_CYLINDER_BY_RESOURCE_CENTRE_AND_STATUS = FETCH_CYLINDER_BY_RESOURCE_CENTRE + " AND cid.cylinderEntity.cylinderStatus = :cylinderStatus ";
+
         private QUERIES() {
         }
-
-        private static final String FETCH_CYLINDER_BY_RESOURCE_CENTRE = "SELECT new com.moderngas.pojo.NameIdDto(cid.cylinderEntity.id, cid.cylinderEntity.code) FROM CylinderInventoryDetailsEntity cid WHERE cid.resourceCentreEntity.id = :resourceCentreId";
-
-        private static final String FETCH_CYLINDER_BY_RESOURCE_CENTRE_AND_STATUS = FETCH_CYLINDER_BY_RESOURCE_CENTRE + " AND cid.cylinderEntity.cylinderStatus = :cylinderStatus ";
     }
 
 }

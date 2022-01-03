@@ -1,6 +1,5 @@
 package com.moderngas.pojo.superadmin;
 
-import com.moderngas.jpaentity.AddressEntity;
 import com.moderngas.jpaentity.ContactPersonEntity;
 import lombok.Data;
 

@@ -1,9 +1,9 @@
 package com.moderngas.restcontroller;
 
 import com.moderngas.exception.BadRequestException;
+import com.moderngas.pojo.ResponseStatus;
 import com.moderngas.pojo.user.CartDto;
 import com.moderngas.pojo.user.OrderDto;
-import com.moderngas.pojo.ResponseStatus;
 import com.moderngas.service.OrderService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,10 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @Slf4j
-@CrossOrigin
 @RestController
 @RequestMapping(value = "/order", produces = "application/json")
 public class OrderController {
@@ -42,8 +40,8 @@ public class OrderController {
      * @return ResponseStatus
      * @throws BadRequestException
      */
-    @DeleteMapping("/order")
-    public ResponseEntity<ResponseStatus> deleteOrder(@RequestParam("id") Long orderId) throws BadRequestException {
+    @DeleteMapping("/order/{id}")
+    public ResponseEntity<ResponseStatus> deleteOrder(@PathVariable("id") Long orderId) throws BadRequestException {
         log.info("OrderController :: deleteOrder >>> Start");
         String response = orderService.deleteOrder(orderId);
         return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
@@ -57,9 +55,9 @@ public class OrderController {
      * @return Order List
      */
     @GetMapping("/order")
-    public List<OrderDto> getOrderListByUser(@RequestParam("id") Long userId, @RequestParam("adminId") Long adminId) throws BadRequestException {
+    public ResponseEntity<?> getOrderListByUser(@RequestParam("id") Long userId, @RequestParam("adminId") Long adminId) throws BadRequestException {
         log.info("OrderController :: getOrderListByUser >>> Start");
-        return orderService.getOrderListByUser(userId, adminId);
+        return new ResponseEntity<>(orderService.getOrderListByUser(userId, adminId), HttpStatus.OK);
     }
 
     /**
@@ -83,8 +81,8 @@ public class OrderController {
      * @return ResponseStatus
      * @throws BadRequestException
      */
-    @DeleteMapping("/cart")
-    public ResponseEntity<ResponseStatus> deleteCart(@RequestParam("id") Long cartId) throws BadRequestException {
+    @DeleteMapping("/cart/{id}")
+    public ResponseEntity<ResponseStatus> deleteCart(@PathVariable("id") Long cartId) throws BadRequestException {
         log.info("OrderController :: deleteCart >>> Start");
         String response = orderService.deleteCart(cartId);
         return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
@@ -98,9 +96,9 @@ public class OrderController {
      * @throws BadRequestException
      */
     @GetMapping("/cart")
-    public List<CartDto> getCartListByUser(@RequestParam("id") Long userId, @RequestParam("adminId") Long adminId) throws BadRequestException {
+    public ResponseEntity<?> getCartListByUser(@RequestParam("id") Long userId, @RequestParam("adminId") Long adminId) throws BadRequestException {
         log.info("OrderController :: getCartListByUser >>> Start");
-        return orderService.getCartByUser(userId, adminId);
+        return new ResponseEntity<>(orderService.getCartByUser(userId, adminId), HttpStatus.OK);
     }
 
     /**
@@ -128,9 +126,9 @@ public class OrderController {
      * @throws BadRequestException
      */
     @GetMapping("/getOrderDetailsById")
-    public OrderDto getOrderDetailsById(@RequestParam("orderId") Long orderId) throws BadRequestException {
+    public ResponseEntity<?> getOrderDetailsById(@RequestParam("orderId") Long orderId) throws BadRequestException {
         log.info("OrderController :: getOrderDetailsById >>> Start");
-        return orderService.getOrderDetailsById(orderId);
+        return new ResponseEntity<>(orderService.getOrderDetailsById(orderId), HttpStatus.OK);
     }
 
     /**

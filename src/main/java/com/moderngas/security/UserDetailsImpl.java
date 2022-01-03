@@ -34,7 +34,7 @@ public class UserDetailsImpl implements UserDetails {
         this.password = userEntity.getPassword();
         this.active = userEntity.isActiveFlag();
         this.authorities = userEntity.getRoleEntitySet().stream().map(UserRoleEntity::getRole)
-                .map(SimpleGrantedAuthority :: new)
+                .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toSet());
     }
 

@@ -11,7 +11,7 @@ import java.util.Random;
 
 public class MyGenerator implements IdentifierGenerator {
 
-    public static final String generatorName = "myGenerator";
+    public static final String GENERATOR_NAME = "myGenerator";
 
     @SneakyThrows
     @Override

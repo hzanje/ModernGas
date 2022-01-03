@@ -1,7 +1,6 @@
 package com.moderngas.restcontroller;
 
 import com.moderngas.exception.BadRequestException;
-import com.moderngas.pojo.NameIdDto;
 import com.moderngas.pojo.ResponseStatus;
 import com.moderngas.service.ResourceCentreService;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @Slf4j
-@CrossOrigin
 @RestController
 @RequestMapping(value = "/operator", produces = "application/json")
 public class OperatorController {
@@ -50,35 +48,51 @@ public class OperatorController {
      */
     @PutMapping("/removeFromResourceCentre/{resourceCentreId}")
     public ResponseEntity<ResponseStatus> removeCylinderToResourceCentre(@PathVariable("resourceCentreId") Long resourceCentreId,
-                                                                      @RequestBody List<String> cylinderCodes) throws BadRequestException {
+                                                                         @RequestBody List<String> cylinderCodes) throws BadRequestException {
         log.info("OperatorController :: addCylinderToResourceCentre >>> Start");
         String response = resourceCentreService.removeCylinderFromResourceCentre(resourceCentreId, cylinderCodes);
         return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
     }
 
+    /**
+     * @param resourceCentreId
+     * @param cylinderCodes
+     * @return
+     * @throws BadRequestException
+     */
     @PutMapping("/public/addToResourceCentre/{resourceCentreId}")
     public ResponseEntity<ResponseStatus> addPublicCylinderToResourceCentre(@PathVariable("resourceCentreId") Long resourceCentreId,
-                                                                      @RequestBody List<String> cylinderCodes) throws BadRequestException {
+                                                                            @RequestBody List<String> cylinderCodes) throws BadRequestException {
         log.info("OperatorController :: (Public) addCylinderToResourceCentre >>> Start");
         String response = "";/*resourceCentreService.addPublicCylinderToResourceCentre(resourceCentreId, cylinderCodes);*/
         return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
     }
 
+    /**
+     * @param resourceCentreId
+     * @param cylinderCodes
+     * @return
+     * @throws BadRequestException
+     */
     @PutMapping("/public/removeFromResourceCentre/{resourceCentreId}")
     public ResponseEntity<ResponseStatus> removePublicCylinderToResourceCentre(@PathVariable("resourceCentreId") Long resourceCentreId,
-                                                                         @RequestBody List<String> cylinderCodes) throws BadRequestException {
+                                                                               @RequestBody List<String> cylinderCodes) throws BadRequestException {
         log.info("OperatorController :: (Public) removeFromResourceCentre >>> Start");
         String response = "";/*resourceCentreService.addPublicCylinderToResourceCentre(resourceCentreId, cylinderCodes);*/
         return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
     }
 
+    /**
+     * @param code
+     * @return
+     * @throws BadRequestException
+     */
     @GetMapping("/checkCylinderCode")
     public ResponseEntity<ResponseStatus> checkCylinderCode(@RequestParam("code") final String code) throws BadRequestException {
         log.info("OperatorController :: checkCylinderCode >>> {}", code);
         String response = resourceCentreService.checkCylinderCode(code);
         return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
     }
-
 
     /**
      * Fetch the cylinder from Resource Centre
@@ -90,9 +104,9 @@ public class OperatorController {
      * @throws BadRequestException
      */
     @GetMapping("/fetchCylinderFromResourceCentre")
-    public List<NameIdDto> fetchCylinderFromResourceCentre(@RequestParam("id") Long resourceCentreId,
-                                                           @RequestParam(value = "cylinderStatus", required = false) String cylinderStatus) throws BadRequestException {
-        return resourceCentreService.fetchCylinderFromResourceCentre(resourceCentreId, cylinderStatus);
+    public ResponseEntity<?> fetchCylinderFromResourceCentre(@RequestParam("id") Long resourceCentreId,
+                                                             @RequestParam(value = "cylinderStatus", required = false) String cylinderStatus) throws BadRequestException {
+        return new ResponseEntity<>(resourceCentreService.fetchCylinderFromResourceCentre(resourceCentreId, cylinderStatus), HttpStatus.OK);
     }
 
     /**
@@ -103,9 +117,9 @@ public class OperatorController {
      * @throws BadRequestException
      */
     @PutMapping("/fillCylinder")
-    public String fillCylinder(@RequestBody List<String> cylinderCodes) throws BadRequestException {
+    public ResponseEntity<?> fillCylinder(@RequestBody List<String> cylinderCodes) throws BadRequestException {
         log.info("EmployeeController :: fillCylinder >>> Start ");
-        return resourceCentreService.fillCylinder(cylinderCodes);
+        return new ResponseEntity<>(resourceCentreService.fillCylinder(cylinderCodes), HttpStatus.OK);
     }
 
 }

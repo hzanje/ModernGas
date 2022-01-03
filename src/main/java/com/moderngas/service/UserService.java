@@ -1,18 +1,15 @@
 package com.moderngas.service;
 
 import com.moderngas.exception.BadRequestException;
-import com.moderngas.jpaentity.AddressEntity;
 import com.moderngas.jpaentity.UserEntity;
+import com.moderngas.pojo.NameIdDto;
 import com.moderngas.pojo.admin.DeliveryVehicleDto;
 import com.moderngas.pojo.admin.UserDetails;
 import com.moderngas.pojo.user.*;
-import com.moderngas.pojo.NameIdDto;
-
 import net.minidev.json.JSONObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -37,7 +34,7 @@ public interface UserService {
     Set<UserDashboardDto> getUserDashboard(Long userId, Long adminId) throws BadRequestException;
 
     String addOrUpdateAddress(AddressDto addressDto, Long userId) throws BadRequestException;
-    
+
     JSONObject getAddress(Long userId) throws BadRequestException;
 
     String deleteUserAddress(Long id);

@@ -4,19 +4,19 @@ import com.moderngas.exception.BadRequestException;
 import com.moderngas.service.EmployeeService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @Slf4j
-@CrossOrigin
 @RestController
 @RequestMapping(value = "/employee", produces = "application/json")
 public class EmployeeController {
 
     @Autowired
     private EmployeeService employeeService;
-
 
     /**
      * Assigned Cylinder to Order.
@@ -27,10 +27,10 @@ public class EmployeeController {
      * @throws BadRequestException
      */
     @PutMapping("/assign/{orderId}")
-    public String assignCylinderToUser(@PathVariable("orderId") Long orderId,
-                                       @RequestBody List<String> cylinderCodes) throws BadRequestException {
+    public ResponseEntity<?> assignCylinderToUser(@PathVariable("orderId") Long orderId,
+                                                  @RequestBody List<String> cylinderCodes) throws BadRequestException {
         log.info("EmployeeController :: assignCylinderToUser >>> Start ");
-        return employeeService.assignCylinderToUser(orderId, cylinderCodes);
+        return new ResponseEntity<>(employeeService.assignCylinderToUser(orderId, cylinderCodes), HttpStatus.OK);
     }
 
     /**
@@ -42,21 +42,21 @@ public class EmployeeController {
      * @throws BadRequestException
      */
     @PutMapping("/receive/{orderId}")
-    public String receiveCylinderFromUser(@PathVariable("orderId") Long orderId,
-                                          @RequestBody List<String> cylinderCodes) throws BadRequestException {
+    public ResponseEntity<?> receiveCylinderFromUser(@PathVariable("orderId") Long orderId,
+                                                     @RequestBody List<String> cylinderCodes) throws BadRequestException {
         log.info("EmployeeController :: receiveCylinderFromUser >>> Start ");
-        return employeeService.receiveCylinderFromUser(orderId, cylinderCodes);
+        return new ResponseEntity<>(employeeService.receiveCylinderFromUser(orderId, cylinderCodes), HttpStatus.OK);
     }
 
     /**
-     *
      * Get All the Available Cylinder
+     *
      * @return
      */
     @GetMapping("/availableCylinder")
-    public List<String> getAvailableCylinder() {
+    public ResponseEntity<?> getAvailableCylinder() {
         log.info("EmployeeController :: getAvailableCylinder >>> Start ");
-        return employeeService.getAvailableCylinder();
+        return new ResponseEntity<>(employeeService.getAvailableCylinder(), HttpStatus.OK);
     }
 
     /**
@@ -67,8 +67,8 @@ public class EmployeeController {
      * @throws BadRequestException
      */
     @GetMapping("/getAssignedCylinder")
-    public List<String> getAssignedCylinder(@RequestParam(value = "id") Long userId) throws BadRequestException {
+    public ResponseEntity<?> getAssignedCylinder(@RequestParam(value = "id") Long userId) throws BadRequestException {
         log.info("EmployeeController :: getAssignedCylinder >>> Start ");
-        return employeeService.getAssignedCylinderByUserId(userId);
+        return new ResponseEntity<>(employeeService.getAssignedCylinderByUserId(userId), HttpStatus.OK);
     }
 }
