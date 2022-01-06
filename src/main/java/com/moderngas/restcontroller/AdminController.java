@@ -99,19 +99,19 @@ public class AdminController {
     }
 
     /**
-     * Add Cylinder for Specific Admin and User by Cylinder Code
+     * Add Cylinder for Specific Admin by Cylinder Code
      *
-     * @param userId
+     * @param adminId
      * @param cylinderCodeStatusDtoList
      * @return
      * @throws BadRequestException
      */
     @Secured({"ROLE_ADMIN", "ROLE_USER"})
-    @PostMapping("/addCylinder/{id}")
-    public ResponseEntity<ResponseStatus> addCylinder(@PathVariable("id") Long userId,
+    @PostMapping("/addCylinder/{adminId}")
+    public ResponseEntity<ResponseStatus> addCylinder(@PathVariable("adminId") Long adminId,
                                                       @RequestBody List<CylinderCodeStatusDto> cylinderCodeStatusDtoList) throws BadRequestException {
         log.info("AdminController :: addCylinder >>> Start ");
-        String response = inventoryService.addCylinder(userId, cylinderCodeStatusDtoList);
+        String response = inventoryService.addCylinder(adminId, cylinderCodeStatusDtoList);
         return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
     }
 

@@ -60,11 +60,12 @@ public class OperatorController {
      * @return
      * @throws BadRequestException
      */
-    @PutMapping("/public/addToResourceCentre/{resourceCentreId}")
+    @PutMapping("/public/addToResourceCentre/{resourceCentreId}/{userId}")
     public ResponseEntity<ResponseStatus> addPublicCylinderToResourceCentre(@PathVariable("resourceCentreId") Long resourceCentreId,
+                                                                            @PathVariable("userId") Long userId,
                                                                             @RequestBody List<String> cylinderCodes) throws BadRequestException {
         log.info("OperatorController :: (Public) addCylinderToResourceCentre >>> Start");
-        String response = "";/*resourceCentreService.addPublicCylinderToResourceCentre(resourceCentreId, cylinderCodes);*/
+        String response = resourceCentreService.addPublicCylinderToResourceCentre(resourceCentreId, userId, cylinderCodes);
         return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
     }
 
@@ -83,6 +84,8 @@ public class OperatorController {
     }
 
     /**
+     * Check if cylinder code exit in System (True : If present).
+     *
      * @param code
      * @return
      * @throws BadRequestException

@@ -31,7 +31,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
-import org.springframework.util.StringUtils;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -334,15 +333,21 @@ public class GenericServiceImpl implements GenericService {
     private List<DateStatusDto> convertDateStatus(OrderEntity orderEntity) {
         List<DateStatusDto> dateStatusDtoList = new ArrayList<>();
         for (OrderStatus orderStatus : OrderStatus.values()) {
-            if (orderStatus.getName().equals(Constants.STATUS_ORDERED)) {
-                dateStatusDtoList.add(new DateStatusDto(
-                        (long) orderStatus.ordinal(), orderStatus.getName(), orderEntity.getCreatedDate()));
-            } else if (orderStatus.getName().equals(Constants.STATUS_LOADED)) {
-                dateStatusDtoList.add(new DateStatusDto(
-                        (long) orderStatus.ordinal(), orderStatus.getName(), orderEntity.getLoadedDate()));
-            } else if (orderStatus.getName().equals(Constants.STATUS_DELIVERED)) {
-                dateStatusDtoList.add(new DateStatusDto(
+            switch (orderStatus) {
+                case ORDER_STATUS_DEVLIVERED: dateStatusDtoList.add(new DateStatusDto(
                         (long) orderStatus.ordinal(), orderStatus.getName(), orderEntity.getDeliveredDate()));
+
+                case ORDER_STATUS_LOADED: dateStatusDtoList.add(new DateStatusDto(
+                        (long) orderStatus.ordinal(), orderStatus.getName(), orderEntity.getLoadedDate()));
+
+                case ORDER_STATUS_CANCELLED: dateStatusDtoList.add(new DateStatusDto(
+                        (long) orderStatus.ordinal(), orderStatus.getName(), orderEntity.getCancellationDate()));
+
+                case ORDER_STATUS_CREATED: dateStatusDtoList.add(new DateStatusDto(
+                        (long) orderStatus.ordinal(), orderStatus.getName(), orderEntity.getCreatedDate()));
+                break;
+
+                default : break;
             }
         }
         return dateStatusDtoList;

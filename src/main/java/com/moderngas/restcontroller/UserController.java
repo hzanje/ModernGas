@@ -2,6 +2,7 @@ package com.moderngas.restcontroller;
 
 import com.moderngas.exception.BadRequestException;
 import com.moderngas.pojo.ResponseStatus;
+import com.moderngas.pojo.admin.CylinderCodeStatusDto;
 import com.moderngas.pojo.user.AddressDto;
 import com.moderngas.pojo.user.UserEntityDto;
 import com.moderngas.service.GenericService;
@@ -13,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 
 @Slf4j
@@ -194,5 +197,21 @@ public class UserController {
     public ResponseEntity<?> getUserInventory(@RequestParam("id") Long id,
                                               @RequestParam("adminId") Long adminId) throws BadRequestException {
         return new ResponseEntity<>(inventoryService.getUserInventory(id, adminId), HttpStatus.OK);
+    }
+
+    /**
+     * Add Cylinder for Specific User by Cylinder Code
+     *
+     * @param userId
+     * @param cylinderCodeStatusDtoList
+     * @return
+     * @throws BadRequestException
+     */
+    @PostMapping("/addCylinder/{userId}")
+    public ResponseEntity<ResponseStatus> addCylinder(@PathVariable("userId") Long userId,
+                                                      @RequestBody List<CylinderCodeStatusDto> cylinderCodeStatusDtoList) throws BadRequestException {
+        log.info("AdminController :: addCylinder >>> Start ");
+        String response = inventoryService.addCylinder(userId, cylinderCodeStatusDtoList);
+        return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
     }
 }

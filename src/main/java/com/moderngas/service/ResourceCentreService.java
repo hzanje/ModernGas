@@ -18,9 +18,12 @@ public interface ResourceCentreService {
 
     String removeCylinderFromResourceCentre(Long resourceCentreId, List<String> cylinderCodes) throws BadRequestException;
 
+    String addPublicCylinderToResourceCentre(Long resourceCentreId, Long userId, List<String> cylinderCodes) throws BadRequestException;
+
     List<NameIdDto> fetchCylinderFromResourceCentre(Long resourceCentreId, String cylinderStatus) throws BadRequestException;
 
     String fillCylinder(List<String> cylinderCodes) throws BadRequestException;
 
     String checkCylinderCode(String code) throws BadRequestException;
+
 }

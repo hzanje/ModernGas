@@ -4,12 +4,10 @@ import com.moderngas.constants.Constants;
 import com.moderngas.constants.ExceptionConstants;
 import com.moderngas.enums.CylinderStatus;
 import com.moderngas.exception.BadRequestException;
-import com.moderngas.jpaentity.CylinderEntity;
-import com.moderngas.jpaentity.CylinderInventoryDetailsEntity;
-import com.moderngas.jpaentity.ResourceCentreEntity;
-import com.moderngas.jpaentity.UserEntity;
+import com.moderngas.jpaentity.*;
 import com.moderngas.pojo.NameIdDto;
 import com.moderngas.pojo.admin.ResourceCentreDto;
+import com.moderngas.repository.AnonymousCylinderRepo;
 import com.moderngas.repository.InventoryRepo;
 import com.moderngas.repository.ResourceCentreRepo;
 import com.moderngas.repository.UserRepo;
@@ -18,12 +16,11 @@ import com.moderngas.service.ResourceCentreService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
-import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -44,6 +41,9 @@ public class ResourceCentreServiceImpl implements ResourceCentreService {
     @Autowired
     private InventoryRepo inventoryRepo;
 
+    @Autowired
+    private AnonymousCylinderRepo anonymousCylinderRepo;
+
     @Override
     public String addOrUpdateResourceCentre(List<ResourceCentreDto> resourceCentreDtoList) throws BadRequestException {
         if (CollectionUtils.isEmpty(resourceCentreDtoList)) {
@@ -57,7 +57,6 @@ public class ResourceCentreServiceImpl implements ResourceCentreService {
         return Constants.SUCCESS_STR;
     }
 
-    @Secured("ROLE_OPERATOR")
     @Override
     public List<ResourceCentreDto> getResourceCentre() throws BadRequestException {
         UserEntity userEntity = genericService.getUserAdminDetails();
@@ -95,7 +94,7 @@ public class ResourceCentreServiceImpl implements ResourceCentreService {
 
     @Override
     public String removeCylinderFromResourceCentre(Long resourceCentreId, List<String> cylinderCodes) throws BadRequestException {
-        resourceCentreRepo.findById(resourceCentreId)
+        ResourceCentreEntity resourceCentreEntity = resourceCentreRepo.findById(resourceCentreId)
                 .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_RESOURCE_CENTRE));
         List<CylinderEntity> cylinderEntityList = inventoryRepo.getCylinderFromCodeList(cylinderCodes);
         if (CollectionUtils.isEmpty(cylinderEntityList)) {
@@ -110,6 +109,34 @@ public class ResourceCentreServiceImpl implements ResourceCentreService {
             cylinderEntity.setCylinderInventoryDetailsEntity(cylinderInventoryEntity);
         }
         inventoryRepo.saveAll(cylinderEntityList);
+        return Constants.SUCCESS_STR;
+    }
+
+    @Override
+    public String addPublicCylinderToResourceCentre(Long resourceCentreId, Long userId, List<String> cylinderCodes) throws BadRequestException {
+        ResourceCentreEntity resourceCentreEntity = resourceCentreRepo.findById(resourceCentreId)
+                .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_RESOURCE_CENTRE));
+        UserEntity userEntity = userRepo.findById(userId)
+                .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER));
+        List<String> existingCylinderCode = new ArrayList<>();
+        List<AnonymousCylinderEntity> anonymousCylinderEntityList = new ArrayList<>();
+        for (String code : cylinderCodes) {
+            CylinderEntity cylinderEntity = inventoryRepo.checkIfCylinderCodeExist(code).orElse(null);
+            if (null != cylinderEntity) {
+                existingCylinderCode.add(code);
+            } else {
+                /* Add Anonymous Cylinder to DB */
+                AnonymousCylinderEntity anonymousCylinderEntity = new AnonymousCylinderEntity();
+                anonymousCylinderEntity.setCode(code);
+                anonymousCylinderEntity.setUserId(userEntity.getId());
+                anonymousCylinderEntityList.add(anonymousCylinderEntity);
+            }
+        }
+        if (!CollectionUtils.isEmpty(existingCylinderCode)) {
+            cylinderCodes.removeAll(existingCylinderCode);
+            addCylinderToResourceCentre(resourceCentreEntity.getId(), existingCylinderCode);
+        }
+        anonymousCylinderRepo.saveAll(anonymousCylinderEntityList);
         return Constants.SUCCESS_STR;
     }
 
@@ -140,6 +167,10 @@ public class ResourceCentreServiceImpl implements ResourceCentreService {
 
     @Override
     public String checkCylinderCode(String code) throws BadRequestException {
-        return null;
+        CylinderEntity cylinderEntity = inventoryRepo.checkIfCylinderCodeExist(code).orElse(null);
+        if (ObjectUtils.isEmpty(cylinderEntity)) {
+            return Constants.SUCCESS_STR;
+        }
+        return Constants.FAILURE_STR;
     }
 }

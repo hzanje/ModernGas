@@ -37,27 +37,34 @@ public class InventoryServiceImpl implements InventoryService {
     private InventoryRepo inventoryRepo;
 
     @Override
-    public String addCylinder(Long userId, List<CylinderCodeStatusDto> cylinderCodeStatusDtoList) throws BadRequestException {
+    public String addCylinder(Long adminId, List<CylinderCodeStatusDto> cylinderCodeStatusDtoList) throws BadRequestException {
         if (CollectionUtils.isEmpty(cylinderCodeStatusDtoList)) {
             throw new BadRequestException(ExceptionConstants.INVALID_REQUEST_DATA);
         }
 
-        UserEntity userEntity = userRepo.findById(userId)
+        UserEntity userEntity = userRepo.findById(adminId)
                 .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER));
         List<CylinderEntity> cylinderEntityList = new ArrayList<>();
         for (CylinderCodeStatusDto cylinderCodeStatusDto : cylinderCodeStatusDtoList) {
             if (!inventoryRepo.checkIfCylinderCodeExist(cylinderCodeStatusDto.getCylinderCode()).isPresent()) {
                 CylinderEntity cylinderEntity = new CylinderEntity();
                 CylinderStatus cylinderStatus = CylinderStatus.getByStatus(cylinderCodeStatusDto.getStatus());
-                if (cylinderStatus.equals(CylinderStatus.CYLINDER_STATUS_ASSIGNED)) {
-                    cylinderEntity.setAssignedUserId(userEntity.getId());
-                }
                 cylinderEntity.setCode(cylinderCodeStatusDto.getCylinderCode());
                 cylinderEntity.setCylinderStatus(cylinderStatus);
+                cylinderEntity.setManufacturer(cylinderCodeStatusDto.getManufacturer());
+                cylinderEntity.setManufacturingDate(cylinderCodeStatusDto.getManufacturingDate());
+                cylinderEntity.setExpiryDate(cylinderCodeStatusDto.getExpiryDate());
+                cylinderEntity.setLastService(cylinderCodeStatusDto.getLastService());
+                cylinderEntity.setNextService(cylinderCodeStatusDto.getNextService());
                 cylinderEntityList.add(cylinderEntity);
             }
         }
-        inventoryRepo.saveAll(cylinderEntityList);
+        List<CylinderEntity> savedCylinder = inventoryRepo.saveAll(cylinderEntityList);
+        Set<CylinderEntity> cylinderEntitySet = userEntity.getCylinderEntitySet();
+        cylinderEntitySet.addAll(savedCylinder);
+        userEntity.setCylinderEntitySet(cylinderEntitySet);
+        userRepo.save(userEntity);
+
         return Constants.SUCCESS_STR;
     }
 
