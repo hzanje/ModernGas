@@ -7,6 +7,7 @@ import com.moderngas.enums.CylinderType;
 import com.moderngas.enums.OrderStatus;
 import com.moderngas.exception.BadRequestException;
 import com.moderngas.jpaentity.CartEntity;
+import com.moderngas.jpaentity.DeliveryVehicleEntity;
 import com.moderngas.jpaentity.OrderEntity;
 import com.moderngas.jpaentity.UserEntity;
 import com.moderngas.pojo.user.CartDto;
@@ -146,10 +147,12 @@ public class OrderServiceImpl implements OrderService {
         log.info("OrderService >>");
         OrderEntity orderEntity = orderRepo.findById(orderId)
                 .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_ORDER));
+        DeliveryVehicleEntity deliveryVehicleEntity = deliveryVehicleRepo.findById(deliveryVehicleId)
+                .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_DELIVERY_VEHICLE));
         OrderStatus orderStatus = validateOrderStatus(status);
         String response = Constants.FAILURE_STR;
         if (null != orderEntity) {
-            orderEntity = genericService.changeOrderStatus(orderEntity, orderStatus, deliveryVehicleId);
+            orderEntity = genericService.changeOrderStatus(orderEntity, orderStatus, deliveryVehicleEntity.getId());
             orderRepo.save(orderEntity);
             response = Constants.SUCCESS_STR;
         }

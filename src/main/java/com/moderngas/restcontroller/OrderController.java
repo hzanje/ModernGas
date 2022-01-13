@@ -145,8 +145,7 @@ public class OrderController {
                                                             @RequestParam(value = "status") String orderStatus,
                                                             @RequestParam(value = "vehicleId", required = false) Long vehicleId) throws BadRequestException {
         log.info("OrderController :: updateOrderStatus >>> Start");
-        String response = orderService.updateOrderStatus(orderId, orderStatus, vehicleId);
-        return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
+        return new ResponseEntity<>(new ResponseStatus(orderService.updateOrderStatus(orderId, orderStatus, vehicleId)), HttpStatus.OK);
     }
 
 }

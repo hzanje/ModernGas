@@ -59,9 +59,8 @@ public class InventoryServiceImpl implements InventoryService {
                 cylinderEntityList.add(cylinderEntity);
             }
         }
-        List<CylinderEntity> savedCylinder = inventoryRepo.saveAll(cylinderEntityList);
         Set<CylinderEntity> cylinderEntitySet = userEntity.getCylinderEntitySet();
-        cylinderEntitySet.addAll(savedCylinder);
+        cylinderEntitySet.addAll(cylinderEntityList);
         userEntity.setCylinderEntitySet(cylinderEntitySet);
         userRepo.save(userEntity);
 

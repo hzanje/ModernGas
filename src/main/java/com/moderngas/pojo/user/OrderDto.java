@@ -47,5 +47,7 @@ public class OrderDto {
 
     private AddressDto addressDto;
 
+    private Long addressId;
+
 
 }

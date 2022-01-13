@@ -24,6 +24,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Autowired
     private UserDetailsServiceImpl userDetailsServiceImpl;
 
+    @Autowired
+    private MethodSecurityConfig methodSecurityConfig;
+
     public SecurityConfiguration(UserDetailsServiceImpl userDetailsServiceImpl,
                                  UserRepo userRepo) {
         this.userDetailsServiceImpl = userDetailsServiceImpl;
@@ -46,6 +49,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .addFilter(new JwtAuthenticationFilter(authenticationManager(), this.userRepo))
                 .addFilter(new JwtAuthorizationFilter(authenticationManager(), this.userRepo))
                 .authorizeRequests()
+                .accessDecisionManager(methodSecurityConfig.getAccessDecisionManager())
                 .antMatchers(HttpMethod.POST, "/login").permitAll()
                 .antMatchers("/base/**").permitAll()
                 .anyRequest().authenticated();

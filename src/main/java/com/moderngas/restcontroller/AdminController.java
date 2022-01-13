@@ -51,7 +51,7 @@ public class AdminController {
     private AdminService adminService;
 
     /**
-     * Get All Order List By Parameter
+     * Get All Order List By Parameter and Recent Order on Dashboard
      *
      * @param assembler
      * @param size
@@ -136,7 +136,7 @@ public class AdminController {
      *
      * @return
      */
-    @Secured("ROLE_ADMIN")
+    @Secured("ROLE_EMPLOYEE")
     @GetMapping("/filter")
     public ResponseEntity<?> getFilters() {
         log.info("AdminController :: getFilters >>> Start");
