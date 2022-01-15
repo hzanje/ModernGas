@@ -13,6 +13,7 @@ import com.moderngas.repository.ResourceCentreRepo;
 import com.moderngas.repository.UserRepo;
 import com.moderngas.service.GenericService;
 import com.moderngas.service.ResourceCentreService;
+import com.moderngas.service.ValidationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +45,9 @@ public class ResourceCentreServiceImpl implements ResourceCentreService {
     @Autowired
     private AnonymousCylinderRepo anonymousCylinderRepo;
 
+    @Autowired
+    private ValidationService validationService;
+
     @Override
     public String addOrUpdateResourceCentre(List<ResourceCentreDto> resourceCentreDtoList) throws BadRequestException {
         if (CollectionUtils.isEmpty(resourceCentreDtoList)) {
@@ -71,8 +75,7 @@ public class ResourceCentreServiceImpl implements ResourceCentreService {
 
     @Override
     public String addCylinderToResourceCentre(Long resourceCentreId, List<String> cylinderCodes) throws BadRequestException {
-        ResourceCentreEntity resourceCentreEntity = resourceCentreRepo.findById(resourceCentreId)
-                .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_RESOURCE_CENTRE));
+        ResourceCentreEntity resourceCentreEntity = validationService.validateResourceCentreEntity(resourceCentreId);
         List<CylinderEntity> cylinderEntityList = inventoryRepo.getCylinderFromCodeList(cylinderCodes);
         if (CollectionUtils.isEmpty(cylinderEntityList)) {
             return Constants.FAILURE_STR;
@@ -94,8 +97,7 @@ public class ResourceCentreServiceImpl implements ResourceCentreService {
 
     @Override
     public String removeCylinderFromResourceCentre(Long resourceCentreId, List<String> cylinderCodes) throws BadRequestException {
-        ResourceCentreEntity resourceCentreEntity = resourceCentreRepo.findById(resourceCentreId)
-                .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_RESOURCE_CENTRE));
+        ResourceCentreEntity resourceCentreEntity = validationService.validateResourceCentreEntity(resourceCentreId);
         List<CylinderEntity> cylinderEntityList = inventoryRepo.getCylinderFromCodeList(cylinderCodes);
         if (CollectionUtils.isEmpty(cylinderEntityList)) {
             return Constants.FAILURE_STR;
@@ -114,10 +116,8 @@ public class ResourceCentreServiceImpl implements ResourceCentreService {
 
     @Override
     public String addPublicCylinderToResourceCentre(Long resourceCentreId, Long userId, List<String> cylinderCodes) throws BadRequestException {
-        ResourceCentreEntity resourceCentreEntity = resourceCentreRepo.findById(resourceCentreId)
-                .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_RESOURCE_CENTRE));
-        UserEntity userEntity = userRepo.findById(userId)
-                .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER));
+        ResourceCentreEntity resourceCentreEntity = validationService.validateResourceCentreEntity(resourceCentreId);
+        UserEntity userEntity = validationService.validateUserEntity(userId);
         List<String> existingCylinderCode = new ArrayList<>();
         List<AnonymousCylinderEntity> anonymousCylinderEntityList = new ArrayList<>();
         for (String code : cylinderCodes) {
@@ -142,8 +142,7 @@ public class ResourceCentreServiceImpl implements ResourceCentreService {
 
     @Override
     public List<NameIdDto> fetchCylinderFromResourceCentre(Long resourceCentreId, String cylinderStatus) throws BadRequestException {
-        ResourceCentreEntity resourceCentreEntity = resourceCentreRepo.findById(resourceCentreId)
-                .orElseThrow(() -> new BeanCreationException(ExceptionConstants.INVALID_RESOURCE_CENTRE));
+        ResourceCentreEntity resourceCentreEntity = validationService.validateResourceCentreEntity(resourceCentreId);
         List<NameIdDto> cylinderCodeIdList;
         if (ObjectUtils.isEmpty(cylinderStatus)) {
             cylinderCodeIdList = inventoryRepo.fetchCylinderFromResourceCentreById(resourceCentreEntity.getId());

@@ -16,6 +16,7 @@ import com.moderngas.security.JwtProperties;
 import com.moderngas.service.EmailService;
 import com.moderngas.service.GenericService;
 import com.moderngas.service.UserService;
+import com.moderngas.service.ValidationService;
 import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,6 +64,9 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private OrderRepo orderRepo;
 
+    @Autowired
+    private ValidationService validationService;
+
 
     @Override
     public String addUser(UserEntityDto userEntityDto) throws BadRequestException {
@@ -109,8 +113,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserEntityDto getUserById(Long userId) throws BadRequestException {
-        UserEntity userEntity = userRepo.findById(userId)
-                .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER));
+        UserEntity userEntity = validationService.validateUserEntity(userId);
         return genericService.convertUserDataToDto(userEntity);
     }
 
@@ -183,8 +186,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Set<UserDashboardDto> getUserDashboard(Long userId, Long adminId) throws BadRequestException {
-        UserEntity userEntity = userRepo.findById(userId)
-                .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER));
+        UserEntity userEntity = validationService.validateUserEntity(userId);
         if (!userEntity.getAdminIdSet().contains(adminId)) {
             throw new BadRequestException(ExceptionConstants.INVALID_USER_ADMIN);
         }
@@ -210,12 +212,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String addOrUpdateAddress(AddressDto addressDto, Long userId) throws BadRequestException {
-        UserEntity userEntity = userRepo.findById(userId)
-                .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER));
+        UserEntity userEntity = validationService.validateUserEntity(userId);
         AddressEntity addressEntity = new AddressEntity();
         if (null != addressDto.getId()) {
-            addressEntity = addressRepo.findById(addressDto.getId())
-                    .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER_ADDRESS));
+            addressEntity = validationService.validateAddressEntity(addressEntity.getId());
         }
         addressEntity = genericService.convertDtoToAddressEntity(addressDto, addressEntity);
         addressRepo.save(addressEntity);
@@ -228,8 +228,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public JSONObject getAddress(Long userId) throws BadRequestException {
-        UserEntity userEntity = userRepo.findById(userId)
-                .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER));
+        UserEntity userEntity = validationService.validateUserEntity(userId);
         JSONObject obj = new JSONObject();
         Set<AddressEntity> addressSet = userEntity.getAddressEntitySet();
         if (addressSet == null) {
@@ -285,8 +284,7 @@ public class UserServiceImpl implements UserService {
     public GasDto getGasDetailsById(Long id, Long adminId) throws BadRequestException {
         AdminGasMapping adminGasMapping = adminGasMappingRepo.getGasMappingByAdminId(id, adminId)
                 .orElseThrow(() -> new BadRequestException(ExceptionConstants.ADMIN_GAS_IS_EMPTY));
-        GasMaster gasMaster = gasRepo.findById(id)
-                .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_GAS));
+        GasMaster gasMaster = validationService.validateGasMaster(id);
         GasDto gasDto = new GasDto();
         gasDto.setCategory(gasMaster.getCategoryMaster().getName());
         gasDto.setId(adminGasMapping.getGasId());
@@ -312,8 +310,7 @@ public class UserServiceImpl implements UserService {
         if (CollectionUtils.isEmpty(deliveryVehicleDto.getNumbers())) {
             throw new BadRequestException(ExceptionConstants.INVALID_REQUEST_DATA);
         }
-        userRepo.findById(deliveryVehicleDto.getUserId())
-                .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER));
+        validationService.validateUserEntity(deliveryVehicleDto.getUserId());
         List<DeliveryVehicleEntity> deliveryVehicleEntityList = genericService.convertDtoToDeliveryVehicle(deliveryVehicleDto);
         deliveryVehicleRepo.saveAll(deliveryVehicleEntityList);
         return Constants.SUCCESS_STR;
@@ -334,8 +331,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDetails getUserDetailsForAdmin(Long id) throws BadRequestException {
-        UserEntity userEntity = userRepo.findById(id)
-                .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER));
+        UserEntity userEntity = validationService.validateUserEntity(id);
         UserDetails userDetails = userRepo.getUserDetailsForAdmin(userEntity.getId());
         userDetails.setAssignedCylinder(getUserInventory(userEntity.getId()));
         userDetails.setTotalOrders(getUserOrdersCount(userEntity.getId()));

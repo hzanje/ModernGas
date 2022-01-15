@@ -21,6 +21,7 @@ import com.moderngas.repository.GasRepo;
 import com.moderngas.repository.UserRepo;
 import com.moderngas.service.GenericService;
 import com.moderngas.service.ResourceCentreService;
+import com.moderngas.service.ValidationService;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,6 +59,9 @@ public class GenericServiceImpl implements GenericService {
 
     @Autowired
     private AddressRepo addressRepo;
+
+    @Autowired
+    private ValidationService validationService;
 
     @Override
     public UserEntity convertDtoToUserData(UserEntityDto userEntityDto) throws BadRequestException {
@@ -189,8 +193,7 @@ public class GenericServiceImpl implements GenericService {
 
     private UserEntityDto setAdminDtoForSingleAdminUser(UserEntityDto userEntityDto, UserEntity userEntity) throws BadRequestException {
         if (!CollectionUtils.isEmpty(userEntityDto.getRoles()) && userEntityDto.getRoles().size() == 1) {
-            UserEntity adminEntity = userRepo.findById(userEntity.getAdminIdSet().iterator().next())
-                    .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER_ADMIN));
+            UserEntity adminEntity = validationService.validateUserEntity(userEntity.getAdminIdSet().iterator().next());
             userEntityDto.setAdminDto(new AdminDto(adminEntity.getId(), adminEntity.getName(),
                     adminEntity.getCompanyName(), convertAddressEntitySetToDto(adminEntity.getAddressEntitySet())));
         }
@@ -290,15 +293,13 @@ public class GenericServiceImpl implements GenericService {
 
     @Override
     public OrderEntity convertDtoToOrderEntity(@NonNull OrderDto orderDto) throws BadRequestException {
-        UserEntity userEntity = userRepo.findById(orderDto.getUserId())
-                .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER));
+        UserEntity userEntity = validationService.validateUserEntity(orderDto.getUserId());
         OrderEntity orderEntity = new OrderEntity();
         orderEntity.setCylinderType(CylinderType.getByStatus(orderDto.getCylinderType()));
         orderEntity.setUserId(orderDto.getUserId());
         orderEntity.setAdminId(orderDto.getAdminId());
         orderEntity.setOrderStatus(OrderStatus.getByStatus(orderDto.getStatus()));
-        orderEntity.setGasMaster(gasRepo.findById(orderDto.getGasId())
-                .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_GAS)));
+        orderEntity.setGasMaster(validationService.validateGasMaster(orderDto.getGasId()));
         orderEntity.setRefill(orderDto.isRefill());
         orderEntity.setRefillCount(orderDto.getRefillCount());
         orderEntity.setAddressEntity(userEntity.getAddressEntitySet().stream()
@@ -373,8 +374,7 @@ public class GenericServiceImpl implements GenericService {
 
     @Override
     public CartEntity convertDtoToCartEntity(@NonNull CartDto cartDto) throws BadRequestException {
-        GasMaster gasMaster = gasRepo.findById(cartDto.getGasId())
-                .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_GAS));
+        GasMaster gasMaster = validationService.validateGasMaster(cartDto.getGasId());
         CartEntity cartEntity = new CartEntity();
         cartEntity.setId(cartDto.getId());
         cartEntity.setCylinderType(CylinderType.getByStatus(cartDto.getCylinderType()));
@@ -419,8 +419,7 @@ public class GenericServiceImpl implements GenericService {
             orderEntity.setRefill(cartEntity.isRefill());
             orderEntity.setRefillCount(cartEntity.getRefillCount());
             orderEntity.setQuantity(cartEntity.getQuantity());
-            orderEntity.setAddressEntity(addressRepo.findById(addressId)
-                    .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER_ADDRESS)));
+            orderEntity.setAddressEntity(validationService.validateAddressEntity(addressId));
             orderEntity.setOrderNumber("");
             orderEntityList.add(orderEntity);
         }
@@ -514,8 +513,7 @@ public class GenericServiceImpl implements GenericService {
 
     @Override
     public UserEntity getUserAndCheckUserAdmin(Long userId, Long adminId) throws BadRequestException {
-        UserEntity userEntity = userRepo.findById(userId)
-                .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER));
+        UserEntity userEntity = validationService.validateUserEntity(userId);
         if (!userEntity.getAdminIdSet().contains(adminId)) {
             throw new BadRequestException(ExceptionConstants.INVALID_USER_ADMIN);
         }

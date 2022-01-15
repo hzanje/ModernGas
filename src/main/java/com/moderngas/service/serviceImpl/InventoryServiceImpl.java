@@ -13,6 +13,7 @@ import com.moderngas.repository.InventoryRepo;
 import com.moderngas.repository.UserRepo;
 import com.moderngas.service.InventoryService;
 import com.moderngas.service.UserService;
+import com.moderngas.service.ValidationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -36,14 +37,16 @@ public class InventoryServiceImpl implements InventoryService {
     @Autowired
     private InventoryRepo inventoryRepo;
 
+    @Autowired
+    private ValidationService validationService;
+
     @Override
     public String addCylinder(Long adminId, List<CylinderCodeStatusDto> cylinderCodeStatusDtoList) throws BadRequestException {
         if (CollectionUtils.isEmpty(cylinderCodeStatusDtoList)) {
             throw new BadRequestException(ExceptionConstants.INVALID_REQUEST_DATA);
         }
 
-        UserEntity userEntity = userRepo.findById(adminId)
-                .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER));
+        UserEntity adminEntity = validationService.validateUserEntity(adminId);
         List<CylinderEntity> cylinderEntityList = new ArrayList<>();
         for (CylinderCodeStatusDto cylinderCodeStatusDto : cylinderCodeStatusDtoList) {
             if (!inventoryRepo.checkIfCylinderCodeExist(cylinderCodeStatusDto.getCylinderCode()).isPresent()) {
@@ -59,10 +62,10 @@ public class InventoryServiceImpl implements InventoryService {
                 cylinderEntityList.add(cylinderEntity);
             }
         }
-        Set<CylinderEntity> cylinderEntitySet = userEntity.getCylinderEntitySet();
+        Set<CylinderEntity> cylinderEntitySet = adminEntity.getCylinderEntitySet();
         cylinderEntitySet.addAll(cylinderEntityList);
-        userEntity.setCylinderEntitySet(cylinderEntitySet);
-        userRepo.save(userEntity);
+        adminEntity.setCylinderEntitySet(cylinderEntitySet);
+        userRepo.save(adminEntity);
 
         return Constants.SUCCESS_STR;
     }
@@ -74,8 +77,7 @@ public class InventoryServiceImpl implements InventoryService {
 
     @Override
     public Set<InventoryDetailsDto> getUserInventory(Long id, Long adminId) throws BadRequestException {
-        UserEntity userEntity = userRepo.findById(id)
-                .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER));
+        UserEntity userEntity = validationService.validateUserEntity(id);
         if (!userEntity.getAdminIdSet().contains(adminId)) {
             throw new BadRequestException(ExceptionConstants.INVALID_USER_ADMIN);
         }

@@ -6,15 +6,15 @@ import com.moderngas.constants.ExceptionConstants;
 import com.moderngas.enums.CylinderType;
 import com.moderngas.enums.OrderStatus;
 import com.moderngas.exception.BadRequestException;
-import com.moderngas.jpaentity.CartEntity;
-import com.moderngas.jpaentity.DeliveryVehicleEntity;
-import com.moderngas.jpaentity.OrderEntity;
-import com.moderngas.jpaentity.UserEntity;
+import com.moderngas.jpaentity.*;
+import com.moderngas.pojo.admin.OpenOrderDto;
 import com.moderngas.pojo.user.CartDto;
 import com.moderngas.pojo.user.OrderDto;
 import com.moderngas.repository.*;
 import com.moderngas.service.GenericService;
 import com.moderngas.service.OrderService;
+import com.moderngas.service.ValidationService;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -46,6 +46,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private DeliveryVehicleRepo deliveryVehicleRepo;
+
+    @Autowired
+    private ValidationService validationService;
 
     @Override
     public String placeOrder(OrderDto orderDto) throws BadRequestException {
@@ -98,8 +101,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public String deleteOrder(Long orderId) throws BadRequestException {
         log.info("OrderService >> Delete Order {}", orderId);
-        OrderEntity orderEntity = orderRepo.findById(orderId)
-                .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_ORDER));
+        OrderEntity orderEntity = validationService.validateOrderEntity(orderId);
         orderRepo.deleteOrderById(orderEntity.getId());
         return Constants.SUCCESS_STR;
     }
@@ -107,7 +109,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public String deleteCart(Long cartId) throws BadRequestException {
         log.info("OrderService >> Delete Cart {}", cartId);
-        CartEntity cartEntity = cartRepo.findById(cartId).orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_CART));
+        CartEntity cartEntity = validationService.validateCartEntity(cartId);
         cartRepo.deleteById(cartEntity.getId());
         return Constants.SUCCESS_STR;
     }
@@ -129,10 +131,8 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public OrderDto getOrderDetailsById(Long orderId) throws BadRequestException {
-        OrderEntity orderEntity = orderRepo.findById(orderId)
-                .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_ORDER));
-        UserEntity userEntity = userRepo.findById(orderEntity.getUserId())
-                .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER));
+        OrderEntity orderEntity = validationService.validateOrderEntity(orderId);
+        UserEntity userEntity = validationService.validateUserEntity(orderEntity.getUserId());
         OrderDto orderDto = genericService.convertOrderEntityToDto(orderEntity);
         orderDto.setAddressDto(genericService.convertAddressEntityToDto(orderEntity.getAddressEntity()));
         orderDto.setUserName(userEntity.getName());
@@ -145,10 +145,8 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public String updateOrderStatus(Long orderId, String status, Long deliveryVehicleId) throws BadRequestException {
         log.info("OrderService >>");
-        OrderEntity orderEntity = orderRepo.findById(orderId)
-                .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_ORDER));
-        DeliveryVehicleEntity deliveryVehicleEntity = deliveryVehicleRepo.findById(deliveryVehicleId)
-                .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_DELIVERY_VEHICLE));
+        OrderEntity orderEntity = validationService.validateOrderEntity(orderId);
+        DeliveryVehicleEntity deliveryVehicleEntity = validationService.validateDeliveryVehicleEntity(deliveryVehicleId);
         OrderStatus orderStatus = validateOrderStatus(status);
         String response = Constants.FAILURE_STR;
         if (null != orderEntity) {
@@ -193,7 +191,27 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<com.moderngas.pojo.admin.OrderDto> getUserOrderListForAdminInUserDetails(Long userId) throws BadRequestException {
-        UserEntity userEntity = userRepo.findById(userId).orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_ORDER));
+        UserEntity userEntity = validationService.validateUserEntity(userId);
         return orderRepo.getUserOrderListForAdminInUserDetails(userEntity.getId());
+    }
+
+    @Override
+    public String placeAdminInitiatedOrder(@NonNull OpenOrderDto openOrderDto, Long adminId) throws BadRequestException {
+        UserEntity adminEntity = validationService.validateUserEntity(adminId);
+        UserEntity userEntity = validationService.validateUserEntity(openOrderDto.getUserId());
+        AddressEntity addressEntity = validationService.validateAddressEntity(openOrderDto.getAddressId());
+        GasMaster gasMaster = validationService.validateGasMaster(openOrderDto.getProductId());
+
+        OrderEntity orderEntity = new OrderEntity();
+        orderEntity.setCylinderType(CylinderType.getByStatus(openOrderDto.getCylinderType()));
+        orderEntity.setUserId(userEntity.getId());
+        orderEntity.setAdminId(adminEntity.getId());
+        orderEntity.setOrderStatus(OrderStatus.ORDER_STATUS_CREATED);
+        orderEntity.setGasMaster(gasMaster);
+        orderEntity.setRefill(false);
+        orderEntity.setRefillCount(0);
+        orderEntity.setAddressEntity(addressEntity);
+        orderRepo.save(orderEntity);
+        return Constants.SUCCESS_STR;
     }
 }

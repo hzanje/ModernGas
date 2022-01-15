@@ -3,6 +3,7 @@ package com.moderngas.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.moderngas.exception.BadRequestException;
+import com.moderngas.pojo.admin.OpenOrderDto;
 import com.moderngas.pojo.user.CartDto;
 import com.moderngas.pojo.user.OrderDto;
 import org.springframework.data.domain.Page;
@@ -33,4 +34,6 @@ public interface OrderService {
     Page<com.moderngas.pojo.admin.OrderDto> getAllOrderListForAdmin(Pageable pageable, String status, List<String> cylinderType, String search, String quantityOrder) throws JsonProcessingException, BadRequestException;
 
     List<com.moderngas.pojo.admin.OrderDto> getUserOrderListForAdminInUserDetails(Long userId) throws BadRequestException;
+
+    String placeAdminInitiatedOrder(OpenOrderDto openOrderDto, Long adminId) throws BadRequestException;
 }

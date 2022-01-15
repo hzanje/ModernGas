@@ -13,6 +13,7 @@ import com.moderngas.repository.InventoryRepo;
 import com.moderngas.repository.OrderRepo;
 import com.moderngas.repository.UserRepo;
 import com.moderngas.service.EmployeeService;
+import com.moderngas.service.ValidationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,15 +32,11 @@ public class EmployeeServiceImpl implements EmployeeService {
     private InventoryRepo inventoryRepo;
 
     @Autowired
-    private OrderRepo orderRepo;
-
-    @Autowired
-    private UserRepo userRepo;
+    private ValidationService validationService;
 
     @Override
     public String assignCylinderToUser(Long orderId, List<String> cylinderCodes) throws BadRequestException {
-        OrderEntity orderEntity = orderRepo.findById(orderId)
-                .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_ORDER));
+        OrderEntity orderEntity = validationService.validateOrderEntity(orderId);
         if (CollectionUtils.isEmpty(cylinderCodes)) {
             throw new BadRequestException(ExceptionConstants.INVALID_REQUEST_DATA);
         }
@@ -49,8 +46,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public String receiveCylinderFromUser(Long orderId, List<String> cylinderCodes) throws BadRequestException {
-        OrderEntity orderEntity = orderRepo.findById(orderId)
-                .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_ORDER));
+        OrderEntity orderEntity = validationService.validateOrderEntity(orderId);
         if (CollectionUtils.isEmpty(cylinderCodes)) {
             throw new BadRequestException(ExceptionConstants.INVALID_REQUEST_DATA);
         }
@@ -78,8 +74,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public List<String> getAssignedCylinderByUserId(Long userId) throws BadRequestException {
-        UserEntity userEntity = userRepo.findById(userId)
-                .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER));
+        UserEntity userEntity = validationService.validateUserEntity(userId);
         return inventoryRepo.getAssignedCylinderByUserId(userEntity.getId());
     }
 }

@@ -300,5 +300,13 @@ public class AdminController {
         return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
     }
 
+    @Secured("ROLE_EMPLOYEE")
+    @PostMapping("/placeOrder/{adminId}")
+    public ResponseEntity<?> placeOrder(@PathVariable("adminId") Long adminId,
+                                        @RequestBody OpenOrderDto openOrderDto) throws BadRequestException {
+        log.info("AdminController :: placeOrder :: {} >>> Start ", adminId);
+        return new ResponseEntity<>(orderService.placeAdminInitiatedOrder(openOrderDto, adminId), HttpStatus.OK);
+    }
+
 }
 
