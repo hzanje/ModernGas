@@ -1,10 +1,15 @@
 package com.moderngas.service;
 
 import com.moderngas.exception.BadRequestException;
+import com.moderngas.pojo.employee.EmployeeSearchDto;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
 public interface EmployeeService {
+
+    Page<EmployeeSearchDto> getAllEmployeeByAdmin(Pageable pageable, String search, Long adminId) throws BadRequestException;
 
     List<String> getAvailableCylinder();
 

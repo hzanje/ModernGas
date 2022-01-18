@@ -12,6 +12,8 @@ public class UserSearchDto {
 
     private String companyName;
 
+    private Long mobileNumber;
+
     public UserSearchDto(Long id, String name, String companyName) {
         this.id = id;
         this.name = name;

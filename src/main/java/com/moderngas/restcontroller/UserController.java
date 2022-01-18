@@ -1,18 +1,31 @@
 package com.moderngas.restcontroller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.moderngas.exception.BadRequestException;
 import com.moderngas.pojo.ResponseStatus;
 import com.moderngas.pojo.admin.CylinderCodeStatusDto;
 import com.moderngas.pojo.user.AddressDto;
 import com.moderngas.pojo.user.UserEntityDto;
+import com.moderngas.pojo.user.UserSearchDto;
 import com.moderngas.service.GenericService;
 import com.moderngas.service.InventoryService;
 import com.moderngas.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.PagedModel;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -38,10 +51,20 @@ public class UserController {
      * @param adminId
      * @return
      */
-    @GetMapping(value = "/getAllClient/{adminId}")
-    public ResponseEntity<?> getAllClient(@PathVariable("adminId") Long adminId) throws BadRequestException {
-        log.info("UserController :: getAllClient >>> Start");
-        return new ResponseEntity<>(userService.getAllUserByAdmin(adminId), HttpStatus.OK);
+    @Secured("ROLE_EMPLOYEE")
+    @GetMapping("/getAllUser")
+    public HttpEntity<PagedModel<EntityModel<UserSearchDto>>> getAllClient(PagedResourcesAssembler<UserSearchDto> assembler,
+                                                                           @RequestParam(value = "size", defaultValue = "0") Integer size,
+                                                                           @RequestParam(value = "page", defaultValue = "0") Integer page,
+                                                                           @RequestParam(value = "search", required = false) String search,
+                                                                           @RequestParam(value = "adminId") Long adminId) throws JsonProcessingException, BadRequestException {
+        log.info("UserController :: searchUser >>> Start ");
+        Pageable pageable = PageRequest.of(page, size, Sort.Direction.ASC);
+        Page<UserSearchDto> userSearchDtoList = userService.getAllUserByAdmin(pageable, search, adminId);
+        Link link = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(UserController.class)
+                .getAllClient(assembler, size, page, search, adminId)).withSelfRel();
+        PagedModel<EntityModel<UserSearchDto>> model = assembler.toModel(userSearchDtoList, link);
+        return new ResponseEntity<>(model, HttpStatus.OK);
     }
 
     /**
@@ -210,7 +233,7 @@ public class UserController {
     @PostMapping("/addCylinder/{userId}")
     public ResponseEntity<ResponseStatus> addCylinder(@PathVariable("userId") Long userId,
                                                       @RequestBody List<CylinderCodeStatusDto> cylinderCodeStatusDtoList) throws BadRequestException {
-        log.info("AdminController :: addCylinder >>> Start ");
+        log.info("UserController :: addCylinder >>> Start ");
         String response = inventoryService.addCylinder(userId, cylinderCodeStatusDtoList);
         return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
     }

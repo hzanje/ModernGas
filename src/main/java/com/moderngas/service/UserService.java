@@ -19,8 +19,6 @@ public interface UserService {
 
     String updateUser(UserEntity userEntity);
 
-    List<UserEntityDto> getAllUserByAdmin(Long adminId) throws BadRequestException;
-
     UserEntityDto getUserById(Long userId) throws BadRequestException;
 
     String checkUserExist(Long mobileNumber);
@@ -43,6 +41,8 @@ public interface UserService {
 
     List<GasNameIdDto> getGasListByCategoryId(Long categoryId, Long adminId);
 
+    List<GasDto> getAllGasList(Long adminId) throws BadRequestException;
+
     GasDto getGasDetailsById(Long id, Long adminId) throws BadRequestException;
 
     void checkIfRoleIsNotUser(UserEntity userEntity) throws BadRequestException;
@@ -51,11 +51,10 @@ public interface UserService {
 
     List<NameIdDto> getVehicleNumberList(Long userId);
 
-    Page<UserSearchDto> searchUserByName(Pageable pageable, String name) throws BadRequestException;
+    Page<UserSearchDto> getAllUserByAdmin(Pageable pageable, String search, Long adminId) throws BadRequestException;
 
     UserDetails getUserDetailsForAdmin(Long id) throws BadRequestException;
 
     String logout(String token) throws BadRequestException;
-
 
 }

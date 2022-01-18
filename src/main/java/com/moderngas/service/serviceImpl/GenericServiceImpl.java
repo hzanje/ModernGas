@@ -4,6 +4,7 @@ import com.moderngas.constants.Constants;
 import com.moderngas.constants.ExceptionConstants;
 import com.moderngas.enums.CylinderType;
 import com.moderngas.enums.OrderStatus;
+import com.moderngas.enums.UserPrivilege;
 import com.moderngas.enums.UserRole;
 import com.moderngas.exception.BadRequestException;
 import com.moderngas.jpaentity.*;
@@ -12,6 +13,7 @@ import com.moderngas.pojo.DateStatusDto;
 import com.moderngas.pojo.admin.DeliveryVehicleDto;
 import com.moderngas.pojo.admin.FilterDto;
 import com.moderngas.pojo.admin.OnboardingDto;
+import com.moderngas.pojo.employee.PrivilegeDto;
 import com.moderngas.pojo.superadmin.AdminEntityDto;
 import com.moderngas.pojo.superadmin.GasNameCylinderTypeDto;
 import com.moderngas.pojo.user.*;
@@ -523,5 +525,11 @@ public class GenericServiceImpl implements GenericService {
     @Override
     public Set<UserDashboardDto> convertGasMappingToDashboardDto(List<AdminGasMapping> adminGasMappingList) {
         return adminGasMappingList.stream().map(e -> new UserDashboardDto(null, e.getCategoryId(), e.getCategoryName())).collect(Collectors.toSet());
+    }
+
+    @Override
+    public Set<PrivilegeDto> convertToPrivilegeDto(Set<UserPrivilegeEntity> userPrivilegeEntitySet) throws BadRequestException {
+        return Arrays.stream(UserPrivilege.values()).map(e -> new PrivilegeDto(e.getPrivilege(),
+                userPrivilegeEntitySet.stream().anyMatch(p -> p.getPrivilege().equals(e.getPrivilege())))).collect(Collectors.toSet());
     }
 }

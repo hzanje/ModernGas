@@ -17,17 +17,23 @@ public class UserEntity extends BaseEntity {
 
     @Column(name = "is_onboarding", columnDefinition = "tinyint(1) DEFAULT 1")
     protected boolean isOnboarding = true;
+
     @Column(name = "name")
     private String name;
+
     @Column(name = "mobile_number")
     private Long mobileNumber;
+
     @Column(name = "email")
     private String email;
+
     @Lob
     @Column(name = "password")
     private String password;
+
     @Column(name = "company_name")
     private String companyName;
+
     @Column(name = "is_forget_password", columnDefinition = "tinyint(1) DEFAULT 0")
     private boolean isForgetPassword = false;
 
@@ -38,7 +44,6 @@ public class UserEntity extends BaseEntity {
 
     @OneToMany(cascade = {CascadeType.DETACH, CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.REMOVE}, fetch = FetchType.EAGER, orphanRemoval = true)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
-    //@Where(clause = "active_flag = 1")
     private Set<AddressEntity> addressEntitySet;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)

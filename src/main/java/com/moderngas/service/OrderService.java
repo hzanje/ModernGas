@@ -31,7 +31,7 @@ public interface OrderService {
 
     String updateOrderStatus(Long orderId, String orderStatus, Long vehicleNumber) throws BadRequestException;
 
-    Page<com.moderngas.pojo.admin.OrderDto> getAllOrderListForAdmin(Pageable pageable, String status, List<String> cylinderType, String search, String quantityOrder) throws JsonProcessingException, BadRequestException;
+    Page<com.moderngas.pojo.admin.OrderDto> getAllOrderListForAdmin(Pageable pageable, String status, List<String> cylinderType, String search, Long id, String quantityOrder) throws JsonProcessingException, BadRequestException;
 
     List<com.moderngas.pojo.admin.OrderDto> getUserOrderListForAdminInUserDetails(Long userId) throws BadRequestException;
 

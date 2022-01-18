@@ -25,7 +25,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.ObjectUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -99,16 +98,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserEntityDto> getAllUserByAdmin(Long adminId) throws BadRequestException {
-        List<UserEntityDto> userEntityDtoList = new ArrayList<>();
-        if (null != adminId) {
-            List<UserEntity> userEntityList = userRepo.getAllUserByAdmin(adminId);
-            for (UserEntity userEntity : userEntityList) {
-                UserEntityDto userEntityDto = genericService.convertUserDataToDto(userEntity);
-                userEntityDtoList.add(userEntityDto);
-            }
-        }
-        return userEntityDtoList;
+    public Page<UserSearchDto> getAllUserByAdmin(Pageable pageable, String search, Long adminId) throws BadRequestException {
+        UserEntity adminEntity = validationService.validateUserEntity(adminId);
+        return userRepo.getAllUserByAdmin(pageable, search, adminEntity.getId());
     }
 
     @Override
@@ -176,12 +168,10 @@ public class UserServiceImpl implements UserService {
     }
 
     private String createEmailBody(String name, String tempPassword) {
-        StringBuilder stringBuilder = new StringBuilder("Hi " + name + ", <Br>");
-        stringBuilder.append("Have you forget your password to Modern Gas App, Don't worry we have provided a temporary password below, ");
-        stringBuilder.append("<Br><Br>Password : <Strong>" + tempPassword + "</Strong>");
-        stringBuilder.append("<Br>Now you may directly login to Modern Gas Account with temporary password. ");
-        stringBuilder.append("<Br><Br>Thanks & Regards, <Br> A.B. Chaudhary");
-        return stringBuilder.toString();
+        return "Hi " + name + ", <Br>" + "Have you forget your password to Modern Gas App, Don't worry we have provided a temporary password below, " +
+                "<Br><Br>Password : <Strong>" + tempPassword + "</Strong>" +
+                "<Br>Now you may directly login to Modern Gas Account with temporary password. " +
+                "<Br><Br>Thanks & Regards, <Br> A.B. Chaudhary";
     }
 
     @Override
@@ -208,6 +198,25 @@ public class UserServiceImpl implements UserService {
         return adminGasMappingList.stream()
                 .map(e -> new GasNameIdDto(e.getGasId(), e.getGasName(), ""))
                 .toList();
+    }
+
+    @Override
+    public List<GasDto> getAllGasList(Long adminId) throws BadRequestException{
+        UserEntity adminEntity = validationService.validateUserEntity(adminId);
+        List<AdminGasMapping> adminGasMappingList = adminGasMappingRepo.getGasMappingList(adminEntity.getId());
+        List<GasDto> gasDtoList = new ArrayList<>();
+        for (AdminGasMapping adminGasMapping : adminGasMappingList) {
+            GasDto gasDto = new GasDto();
+            gasDto.setId(adminGasMapping.getGasId());
+            gasDto.setName(adminGasMapping.getGasName());
+            gasDto.setCategory(adminGasMapping.getCategoryName());
+            gasDto.setAvailable(adminGasMapping.isActiveFlag());
+            gasDto.setPrice(adminGasMapping.getPrice());
+            gasDto.setAvailableCylinderType(adminGasMapping.getAdminGasCylinderTypeMapping()
+                    .stream().map(e -> new CylinderTypeDto(e.getCylinderType().getName(), e.getCylinderType().getDescription())).toList());
+            gasDtoList.add(gasDto);
+        }
+        return gasDtoList;
     }
 
     @Override
@@ -319,14 +328,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<NameIdDto> getVehicleNumberList(Long userId) {
         return deliveryVehicleRepo.getVehicleNumberList(userId);
-    }
-
-    @Override
-    public Page<UserSearchDto> searchUserByName(Pageable pageable, String name) throws BadRequestException {
-        if (ObjectUtils.isEmpty(name)) {
-            throw new BadRequestException(ExceptionConstants.INVALID_REQUEST_DATA);
-        }
-        return userRepo.searchUserByName(pageable, name);
     }
 
     @Override

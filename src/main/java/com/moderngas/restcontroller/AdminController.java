@@ -50,53 +50,6 @@ public class AdminController {
     @Autowired
     private AdminService adminService;
 
-    /**
-     * Get All Order List By Parameter and Recent Order on Dashboard
-     *
-     * @param assembler
-     * @param size
-     * @param page
-     * @param status
-     * @param cylinderType
-     * @param search
-     * @param quantityOrder
-     * @return
-     * @throws JsonProcessingException
-     * @throws BadRequestException
-     */
-    @Secured("ROLE_ADMIN")
-    @GetMapping("/order")
-    public HttpEntity<PagedModel<EntityModel<OrderDto>>> getAllOrderList(PagedResourcesAssembler<OrderDto> assembler,
-                                                                         @RequestParam(value = "size", defaultValue = "0") Integer size,
-                                                                         @RequestParam(value = "page", defaultValue = "0") Integer page,
-                                                                         @RequestParam(value = "status", required = false) String status,
-                                                                         @RequestParam(value = "cylinderType", required = false) List<String> cylinderType,
-                                                                         @RequestParam(value = "search", required = false) String search,
-                                                                         @RequestParam(value = "quantityOrdering", required = false) String quantityOrder) throws JsonProcessingException, BadRequestException {
-
-        log.info("AdminController :: getAllOrderList >>> Start");
-        Sort sortOrdering = getSortingOrder(quantityOrder);
-        Pageable pageable = PageRequest.of(page, size, sortOrdering);
-        Page<OrderDto> orderDtoList = orderService.getAllOrderListForAdmin(pageable, status, cylinderType, search, quantityOrder);
-        Link link = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(AdminController.class)
-                .getAllOrderList(assembler, size, page, status, cylinderType, search, quantityOrder)).withSelfRel();
-
-        PagedModel<EntityModel<OrderDto>> model = assembler.toModel(orderDtoList, link);
-        return new ResponseEntity<>(model, HttpStatus.OK);
-    }
-
-    /**
-     * Get Sorting Order
-     *
-     * @param quantityOrder
-     * @return
-     */
-    private Sort getSortingOrder(String quantityOrder) {
-        if (quantityOrder.equals(Constants.FILTER_ORDERING_MIN_MAX)) {
-            return Sort.by(Sort.Direction.ASC, "createdDate");
-        }
-        return Sort.by(Sort.Direction.DESC, "createdDate");
-    }
 
     /**
      * Add Cylinder for Specific Admin by Cylinder Code
@@ -184,23 +137,6 @@ public class AdminController {
         return new ResponseEntity<>(inventoryService.getInventoryCylinderForAdmin(adminId), HttpStatus.OK);
     }
 
-
-    @Secured("ROLE_ADMIN")
-    @GetMapping("/search")
-    public HttpEntity<PagedModel<EntityModel<UserSearchDto>>> searchUser(PagedResourcesAssembler<UserSearchDto> assembler,
-                                                                         @RequestParam(value = "size", defaultValue = "0") Integer size,
-                                                                         @RequestParam(value = "page", defaultValue = "0") Integer page,
-                                                                         @RequestParam(value = "name") String name) throws BadRequestException {
-
-        log.info("AdminController :: searchUser >>> Start");
-        Pageable pageable = PageRequest.of(page, size);
-        Page<UserSearchDto> userSearchList = userService.searchUserByName(pageable, name);
-        Link link = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(AdminController.class)
-                .searchUser(assembler, size, page, name)).withSelfRel();
-
-        PagedModel<EntityModel<UserSearchDto>> model = assembler.toModel(userSearchList, link);
-        return new ResponseEntity<>(model, HttpStatus.OK);
-    }
 
     /**
      * Get User details for Admin as per specific Admin
@@ -304,9 +240,16 @@ public class AdminController {
     @PostMapping("/placeOrder/{adminId}")
     public ResponseEntity<?> placeOrder(@PathVariable("adminId") Long adminId,
                                         @RequestBody OpenOrderDto openOrderDto) throws BadRequestException {
-        log.info("AdminController :: placeOrder :: {} >>> Start ", adminId);
+        log.info("AdminController :: placeOrder :: adminId > {} >>> Start ", adminId);
         return new ResponseEntity<>(orderService.placeAdminInitiatedOrder(openOrderDto, adminId), HttpStatus.OK);
     }
+
+    @GetMapping("/getAllGasList/{adminId}")
+    public ResponseEntity<?> getAllGasList(@PathVariable("adminId") Long adminId) throws BadRequestException {
+        log.info("AdminController :: getAllGasList :: adminId > {} >>> Start ", adminId);
+        return new ResponseEntity<>(userService.getAllGasList(adminId), HttpStatus.OK);
+    }
+
 
 }
 

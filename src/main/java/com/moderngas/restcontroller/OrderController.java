@@ -1,5 +1,7 @@
 package com.moderngas.restcontroller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.moderngas.constants.Constants;
 import com.moderngas.exception.BadRequestException;
 import com.moderngas.pojo.ResponseStatus;
 import com.moderngas.pojo.user.CartDto;
@@ -7,9 +9,22 @@ import com.moderngas.pojo.user.OrderDto;
 import com.moderngas.service.OrderService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.PagedModel;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 
 @Slf4j
@@ -54,11 +69,61 @@ public class OrderController {
      * @param adminId
      * @return Order List
      */
-    @GetMapping("/order")
+    @GetMapping("/userOrderList")
     public ResponseEntity<?> getOrderListByUser(@RequestParam("id") Long userId, @RequestParam("adminId") Long adminId) throws BadRequestException {
         log.info("OrderController :: getOrderListByUser >>> Start");
         return new ResponseEntity<>(orderService.getOrderListByUser(userId, adminId), HttpStatus.OK);
     }
+
+    /**
+     * Get All Order List By Parameter and Recent Order on Dashboard
+     *
+     * @param assembler
+     * @param size
+     * @param page
+     * @param status
+     * @param cylinderType
+     * @param search
+     * @param quantityOrder
+     * @return
+     * @throws JsonProcessingException
+     * @throws BadRequestException
+     */
+    @Secured("ROLE_ADMIN")
+    @GetMapping("/adminOrderList")
+    public HttpEntity<PagedModel<EntityModel<com.moderngas.pojo.admin.OrderDto>>> getAllOrderList(PagedResourcesAssembler<com.moderngas.pojo.admin.OrderDto> assembler,
+                                                                                                  @RequestParam(value = "size", defaultValue = "0") Integer size,
+                                                                                                  @RequestParam(value = "page", defaultValue = "0") Integer page,
+                                                                                                  @RequestParam(value = "status", required = false) String status,
+                                                                                                  @RequestParam(value = "cylinderType", required = false) List<String> cylinderType,
+                                                                                                  @RequestParam(value = "search", required = false) String search,
+                                                                                                  @RequestParam(value = "id") Long id,
+                                                                                                  @RequestParam(value = "quantityOrdering", required = false) String quantityOrder) throws JsonProcessingException, BadRequestException {
+
+        log.info("AdminController :: getAllOrderList >>> Start");
+        Sort sortOrdering = getSortingOrder(quantityOrder);
+        Pageable pageable = PageRequest.of(page, size, sortOrdering);
+        Page<com.moderngas.pojo.admin.OrderDto> orderDtoList = orderService.getAllOrderListForAdmin(pageable, status, cylinderType, search, id, quantityOrder);
+        Link link = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(OrderController.class)
+                .getAllOrderList(assembler, size, page, status, cylinderType, search, id, quantityOrder)).withSelfRel();
+
+        PagedModel<EntityModel<com.moderngas.pojo.admin.OrderDto>> model = assembler.toModel(orderDtoList, link);
+        return new ResponseEntity<>(model, HttpStatus.OK);
+    }
+
+    /**
+     * Get Sorting Order
+     *
+     * @param quantityOrder
+     * @return
+     */
+    private Sort getSortingOrder(String quantityOrder) {
+        if (quantityOrder.equals(Constants.FILTER_ORDERING_MIN_MAX)) {
+            return Sort.by(Sort.Direction.ASC, "createdDate");
+        }
+        return Sort.by(Sort.Direction.DESC, "createdDate");
+    }
+
 
     /**
      * Add Or Update User Cart Record For Specific Admin

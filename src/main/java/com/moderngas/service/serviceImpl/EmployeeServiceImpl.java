@@ -8,6 +8,8 @@ import com.moderngas.jpaentity.CylinderEntity;
 import com.moderngas.jpaentity.CylinderInventoryDetailsEntity;
 import com.moderngas.jpaentity.OrderEntity;
 import com.moderngas.jpaentity.UserEntity;
+import com.moderngas.pojo.employee.EmployeeSearchDto;
+import com.moderngas.pojo.user.UserSearchDto;
 import com.moderngas.repository.DeliveryVehicleRepo;
 import com.moderngas.repository.InventoryRepo;
 import com.moderngas.repository.OrderRepo;
@@ -16,6 +18,8 @@ import com.moderngas.service.EmployeeService;
 import com.moderngas.service.ValidationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -33,6 +37,15 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Autowired
     private ValidationService validationService;
+
+    @Autowired
+    private UserRepo userRepo;
+
+    @Override
+    public Page<EmployeeSearchDto> getAllEmployeeByAdmin(Pageable pageable, String search, Long adminId) throws BadRequestException {
+        UserEntity adminEntity = validationService.validateUserEntity(adminId);
+        return userRepo.getAllEmployeeByAdmin(pageable, search, adminEntity.getId());
+    }
 
     @Override
     public String assignCylinderToUser(Long orderId, List<String> cylinderCodes) throws BadRequestException {

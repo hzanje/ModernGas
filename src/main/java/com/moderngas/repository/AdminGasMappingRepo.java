@@ -24,4 +24,7 @@ public interface AdminGasMappingRepo extends JpaRepository<AdminGasMapping, Long
     @Query("SELECT agm FROM UserEntity u INNER JOIN u.adminGasMappings agm WHERE u.id = :adminId AND agm.categoryId = :id")
     List<AdminGasMapping> getGasMappingListByCategoryId(@Param("id") Long categoryId,
                                                         @Param("adminId") Long adminId);
+
+    @Query("SELECT agm FROM UserEntity u INNER JOIN u.adminGasMappings agm WHERE u.id = :adminId")
+    List<AdminGasMapping> getGasMappingList(@Param("adminId") Long adminId);
 }
