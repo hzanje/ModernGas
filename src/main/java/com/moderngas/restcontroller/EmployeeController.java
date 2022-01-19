@@ -41,10 +41,10 @@ public class EmployeeController {
                                                                                  @RequestParam(value = "adminId") Long adminId) throws JsonProcessingException, BadRequestException {
         log.info("UserController :: searchUser >>> Start ");
         Pageable pageable = PageRequest.of(page, size, Sort.Direction.ASC);
-        Page<EmployeeSearchDto> userSearchDtoList = employeeService.getAllEmployeeByAdmin(pageable, search, adminId);
+        Page<EmployeeSearchDto> employeeSearchDtoList = employeeService.getAllEmployeeByAdmin(pageable, search, adminId);
         Link link = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(EmployeeController.class)
                 .getAllEmployee(assembler, size, page, search, adminId)).withSelfRel();
-        PagedModel<EntityModel<EmployeeSearchDto>> model = assembler.toModel(userSearchDtoList, link);
+        PagedModel<EntityModel<EmployeeSearchDto>> model = assembler.toModel(employeeSearchDtoList, link);
         return new ResponseEntity<>(model, HttpStatus.OK);
     }
 

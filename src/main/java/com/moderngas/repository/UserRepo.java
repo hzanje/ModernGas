@@ -26,10 +26,10 @@ public interface UserRepo extends JpaRepository<UserEntity, Long> {
                                           @Param("name") String name,
                                           @Param("adminId") Long adminId);
 
-    @Query(value = "", countQuery = "")
+    /*@Query(value = "", countQuery = "")
     Page<EmployeeSearchDto> getAllEmployeeByAdmin(Pageable pageable,
                                                   @Param("name") String name,
-                                                  @Param("adminId") Long adminId);
+                                                  @Param("adminId") Long adminId);*/
 
     @Query("SELECT new com.moderngas.pojo.admin.UserDetails(u.id, u.activeFlag, u.name, u.mobileNumber, u.email, u.companyName) " +
             "FROM UserEntity u WHERE u.id = :id")
