@@ -22,6 +22,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -118,7 +119,7 @@ public class OrderController {
      * @return
      */
     private Sort getSortingOrder(String quantityOrder) {
-        if (quantityOrder.equals(Constants.FILTER_ORDERING_MIN_MAX)) {
+        if (!ObjectUtils.isEmpty(quantityOrder) && quantityOrder.equals(Constants.FILTER_ORDERING_MIN_MAX)) {
             return Sort.by(Sort.Direction.ASC, "createdDate");
         }
         return Sort.by(Sort.Direction.DESC, "createdDate");
