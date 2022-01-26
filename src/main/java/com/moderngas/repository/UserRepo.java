@@ -23,7 +23,7 @@ public interface UserRepo extends JpaRepository<UserEntity, Long> {
 
     @Query(value = UserRepo.QUERIES.ALL_USER_BY_ADMIN, countQuery = UserRepo.QUERIES.ALL_USER_BY_ADMIN_COUNT)
     Page<UserSearchDto> getAllUserByAdmin(Pageable pageable,
-                                          @Param("name") String name,
+                                          @Param("search") String search,
                                           @Param("adminId") Long adminId);
 
     /*@Query(value = "", countQuery = "")
@@ -45,14 +45,12 @@ public interface UserRepo extends JpaRepository<UserEntity, Long> {
     class QUERIES {
 
         private static final String ALL_USER_BY_ADMIN = "SELECT new com.moderngas.pojo.user.UserSearchDto(u.id, u.name, u.companyName, u.mobileNumber) FROM UserEntity u " +
-                "WHERE u.name LIKE :name% " +
-                "AND :adminId member of u.adminIdSet " +
+                "WHERE :adminId member of u.adminIdSet " +
                 "AND (:search IS NULL OR u.name LIKE :search%) " +
                 "ORDER BY u.name ASC ";
 
         private static final String ALL_USER_BY_ADMIN_COUNT = "SELECT COUNT(u.id) FROM UserEntity u " +
-                "WHERE u.name LIKE :name% " +
-                "AND :adminId member of u.adminIdSet " +
+                "WHERE :adminId member of u.adminIdSet " +
                 "AND (:search IS NULL OR u.name LIKE :search%) " +
                 "ORDER BY u.name ASC ";
 

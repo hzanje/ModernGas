@@ -57,9 +57,9 @@ public class UserController {
                                                                            @RequestParam(value = "size", defaultValue = "0") Integer size,
                                                                            @RequestParam(value = "page", defaultValue = "0") Integer page,
                                                                            @RequestParam(value = "search", required = false) String search,
-                                                                           @RequestParam(value = "adminId") Long adminId) throws JsonProcessingException, BadRequestException {
+                                                                           @RequestParam(value = "adminId") Long adminId) throws BadRequestException {
         log.info("UserController :: searchUser >>> Start ");
-        Pageable pageable = PageRequest.of(page, size, Sort.Direction.ASC);
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "createdDate"));
         Page<UserSearchDto> userSearchDtoList = userService.getAllUserByAdmin(pageable, search, adminId);
         Link link = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(UserController.class)
                 .getAllClient(assembler, size, page, search, adminId)).withSelfRel();
