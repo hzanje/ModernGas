@@ -39,12 +39,6 @@ public class OrderDto {
 
     private List<DateStatusDto> dateStatusDto;
 
-    private Date orderedOnDate;
-
-    private Date loadedOnDate;
-
-    private Date deliveredOnDate;
-
     private AddressDto addressDto;
 
     private Long addressId;

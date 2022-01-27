@@ -327,45 +327,46 @@ public class GenericServiceImpl implements GenericService {
             orderDto.setAdminId(orderEntity.getAdminId());
             orderDto.setGasId(orderEntity.getGasMaster().getId());
             orderDto.setDateStatusDto(convertDateStatus(orderEntity));
+            orderDto.setDeliveryVehicle(ObjectUtils.isEmpty(orderEntity.getDeliveryVehicle()) ? "" : orderEntity.getDeliveryVehicle().getNumber());
         }
         return orderDto;
     }
 
     private List<DateStatusDto> convertDateStatus(OrderEntity orderEntity) {
         List<DateStatusDto> dateStatusDtoList = new ArrayList<>();
-        for (OrderStatus orderStatus : OrderStatus.values()) {
-            switch (orderStatus) {
-                case ORDER_STATUS_DEVLIVERED -> {
-                    dateStatusDtoList.add(
-                            createDateStatusDto(OrderStatus.ORDER_STATUS_DEVLIVERED, orderEntity.getDeliveredDate()));
-                    dateStatusDtoList.add(
-                            createDateStatusDto(OrderStatus.ORDER_STATUS_LOADED, orderEntity.getLoadedDate()));
-                    dateStatusDtoList.add(
-                            createDateStatusDto(OrderStatus.ORDER_STATUS_CANCELLED, orderEntity.getCancellationDate()));
-                    dateStatusDtoList.add(
-                            createDateStatusDto(OrderStatus.ORDER_STATUS_CREATED, orderEntity.getCreatedDate()));
-                }
-
-                case ORDER_STATUS_LOADED -> {
-                    dateStatusDtoList.add(
-                            createDateStatusDto(OrderStatus.ORDER_STATUS_LOADED, orderEntity.getLoadedDate()));
-                    dateStatusDtoList.add(
-                            createDateStatusDto(OrderStatus.ORDER_STATUS_CANCELLED, orderEntity.getCancellationDate()));
-                    dateStatusDtoList.add(
-                            createDateStatusDto(OrderStatus.ORDER_STATUS_CREATED, orderEntity.getCreatedDate()));
-                }
-
-                case ORDER_STATUS_CANCELLED -> {
-                    dateStatusDtoList.add(
-                            createDateStatusDto(OrderStatus.ORDER_STATUS_CANCELLED, orderEntity.getCancellationDate()));
-                    dateStatusDtoList.add(
-                            createDateStatusDto(OrderStatus.ORDER_STATUS_CREATED, orderEntity.getCreatedDate()));
-                }
-
-                case ORDER_STATUS_CREATED -> dateStatusDtoList.add(
+        switch (orderEntity.getOrderStatus()) {
+            case ORDER_STATUS_DEVLIVERED -> {
+                dateStatusDtoList.add(
+                        createDateStatusDto(OrderStatus.ORDER_STATUS_DEVLIVERED, orderEntity.getDeliveredDate()));
+                dateStatusDtoList.add(
+                        createDateStatusDto(OrderStatus.ORDER_STATUS_LOADED, orderEntity.getLoadedDate()));
+                dateStatusDtoList.add(
                         createDateStatusDto(OrderStatus.ORDER_STATUS_CREATED, orderEntity.getCreatedDate()));
-
+                break;
             }
+
+            case ORDER_STATUS_LOADED -> {
+                dateStatusDtoList.add(
+                        createDateStatusDto(OrderStatus.ORDER_STATUS_LOADED, orderEntity.getLoadedDate()));
+                dateStatusDtoList.add(
+                        createDateStatusDto(OrderStatus.ORDER_STATUS_CREATED, orderEntity.getCreatedDate()));
+                break;
+            }
+
+            case ORDER_STATUS_CANCELLED -> {
+                dateStatusDtoList.add(
+                        createDateStatusDto(OrderStatus.ORDER_STATUS_CANCELLED, orderEntity.getCancellationDate()));
+                dateStatusDtoList.add(
+                        createDateStatusDto(OrderStatus.ORDER_STATUS_CREATED, orderEntity.getCreatedDate()));
+                break;
+            }
+
+            case ORDER_STATUS_CREATED -> {
+                dateStatusDtoList.add(
+                        createDateStatusDto(OrderStatus.ORDER_STATUS_CREATED, orderEntity.getCreatedDate()));
+                break;
+            }
+
         }
         return dateStatusDtoList;
     }
@@ -433,22 +434,26 @@ public class GenericServiceImpl implements GenericService {
         log.info("GenericService >> Changes Status: {} for User: {}", orderStatus.getName(), orderEntity.getUserId());
         switch (orderStatus) {
 
-            case ORDER_STATUS_LOADED:
+            case ORDER_STATUS_LOADED -> {
                 orderEntity.setLoadedDate(new Date());
                 orderEntity.setDeliveryVehicle(deliveryVehicleRepo.getVehicleById(deliveryVehicleId));
                 break;
+            }
 
-            case ORDER_STATUS_DEVLIVERED:
+            case ORDER_STATUS_DEVLIVERED -> {
                 orderEntity.setDeliveredDate(new Date());
                 break;
+            }
 
-            case ORDER_STATUS_CANCELLED:
+            case ORDER_STATUS_CANCELLED -> {
                 orderEntity.setActiveFlag(false);
                 orderEntity.setCancellationDate(new Date());
                 break;
+            }
 
-            default:
+            default -> {
                 break;
+            }
         }
         orderEntity.setOrderStatus(orderStatus);
         return orderEntity;
