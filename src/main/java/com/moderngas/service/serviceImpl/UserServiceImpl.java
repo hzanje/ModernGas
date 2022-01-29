@@ -4,6 +4,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.moderngas.constants.Constants;
 import com.moderngas.constants.ExceptionConstants;
+import com.moderngas.enums.UserRole;
 import com.moderngas.exception.BadRequestException;
 import com.moderngas.jpaentity.*;
 import com.moderngas.pojo.CylinderTypeDto;
@@ -72,7 +73,6 @@ public class UserServiceImpl implements UserService {
         log.info("UserService >> Create New User");
         /* Add new Client to DataBase */
         String response = Constants.FAILURE_STR;
-
         UserEntity userEntity = genericService.convertDtoToUserData(userEntityDto);
         userEntity = userRepo.save(userEntity);
         if (userEntity.getId() != null) {
@@ -100,7 +100,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public Page<UserSearchDto> getAllUserByAdmin(Pageable pageable, String search, Long adminId) throws BadRequestException {
         UserEntity adminEntity = validationService.validateUserEntity(adminId);
-        return userRepo.getAllUserByAdmin(pageable, search, adminEntity.getId());
+        return userRepo.getAllUserByAdmin(pageable, search, adminEntity.getId(), UserRole.USER_ROLE_USER.getRole());
     }
 
     @Override
@@ -334,7 +334,6 @@ public class UserServiceImpl implements UserService {
     public UserDetails getUserDetailsForAdmin(Long id) throws BadRequestException {
         UserEntity userEntity = validationService.validateUserEntity(id);
         UserDetails userDetails = userRepo.getUserDetailsForAdmin(userEntity.getId());
-        userDetails.setAssignedCylinder(getUserInventory(userEntity.getId()));
         userDetails.setTotalOrders(getUserOrdersCount(userEntity.getId()));
         return userDetails;
     }
@@ -343,8 +342,5 @@ public class UserServiceImpl implements UserService {
         return orderRepo.getOrderCountByUserId(userId);
     }
 
-    private List<String> getUserInventory(Long userId) {
-        return inventoryRepo.getAssignedCylinderByUserId(userId);
-    }
 
 }

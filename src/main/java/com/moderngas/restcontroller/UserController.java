@@ -1,6 +1,5 @@
 package com.moderngas.restcontroller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.moderngas.exception.BadRequestException;
 import com.moderngas.pojo.ResponseStatus;
 import com.moderngas.pojo.admin.CylinderCodeStatusDto;
@@ -58,7 +57,7 @@ public class UserController {
                                                                            @RequestParam(value = "page", defaultValue = "0") Integer page,
                                                                            @RequestParam(value = "search", required = false) String search,
                                                                            @RequestParam(value = "adminId") Long adminId) throws BadRequestException {
-        log.info("UserController :: searchUser >>> Start ");
+        log.info("UserController :: getAllClient >>> Start ");
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "createdDate"));
         Page<UserSearchDto> userSearchDtoList = userService.getAllUserByAdmin(pageable, search, adminId);
         Link link = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(UserController.class)
@@ -66,6 +65,7 @@ public class UserController {
         PagedModel<EntityModel<UserSearchDto>> model = assembler.toModel(userSearchDtoList, link);
         return new ResponseEntity<>(model, HttpStatus.OK);
     }
+
 
     /**
      * Get Client/User by Id.

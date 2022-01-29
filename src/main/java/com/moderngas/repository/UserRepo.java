@@ -2,7 +2,6 @@ package com.moderngas.repository;
 
 import com.moderngas.jpaentity.UserEntity;
 import com.moderngas.pojo.admin.UserDetails;
-import com.moderngas.pojo.employee.EmployeeSearchDto;
 import com.moderngas.pojo.user.UserSearchDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,7 +11,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import javax.transaction.Transactional;
-import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -24,7 +22,8 @@ public interface UserRepo extends JpaRepository<UserEntity, Long> {
     @Query(value = UserRepo.QUERIES.ALL_USER_BY_ADMIN, countQuery = UserRepo.QUERIES.ALL_USER_BY_ADMIN_COUNT)
     Page<UserSearchDto> getAllUserByAdmin(Pageable pageable,
                                           @Param("search") String search,
-                                          @Param("adminId") Long adminId);
+                                          @Param("adminId") Long adminId,
+                                          @Param("role") String role);
 
     /*@Query(value = "", countQuery = "")
     Page<EmployeeSearchDto> getAllEmployeeByAdmin(Pageable pageable,
@@ -47,11 +46,13 @@ public interface UserRepo extends JpaRepository<UserEntity, Long> {
         private static final String ALL_USER_BY_ADMIN = "SELECT new com.moderngas.pojo.user.UserSearchDto(u.id, u.name, u.companyName, u.mobileNumber) FROM UserEntity u " +
                 "WHERE :adminId member of u.adminIdSet " +
                 "AND (:search IS NULL OR u.name LIKE :search%) " +
+                "AND u.roleEntitySet.role = :role " +
                 "ORDER BY u.name ASC ";
 
         private static final String ALL_USER_BY_ADMIN_COUNT = "SELECT COUNT(u.id) FROM UserEntity u " +
                 "WHERE :adminId member of u.adminIdSet " +
                 "AND (:search IS NULL OR u.name LIKE :search%) " +
+                "AND u.roleEntitySet.role = :role " +
                 "ORDER BY u.name ASC ";
 
         private QUERIES() {

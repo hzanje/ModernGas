@@ -3,16 +3,16 @@ package com.moderngas.service.serviceImpl;
 import com.moderngas.constants.Constants;
 import com.moderngas.constants.ExceptionConstants;
 import com.moderngas.enums.CylinderStatus;
+import com.moderngas.enums.UserRole;
 import com.moderngas.exception.BadRequestException;
 import com.moderngas.jpaentity.CylinderEntity;
 import com.moderngas.jpaentity.CylinderInventoryDetailsEntity;
 import com.moderngas.jpaentity.OrderEntity;
 import com.moderngas.jpaentity.UserEntity;
-import com.moderngas.pojo.employee.EmployeeSearchDto;
+import com.moderngas.pojo.admin.InventoryCylinderDto;
 import com.moderngas.pojo.user.UserSearchDto;
 import com.moderngas.repository.DeliveryVehicleRepo;
 import com.moderngas.repository.InventoryRepo;
-import com.moderngas.repository.OrderRepo;
 import com.moderngas.repository.UserRepo;
 import com.moderngas.service.EmployeeService;
 import com.moderngas.service.ValidationService;
@@ -42,10 +42,9 @@ public class EmployeeServiceImpl implements EmployeeService {
     private UserRepo userRepo;
 
     @Override
-    public Page<EmployeeSearchDto> getAllEmployeeByAdmin(Pageable pageable, String search, Long adminId) throws BadRequestException {
+    public Page<UserSearchDto> getAllEmployeeByAdmin(Pageable pageable, String search, Long adminId) throws BadRequestException {
         UserEntity adminEntity = validationService.validateUserEntity(adminId);
-        return null;
-        //return userRepo.getAllEmployeeByAdmin(pageable, search, adminEntity.getId());
+        return userRepo.getAllUserByAdmin(pageable, search, adminEntity.getId(), UserRole.USER_ROLE_EMPLOYEE.getRole());
     }
 
     @Override
@@ -87,7 +86,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public List<String> getAssignedCylinderByUserId(Long userId) throws BadRequestException {
+    public List<InventoryCylinderDto> getAssignedCylinderByUserId(Long userId) throws BadRequestException {
         UserEntity userEntity = validationService.validateUserEntity(userId);
         return inventoryRepo.getAssignedCylinderByUserId(userEntity.getId());
     }

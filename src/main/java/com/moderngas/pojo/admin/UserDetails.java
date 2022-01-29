@@ -3,8 +3,6 @@ package com.moderngas.pojo.admin;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @NoArgsConstructor
 public class UserDetails {
@@ -20,8 +18,6 @@ public class UserDetails {
     private String email;
 
     private String companyName;
-
-    private List<String> assignedCylinder;
 
     private int totalOrders;
 

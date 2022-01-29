@@ -335,17 +335,9 @@ public class GenericServiceImpl implements GenericService {
     private List<DateStatusDto> convertDateStatus(OrderEntity orderEntity) {
         List<DateStatusDto> dateStatusDtoList = new ArrayList<>();
         switch (orderEntity.getOrderStatus()) {
-            case ORDER_STATUS_DEVLIVERED -> {
+            case ORDER_STATUS_DEVLIVERED,ORDER_STATUS_LOADED, ORDER_STATUS_CREATED -> {
                 dateStatusDtoList.add(
                         createDateStatusDto(OrderStatus.ORDER_STATUS_DEVLIVERED, orderEntity.getDeliveredDate()));
-                dateStatusDtoList.add(
-                        createDateStatusDto(OrderStatus.ORDER_STATUS_LOADED, orderEntity.getLoadedDate()));
-                dateStatusDtoList.add(
-                        createDateStatusDto(OrderStatus.ORDER_STATUS_CREATED, orderEntity.getCreatedDate()));
-                break;
-            }
-
-            case ORDER_STATUS_LOADED -> {
                 dateStatusDtoList.add(
                         createDateStatusDto(OrderStatus.ORDER_STATUS_LOADED, orderEntity.getLoadedDate()));
                 dateStatusDtoList.add(
@@ -360,13 +352,6 @@ public class GenericServiceImpl implements GenericService {
                         createDateStatusDto(OrderStatus.ORDER_STATUS_CREATED, orderEntity.getCreatedDate()));
                 break;
             }
-
-            case ORDER_STATUS_CREATED -> {
-                dateStatusDtoList.add(
-                        createDateStatusDto(OrderStatus.ORDER_STATUS_CREATED, orderEntity.getCreatedDate()));
-                break;
-            }
-
         }
         return dateStatusDtoList;
     }

@@ -2,7 +2,6 @@ package com.moderngas.restcontroller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.moderngas.exception.BadRequestException;
-import com.moderngas.pojo.employee.EmployeeSearchDto;
 import com.moderngas.pojo.user.UserSearchDto;
 import com.moderngas.service.EmployeeService;
 import lombok.extern.slf4j.Slf4j;
@@ -32,19 +31,25 @@ public class EmployeeController {
     @Autowired
     private EmployeeService employeeService;
 
+    /**
+     * Get All the Employee with respect to its Admin.
+     *
+     * @param adminId
+     * @return
+     */
     @Secured("ROLE_EMPLOYEE")
     @GetMapping("/getAllEmployee")
-    public HttpEntity<PagedModel<EntityModel<EmployeeSearchDto>>> getAllEmployee(PagedResourcesAssembler<EmployeeSearchDto> assembler,
+    public HttpEntity<PagedModel<EntityModel<UserSearchDto>>> getAllEmployee(PagedResourcesAssembler<UserSearchDto> assembler,
                                                                                  @RequestParam(value = "size", defaultValue = "0") Integer size,
                                                                                  @RequestParam(value = "page", defaultValue = "0") Integer page,
                                                                                  @RequestParam(value = "search", required = false) String search,
                                                                                  @RequestParam(value = "adminId") Long adminId) throws JsonProcessingException, BadRequestException {
         log.info("UserController :: searchUser >>> Start ");
-        Pageable pageable = PageRequest.of(page, size, Sort.Direction.ASC);
-        Page<EmployeeSearchDto> employeeSearchDtoList = employeeService.getAllEmployeeByAdmin(pageable, search, adminId);
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "createdDate"));
+        Page<UserSearchDto> employeeSearchDtoList = employeeService.getAllEmployeeByAdmin(pageable, search, adminId);
         Link link = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(EmployeeController.class)
                 .getAllEmployee(assembler, size, page, search, adminId)).withSelfRel();
-        PagedModel<EntityModel<EmployeeSearchDto>> model = assembler.toModel(employeeSearchDtoList, link);
+        PagedModel<EntityModel<UserSearchDto>> model = assembler.toModel(employeeSearchDtoList, link);
         return new ResponseEntity<>(model, HttpStatus.OK);
     }
 

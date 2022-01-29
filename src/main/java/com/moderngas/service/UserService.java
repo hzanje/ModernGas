@@ -56,5 +56,4 @@ public interface UserService {
     UserDetails getUserDetailsForAdmin(Long id) throws BadRequestException;
 
     String logout(String token) throws BadRequestException;
-
 }
