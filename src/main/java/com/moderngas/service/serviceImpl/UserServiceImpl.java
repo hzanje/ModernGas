@@ -81,7 +81,7 @@ public class UserServiceImpl implements UserService {
         return response;
     }
 
-    public String updateUser(UserEntity userEntity) {
+    public String updateUser(UserEntity userEntity) throws BadRequestException {
         log.info("UserService >> Update User");
         String response = Constants.FAILURE_STR;
         Optional<UserEntity> user = userRepo.findByMobileNumber(userEntity.getMobileNumber());

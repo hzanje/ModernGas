@@ -25,11 +25,6 @@ public interface UserRepo extends JpaRepository<UserEntity, Long> {
                                           @Param("adminId") Long adminId,
                                           @Param("role") String role);
 
-    /*@Query(value = "", countQuery = "")
-    Page<EmployeeSearchDto> getAllEmployeeByAdmin(Pageable pageable,
-                                                  @Param("name") String name,
-                                                  @Param("adminId") Long adminId);*/
-
     @Query("SELECT new com.moderngas.pojo.admin.UserDetails(u.id, u.activeFlag, u.name, u.mobileNumber, u.email, u.companyName) " +
             "FROM UserEntity u WHERE u.id = :id")
     UserDetails getUserDetailsForAdmin(@Param("id") Long id);
@@ -44,15 +39,17 @@ public interface UserRepo extends JpaRepository<UserEntity, Long> {
     class QUERIES {
 
         private static final String ALL_USER_BY_ADMIN = "SELECT new com.moderngas.pojo.user.UserSearchDto(u.id, u.name, u.companyName, u.mobileNumber) FROM UserEntity u " +
+                "INNER JOIN u.roleEntitySet res " +
                 "WHERE :adminId member of u.adminIdSet " +
                 "AND (:search IS NULL OR u.name LIKE :search%) " +
-                "AND u.roleEntitySet.role = :role " +
+                "AND res.role = :role " +
                 "ORDER BY u.name ASC ";
 
         private static final String ALL_USER_BY_ADMIN_COUNT = "SELECT COUNT(u.id) FROM UserEntity u " +
+                "INNER JOIN u.roleEntitySet res " +
                 "WHERE :adminId member of u.adminIdSet " +
                 "AND (:search IS NULL OR u.name LIKE :search%) " +
-                "AND u.roleEntitySet.role = :role " +
+                "AND res.role = :role " +
                 "ORDER BY u.name ASC ";
 
         private QUERIES() {

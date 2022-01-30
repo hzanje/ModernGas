@@ -73,11 +73,11 @@ public class GenericServiceImpl implements GenericService {
         UserEntity adminEntity = getUserAdminDetails();
         UserEntity userEntity = userRepo.findByMobileNumber(userEntityDto.getMobileNumber())
                 .orElse(new UserEntity());
+        userEntity.setName(userEntityDto.getName());
+        userEntity.setEmail(userEntityDto.getEmail());
+        userEntity.setMobileNumber(userEntityDto.getMobileNumber());
+        userEntity.setCompanyName(userEntityDto.getCompanyName());
         if (null == userEntity.getId()) {
-            userEntity.setName(userEntityDto.getName());
-            userEntity.setEmail(userEntityDto.getEmail());
-            userEntity.setMobileNumber(userEntityDto.getMobileNumber());
-            userEntity.setCompanyName(userEntityDto.getCompanyName());
             userEntity.setRoleEntitySet(addUserRole(userEntityDto.getRoles(), userEntity.getRoleEntitySet()));
             if (null != userEntityDto.getPassword() && !userEntityDto.getPassword().isEmpty()) {
                 userEntity.setPassword(encodeUserPassword(userEntityDto.getPassword()));
@@ -342,7 +342,6 @@ public class GenericServiceImpl implements GenericService {
                         createDateStatusDto(OrderStatus.ORDER_STATUS_LOADED, orderEntity.getLoadedDate()));
                 dateStatusDtoList.add(
                         createDateStatusDto(OrderStatus.ORDER_STATUS_CREATED, orderEntity.getCreatedDate()));
-                break;
             }
 
             case ORDER_STATUS_CANCELLED -> {
@@ -350,7 +349,6 @@ public class GenericServiceImpl implements GenericService {
                         createDateStatusDto(OrderStatus.ORDER_STATUS_CANCELLED, orderEntity.getCancellationDate()));
                 dateStatusDtoList.add(
                         createDateStatusDto(OrderStatus.ORDER_STATUS_CREATED, orderEntity.getCreatedDate()));
-                break;
             }
         }
         return dateStatusDtoList;
@@ -422,22 +420,15 @@ public class GenericServiceImpl implements GenericService {
             case ORDER_STATUS_LOADED -> {
                 orderEntity.setLoadedDate(new Date());
                 orderEntity.setDeliveryVehicle(deliveryVehicleRepo.getVehicleById(deliveryVehicleId));
-                break;
             }
 
             case ORDER_STATUS_DEVLIVERED -> {
                 orderEntity.setDeliveredDate(new Date());
-                break;
             }
 
             case ORDER_STATUS_CANCELLED -> {
                 orderEntity.setActiveFlag(false);
                 orderEntity.setCancellationDate(new Date());
-                break;
-            }
-
-            default -> {
-                break;
             }
         }
         orderEntity.setOrderStatus(orderStatus);

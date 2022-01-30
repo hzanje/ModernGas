@@ -17,7 +17,7 @@ public interface UserService {
 
     String addUser(UserEntityDto userEntityDto) throws BadRequestException;
 
-    String updateUser(UserEntity userEntity);
+    String updateUser(UserEntity userEntity) throws BadRequestException;
 
     UserEntityDto getUserById(Long userId) throws BadRequestException;
 
