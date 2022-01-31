@@ -22,6 +22,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -159,7 +160,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Page<com.moderngas.pojo.admin.OrderDto> getAllOrderListForAdmin(Pageable pageable, String status, List<String> cylinderType, String search,Long id,  String quantityOrder) throws JsonProcessingException, BadRequestException {
-        UserEntity adminEntity = validationService.validateUserEntity(id);
+        UserEntity userEntity = validationService.validateUserEntity(id);
         List<OrderStatus> statusList = new ArrayList<>();
         List<CylinderType> cylinderTypeList = new ArrayList<>();
         if (null != status) {
@@ -175,7 +176,7 @@ public class OrderServiceImpl implements OrderService {
             cylinderTypeList = CylinderType.getCylinderTypeList();
         }
         return orderRepo.getAllOrderListForAdmin(pageable, statusList, cylinderTypeList,
-                adminEntity.getId(), search, quantityOrder);
+                userEntity.getId(), search, quantityOrder);
     }
 
     public OrderStatus validateOrderStatus(String status) throws BadRequestException {
@@ -196,7 +197,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public String placeAdminInitiatedOrder(@NonNull OpenOrderDto openOrderDto, Long adminId) throws BadRequestException {
+    public String placeAdminInitiatedOrder(@NonNull OpenOrderDto openOrderDto, Long adminId) throws BadRequestException, NoSuchAlgorithmException {
         UserEntity adminEntity = validationService.validateUserEntity(adminId);
         UserEntity userEntity = validationService.validateUserEntity(openOrderDto.getUserId());
         AddressEntity addressEntity = validationService.validateAddressEntity(openOrderDto.getAddressId());
@@ -211,6 +212,7 @@ public class OrderServiceImpl implements OrderService {
         orderEntity.setRefill(false);
         orderEntity.setRefillCount(0);
         orderEntity.setAddressEntity(addressEntity);
+        orderEntity.setOrderNumber("REEK_ORD_" + String.format("%05d", genericService.generateRandomOrderNumber()));
         orderRepo.save(orderEntity);
         return Constants.SUCCESS_STR;
     }

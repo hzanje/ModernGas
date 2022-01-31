@@ -73,6 +73,7 @@ public class UserServiceImpl implements UserService {
         log.info("UserService >> Create New User");
         /* Add new Client to DataBase */
         String response = Constants.FAILURE_STR;
+        userEntityDto.setRoles(new ArrayList<>(Arrays.asList(UserRole.USER_ROLE_USER.getRole())));
         UserEntity userEntity = genericService.convertDtoToUserData(userEntityDto);
         userEntity = userRepo.save(userEntity);
         if (userEntity.getId() != null) {

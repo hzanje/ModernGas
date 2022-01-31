@@ -9,7 +9,7 @@ import java.util.Date;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class DateStatusDto {
+public class OrderDateStatusDto {
 
     private Long id;
 

@@ -2,7 +2,7 @@ package com.moderngas.restcontroller;
 
 import com.moderngas.exception.BadRequestException;
 import com.moderngas.pojo.ResponseStatus;
-import com.moderngas.pojo.admin.CylinderCodeStatusDto;
+import com.moderngas.pojo.admin.CylinderDto;
 import com.moderngas.pojo.user.AddressDto;
 import com.moderngas.pojo.user.UserEntityDto;
 import com.moderngas.pojo.user.UserSearchDto;
@@ -226,15 +226,15 @@ public class UserController {
      * Add Cylinder for Specific User by Cylinder Code
      *
      * @param userId
-     * @param cylinderCodeStatusDtoList
+     * @param cylinderDtoList
      * @return
      * @throws BadRequestException
      */
     @PostMapping("/addCylinder/{userId}")
     public ResponseEntity<ResponseStatus> addCylinder(@PathVariable("userId") Long userId,
-                                                      @RequestBody List<CylinderCodeStatusDto> cylinderCodeStatusDtoList) throws BadRequestException {
+                                                      @RequestBody List<CylinderDto> cylinderDtoList) throws BadRequestException {
         log.info("UserController :: addCylinder >>> Start ");
-        String response = inventoryService.addCylinder(userId, cylinderCodeStatusDtoList);
+        String response = inventoryService.addCylinder(userId, cylinderDtoList);
         return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
     }
 }

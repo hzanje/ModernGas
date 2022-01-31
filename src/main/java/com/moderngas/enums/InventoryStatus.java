@@ -5,8 +5,8 @@ import org.springframework.util.ObjectUtils;
 
 public enum InventoryStatus {
 
-    INVENTORY_STATUS_ASSIGNED("In"),
-    INVENTORY_STATUS_FILLED("Out");
+    INVENTORY_STATUS_IN("In"),
+    INVENTORY_STATUS_OUT("Out");
 
     private final String name;
 

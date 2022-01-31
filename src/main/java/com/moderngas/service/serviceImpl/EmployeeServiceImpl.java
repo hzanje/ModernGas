@@ -9,7 +9,7 @@ import com.moderngas.jpaentity.CylinderEntity;
 import com.moderngas.jpaentity.CylinderInventoryDetailsEntity;
 import com.moderngas.jpaentity.OrderEntity;
 import com.moderngas.jpaentity.UserEntity;
-import com.moderngas.pojo.admin.InventoryCylinderDto;
+import com.moderngas.pojo.admin.CylinderInventoryDto;
 import com.moderngas.pojo.user.UserSearchDto;
 import com.moderngas.repository.DeliveryVehicleRepo;
 import com.moderngas.repository.InventoryRepo;
@@ -86,7 +86,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public List<InventoryCylinderDto> getAssignedCylinderByUserId(Long userId) throws BadRequestException {
+    public List<CylinderInventoryDto> getAssignedCylinderByUserId(Long userId) throws BadRequestException {
         UserEntity userEntity = validationService.validateUserEntity(userId);
         return inventoryRepo.getAssignedCylinderByUserId(userEntity.getId());
     }

@@ -9,7 +9,7 @@ import com.moderngas.enums.UserRole;
 import com.moderngas.exception.BadRequestException;
 import com.moderngas.jpaentity.*;
 import com.moderngas.pojo.CylinderTypeDto;
-import com.moderngas.pojo.DateStatusDto;
+import com.moderngas.pojo.OrderDateStatusDto;
 import com.moderngas.pojo.admin.DeliveryVehicleDto;
 import com.moderngas.pojo.admin.FilterDto;
 import com.moderngas.pojo.admin.OnboardingDto;
@@ -78,11 +78,13 @@ public class GenericServiceImpl implements GenericService {
         userEntity.setMobileNumber(userEntityDto.getMobileNumber());
         userEntity.setCompanyName(userEntityDto.getCompanyName());
         if (null == userEntity.getId()) {
+            // Add User Role to User
             userEntity.setRoleEntitySet(addUserRole(userEntityDto.getRoles(), userEntity.getRoleEntitySet()));
             if (null != userEntityDto.getPassword() && !userEntityDto.getPassword().isEmpty()) {
                 userEntity.setPassword(encodeUserPassword(userEntityDto.getPassword()));
             }
             userEntity.setAdminIdSet(new HashSet<>(Arrays.asList(adminEntity.getId())));
+
         } else {
             Set<Long> updatedAdminIdList = userEntity.getAdminIdSet();
             updatedAdminIdList.add(adminEntity.getId());
@@ -120,6 +122,14 @@ public class GenericServiceImpl implements GenericService {
         return userEntity;
     }
 
+    /**
+     * Get Gas Mapping By Name and Type(Category)
+     * Create The Mapping of Admin Gas while creation of Admin
+     *
+     * @param gasNameCylinderTypes
+     * @return AdminGasMapping Set
+     * @throws BadRequestException
+     */
     private Set<AdminGasMapping> gasMappingByNameAndType(List<GasNameCylinderTypeDto> gasNameCylinderTypes) throws BadRequestException {
         if (CollectionUtils.isEmpty(gasNameCylinderTypes)) {
             return Collections.emptySet();
@@ -129,6 +139,7 @@ public class GenericServiceImpl implements GenericService {
                 gasNameCylinderTypes.stream().map(GasNameCylinderTypeDto::getId).toList());
 
         for (GasNameCylinderTypeDto nameType : gasNameCylinderTypes) {
+            // Get Gas Master as per Dto
             GasMaster gasMaster = gasMasterList.stream().filter(
                     g -> g.getId().equals(nameType.getId())).findFirst()
                     .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_GAS));
@@ -241,6 +252,13 @@ public class GenericServiceImpl implements GenericService {
     }
 
     @Override
+    public Integer generateRandomOrderNumber() {
+        Random random = new Random();
+        int min = 0, max = 50000;
+        return random.ints(min,(max + 1)).findFirst().getAsInt();
+    }
+
+    @Override
     public AddressEntity convertDtoToAddressEntity(AddressDto addressDto, AddressEntity addressEntity) {
         addressEntity.setId(addressDto.getId());
         addressEntity.setName(addressDto.getName());
@@ -303,6 +321,7 @@ public class GenericServiceImpl implements GenericService {
         orderEntity.setOrderStatus(OrderStatus.getByStatus(orderDto.getStatus()));
         orderEntity.setGasMaster(validationService.validateGasMaster(orderDto.getGasId()));
         orderEntity.setRefill(orderDto.isRefill());
+        orderEntity.setOrderNumber("REEK_ORD_" + String.format("%05d", generateRandomOrderNumber()));
         orderEntity.setRefillCount(orderDto.getRefillCount());
         orderEntity.setAddressEntity(userEntity.getAddressEntitySet().stream()
                 .filter(e -> e.getId().equals(orderDto.getAddressDto().getId())).findFirst()
@@ -326,36 +345,37 @@ public class GenericServiceImpl implements GenericService {
             orderDto.setUserId(orderEntity.getUserId());
             orderDto.setAdminId(orderEntity.getAdminId());
             orderDto.setGasId(orderEntity.getGasMaster().getId());
-            orderDto.setDateStatusDto(convertDateStatus(orderEntity));
+            orderDto.setOrderDateStatusDto(convertDateStatus(orderEntity));
             orderDto.setDeliveryVehicle(ObjectUtils.isEmpty(orderEntity.getDeliveryVehicle()) ? "" : orderEntity.getDeliveryVehicle().getNumber());
         }
         return orderDto;
     }
 
-    private List<DateStatusDto> convertDateStatus(OrderEntity orderEntity) {
-        List<DateStatusDto> dateStatusDtoList = new ArrayList<>();
+    private List<OrderDateStatusDto> convertDateStatus(OrderEntity orderEntity) {
+        List<OrderDateStatusDto> orderDateStatusDtoList = new ArrayList<>();
         switch (orderEntity.getOrderStatus()) {
             case ORDER_STATUS_DEVLIVERED,ORDER_STATUS_LOADED, ORDER_STATUS_CREATED -> {
-                dateStatusDtoList.add(
-                        createDateStatusDto(OrderStatus.ORDER_STATUS_DEVLIVERED, orderEntity.getDeliveredDate()));
-                dateStatusDtoList.add(
-                        createDateStatusDto(OrderStatus.ORDER_STATUS_LOADED, orderEntity.getLoadedDate()));
-                dateStatusDtoList.add(
+                orderDateStatusDtoList.add(
                         createDateStatusDto(OrderStatus.ORDER_STATUS_CREATED, orderEntity.getCreatedDate()));
+                orderDateStatusDtoList.add(
+                        createDateStatusDto(OrderStatus.ORDER_STATUS_LOADED, orderEntity.getLoadedDate()));
+                orderDateStatusDtoList.add(
+                        createDateStatusDto(OrderStatus.ORDER_STATUS_DEVLIVERED, orderEntity.getDeliveredDate()));
+
             }
 
             case ORDER_STATUS_CANCELLED -> {
-                dateStatusDtoList.add(
-                        createDateStatusDto(OrderStatus.ORDER_STATUS_CANCELLED, orderEntity.getCancellationDate()));
-                dateStatusDtoList.add(
+                orderDateStatusDtoList.add(
                         createDateStatusDto(OrderStatus.ORDER_STATUS_CREATED, orderEntity.getCreatedDate()));
+                orderDateStatusDtoList.add(
+                        createDateStatusDto(OrderStatus.ORDER_STATUS_CANCELLED, orderEntity.getCancellationDate()));
             }
         }
-        return dateStatusDtoList;
+        return orderDateStatusDtoList;
     }
 
-    private DateStatusDto createDateStatusDto(OrderStatus orderStatus, Date date) {
-        return new DateStatusDto((long) orderStatus.ordinal(), orderStatus.getName(), date);
+    private OrderDateStatusDto createDateStatusDto(OrderStatus orderStatus, Date date) {
+        return new OrderDateStatusDto((long) orderStatus.ordinal(), orderStatus.getName(), date);
     }
 
     @Override
@@ -406,7 +426,7 @@ public class GenericServiceImpl implements GenericService {
             orderEntity.setRefillCount(cartEntity.getRefillCount());
             orderEntity.setQuantity(cartEntity.getQuantity());
             orderEntity.setAddressEntity(validationService.validateAddressEntity(addressId));
-            orderEntity.setOrderNumber("");
+            orderEntity.setOrderNumber("REEK_ORD_" + String.format("%05d", generateRandomOrderNumber()));
             orderEntityList.add(orderEntity);
         }
         return orderEntityList;

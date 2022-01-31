@@ -5,9 +5,11 @@ import lombok.Data;
 import java.util.Date;
 
 @Data
-public class CylinderCodeStatusDto {
+public class CylinderDto {
 
     private String status;
+
+    private Long resourceCentreId;
 
     private String cylinderCode;
 

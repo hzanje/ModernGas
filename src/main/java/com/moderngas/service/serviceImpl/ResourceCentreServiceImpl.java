@@ -5,7 +5,7 @@ import com.moderngas.constants.ExceptionConstants;
 import com.moderngas.enums.CylinderStatus;
 import com.moderngas.exception.BadRequestException;
 import com.moderngas.jpaentity.*;
-import com.moderngas.pojo.admin.InventoryCylinderDto;
+import com.moderngas.pojo.admin.CylinderInventoryDto;
 import com.moderngas.pojo.admin.ResourceCentreDto;
 import com.moderngas.repository.AnonymousCylinderRepo;
 import com.moderngas.repository.InventoryRepo;
@@ -140,9 +140,9 @@ public class ResourceCentreServiceImpl implements ResourceCentreService {
     }
 
     @Override
-    public List<InventoryCylinderDto> fetchCylinderFromResourceCentre(Long resourceCentreId, String cylinderStatus) throws BadRequestException {
+    public List<CylinderInventoryDto> fetchCylinderFromResourceCentre(Long resourceCentreId, String cylinderStatus) throws BadRequestException {
         ResourceCentreEntity resourceCentreEntity = validationService.validateResourceCentreEntity(resourceCentreId);
-        List<InventoryCylinderDto> cylinderCodeIdList;
+        List<CylinderInventoryDto> cylinderCodeIdList;
         if (ObjectUtils.isEmpty(cylinderStatus)) {
             cylinderCodeIdList = inventoryRepo.fetchCylinderFromResourceCentreById(resourceCentreEntity.getId());
         } else {

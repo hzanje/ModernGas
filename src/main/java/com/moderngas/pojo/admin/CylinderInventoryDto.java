@@ -4,7 +4,7 @@ import com.moderngas.enums.CylinderStatus;
 import lombok.Data;
 
 @Data
-public class InventoryCylinderDto {
+public class CylinderInventoryDto {
 
     private Long id;
 
@@ -16,7 +16,7 @@ public class InventoryCylinderDto {
 
     private String name;
 
-    public InventoryCylinderDto(Long id, String code, CylinderStatus cylinderStatus, Long userId, String name) {
+    public CylinderInventoryDto(Long id, String code, CylinderStatus cylinderStatus, Long userId, String name) {
         this.id = id;
         this.code = code;
         this.status = CylinderStatus.isExist(cylinderStatus.getName()) ? cylinderStatus.getName() : "";

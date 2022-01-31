@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 @Slf4j
@@ -42,16 +43,16 @@ public class AdminController {
      * Add Cylinder for Specific Admin by Cylinder Code
      *
      * @param adminId
-     * @param cylinderCodeStatusDtoList
+     * @param cylinderDtoList
      * @return
      * @throws BadRequestException
      */
     @Secured({"ROLE_ADMIN", "ROLE_USER"})
     @PostMapping("/addCylinder/{adminId}")
     public ResponseEntity<ResponseStatus> addCylinder(@PathVariable("adminId") Long adminId,
-                                                      @RequestBody List<CylinderCodeStatusDto> cylinderCodeStatusDtoList) throws BadRequestException {
+                                                      @RequestBody List<CylinderDto> cylinderDtoList) throws BadRequestException {
         log.info("AdminController :: addCylinder >>> Start ");
-        String response = inventoryService.addCylinder(adminId, cylinderCodeStatusDtoList);
+        String response = inventoryService.addCylinder(adminId, cylinderDtoList);
         return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
     }
 
@@ -226,17 +227,39 @@ public class AdminController {
     @Secured("ROLE_EMPLOYEE")
     @PostMapping("/placeOrder/{adminId}")
     public ResponseEntity<?> placeOrder(@PathVariable("adminId") Long adminId,
-                                        @RequestBody OpenOrderDto openOrderDto) throws BadRequestException {
+                                        @RequestBody OpenOrderDto openOrderDto) throws BadRequestException, NoSuchAlgorithmException {
         log.info("AdminController :: placeOrder :: adminId > {} >>> Start ", adminId);
         return new ResponseEntity<>(orderService.placeAdminInitiatedOrder(openOrderDto, adminId), HttpStatus.OK);
     }
 
+    /**
+     * Get All Gas/Product List as Respect to Admin
+     * API is used to fetch all Gas/Product List while creating order and View in Product Tab
+     *
+     * @param adminId
+     * @return
+     * @throws BadRequestException
+     */
     @GetMapping("/getAllGasList/{adminId}")
     public ResponseEntity<?> getAllGasList(@PathVariable("adminId") Long adminId) throws BadRequestException {
         log.info("AdminController :: getAllGasList :: adminId > {} >>> Start ", adminId);
         return new ResponseEntity<>(userService.getAllGasList(adminId), HttpStatus.OK);
     }
 
+    /**
+     * Update Gas/Product Price and Description By Admin
+     *
+     * @param adminId
+     * @param productGasDto
+     * @return
+     * @throws BadRequestException
+     */
+    @PutMapping("/updateAdminGas/{adminId}")
+    public ResponseEntity<?> updateAdminGas(@PathVariable("adminId") Long adminId,
+                                            @RequestBody ProductGasDto productGasDto) throws BadRequestException {
+        log.info("AdminController ::  >>> Admin : {}", adminId);
+        return new ResponseEntity<>(adminService.updateAdminGas(adminId, productGasDto), HttpStatus.OK);
+    }
 
 }
 

@@ -1,7 +1,7 @@
 package com.moderngas.service;
 
 import com.moderngas.exception.BadRequestException;
-import com.moderngas.pojo.admin.InventoryCylinderDto;
+import com.moderngas.pojo.admin.CylinderInventoryDto;
 import com.moderngas.pojo.user.UserSearchDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,6 +18,6 @@ public interface EmployeeService {
 
     String receiveCylinderFromUser(Long orderId, List<String> cylinderCodes) throws BadRequestException;
 
-    List<InventoryCylinderDto> getAssignedCylinderByUserId(Long userId) throws BadRequestException;
+    List<CylinderInventoryDto> getAssignedCylinderByUserId(Long userId) throws BadRequestException;
 
 }

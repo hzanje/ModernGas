@@ -26,6 +26,8 @@ public interface GenericService {
 
     String generateRandomPassword() throws NoSuchAlgorithmException;
 
+    Integer generateRandomOrderNumber() throws NoSuchAlgorithmException;
+
     AddressEntity convertDtoToAddressEntity(AddressDto addressDto, AddressEntity addressEntity);
 
     Set<AddressDto> convertAddressEntitySetToDto(Set<AddressEntity> addressEntity);

@@ -3,11 +3,13 @@ package com.moderngas.service.serviceImpl;
 import com.moderngas.constants.Constants;
 import com.moderngas.constants.ExceptionConstants;
 import com.moderngas.enums.CylinderStatus;
+import com.moderngas.enums.InventoryStatus;
 import com.moderngas.exception.BadRequestException;
 import com.moderngas.jpaentity.CylinderEntity;
+import com.moderngas.jpaentity.CylinderInventoryDetailsEntity;
 import com.moderngas.jpaentity.UserEntity;
-import com.moderngas.pojo.admin.CylinderCodeStatusDto;
-import com.moderngas.pojo.admin.InventoryCylinderDto;
+import com.moderngas.pojo.admin.CylinderDto;
+import com.moderngas.pojo.admin.CylinderInventoryDto;
 import com.moderngas.pojo.user.InventoryDetailsDto;
 import com.moderngas.repository.InventoryRepo;
 import com.moderngas.repository.UserRepo;
@@ -41,24 +43,28 @@ public class InventoryServiceImpl implements InventoryService {
     private ValidationService validationService;
 
     @Override
-    public String addCylinder(Long adminId, List<CylinderCodeStatusDto> cylinderCodeStatusDtoList) throws BadRequestException {
-        if (CollectionUtils.isEmpty(cylinderCodeStatusDtoList)) {
+    public String addCylinder(Long adminId, List<CylinderDto> cylinderDtoList) throws BadRequestException {
+        if (CollectionUtils.isEmpty(cylinderDtoList)) {
             throw new BadRequestException(ExceptionConstants.INVALID_REQUEST_DATA);
         }
 
         UserEntity adminEntity = validationService.validateUserEntity(adminId);
         List<CylinderEntity> cylinderEntityList = new ArrayList<>();
-        for (CylinderCodeStatusDto cylinderCodeStatusDto : cylinderCodeStatusDtoList) {
-            if (!inventoryRepo.checkIfCylinderCodeExist(cylinderCodeStatusDto.getCylinderCode()).isPresent()) {
+        for (CylinderDto cylinderDto : cylinderDtoList) {
+            if (!inventoryRepo.checkIfCylinderCodeExist(cylinderDto.getCylinderCode()).isPresent()) {
                 CylinderEntity cylinderEntity = new CylinderEntity();
-                CylinderStatus cylinderStatus = CylinderStatus.getByStatus(cylinderCodeStatusDto.getStatus());
-                cylinderEntity.setCode(cylinderCodeStatusDto.getCylinderCode());
+                CylinderStatus cylinderStatus = CylinderStatus.getByStatus(cylinderDto.getStatus());
+                cylinderEntity.setCode(cylinderDto.getCylinderCode());
                 cylinderEntity.setCylinderStatus(cylinderStatus);
-                cylinderEntity.setManufacturer(cylinderCodeStatusDto.getManufacturer());
-                cylinderEntity.setManufacturingDate(cylinderCodeStatusDto.getManufacturingDate());
-                cylinderEntity.setExpiryDate(cylinderCodeStatusDto.getExpiryDate());
-                cylinderEntity.setLastService(cylinderCodeStatusDto.getLastService());
-                cylinderEntity.setNextService(cylinderCodeStatusDto.getNextService());
+                cylinderEntity.setManufacturer(cylinderDto.getManufacturer());
+                cylinderEntity.setManufacturingDate(cylinderDto.getManufacturingDate());
+                cylinderEntity.setExpiryDate(cylinderDto.getExpiryDate());
+                cylinderEntity.setLastService(cylinderDto.getLastService());
+                cylinderEntity.setNextService(cylinderDto.getNextService());
+                CylinderInventoryDetailsEntity cylinderInventoryDetailsEntity = new CylinderInventoryDetailsEntity();
+                cylinderInventoryDetailsEntity.setInventoryStatus(InventoryStatus.INVENTORY_STATUS_IN);
+                cylinderInventoryDetailsEntity.setResourceCentreEntity(validationService.validateResourceCentreEntity(cylinderDto.getResourceCentreId()));
+                cylinderEntity.setCylinderInventoryDetailsEntity(cylinderInventoryDetailsEntity);
                 cylinderEntityList.add(cylinderEntity);
             }
         }
@@ -71,7 +77,7 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
-    public List<InventoryCylinderDto> getInventoryCylinderForAdmin(Long adminId) {
+    public List<CylinderInventoryDto> getInventoryCylinderForAdmin(Long adminId) {
         return inventoryRepo.getInventoryCylinderForAdmin();
     }
 

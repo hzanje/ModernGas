@@ -1,6 +1,6 @@
 package com.moderngas.pojo.user;
 
-import com.moderngas.pojo.DateStatusDto;
+import com.moderngas.pojo.OrderDateStatusDto;
 import lombok.Data;
 
 import java.util.List;
@@ -36,7 +36,7 @@ public class OrderDto {
 
     private String deliveryVehicle;
 
-    private List<DateStatusDto> dateStatusDto;
+    private List<OrderDateStatusDto> orderDateStatusDto;
 
     private AddressDto addressDto;
 

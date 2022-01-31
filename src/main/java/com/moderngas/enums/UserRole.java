@@ -18,7 +18,7 @@ public enum UserRole {
     public static UserRole getByRole(String role) {
         if (!ObjectUtils.isEmpty(role)) {
             for (UserRole userRole : UserRole.values()) {
-                if (userRole.getRole().equals("ROLE_" + role)) {
+                if (userRole.getRole().equals(role)) {
                     return userRole;
                 }
             }

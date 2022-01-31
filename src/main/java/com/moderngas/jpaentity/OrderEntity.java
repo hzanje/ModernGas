@@ -17,8 +17,6 @@ import java.util.Date;
 public class OrderEntity extends BaseEntity {
 
     @Column(name = "order_number")
-    @SequenceGenerator(name = MyGenerator.GENERATOR_NAME)
-    @GenericGenerator(name = MyGenerator.GENERATOR_NAME, strategy = "a.b.c.MyGenerator")
     private String orderNumber;
 
     @Column(name = "quantity")

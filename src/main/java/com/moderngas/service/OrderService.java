@@ -9,6 +9,7 @@ import com.moderngas.pojo.user.OrderDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 public interface OrderService {
@@ -35,5 +36,5 @@ public interface OrderService {
 
     List<com.moderngas.pojo.admin.OrderDto> getUserOrderListForAdminInUserDetails(Long userId) throws BadRequestException;
 
-    String placeAdminInitiatedOrder(OpenOrderDto openOrderDto, Long adminId) throws BadRequestException;
+    String placeAdminInitiatedOrder(OpenOrderDto openOrderDto, Long adminId) throws BadRequestException, NoSuchAlgorithmException;
 }

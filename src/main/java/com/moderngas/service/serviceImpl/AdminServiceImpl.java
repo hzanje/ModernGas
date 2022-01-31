@@ -4,13 +4,17 @@ import com.moderngas.constants.Constants;
 import com.moderngas.constants.ExceptionConstants;
 import com.moderngas.exception.BadRequestException;
 import com.moderngas.jpaentity.AdminGasMapping;
+import com.moderngas.jpaentity.GasMaster;
 import com.moderngas.jpaentity.UserEntity;
 import com.moderngas.pojo.admin.OnboardingDto;
 import com.moderngas.pojo.admin.OnboardingDtoList;
+import com.moderngas.pojo.admin.ProductGasDto;
+import com.moderngas.repository.AdminGasMappingRepo;
 import com.moderngas.repository.UserRepo;
 import com.moderngas.service.AdminService;
 import com.moderngas.service.GenericService;
 import com.moderngas.service.ValidationService;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,6 +36,9 @@ public class AdminServiceImpl implements AdminService {
 
     @Autowired
     private ValidationService validationService;
+
+    @Autowired
+    private AdminGasMappingRepo adminGasMappingRepo;
 
     @Override
     public List<OnboardingDto> getOnboardingDetails(Long id) throws BadRequestException {
@@ -65,5 +72,19 @@ public class AdminServiceImpl implements AdminService {
         userRepo.save(userEntity);
         response = Constants.SUCCESS_STR;
         return response;
+    }
+
+    @Override
+    public String updateAdminGas(Long adminId, @NonNull ProductGasDto productGasDto) throws BadRequestException {
+        UserEntity adminEntity = validationService.validateUserEntity(adminId);
+        GasMaster gasMaster = validationService.validateGasMaster(productGasDto.getId());
+        AdminGasMapping adminGasMapping = adminGasMappingRepo.getGasMappingByGasIdAndAdminId(gasMaster.getId(), adminEntity.getId());
+        if (null == adminGasMapping) {
+            throw new BadRequestException(ExceptionConstants.ADMIN_GAS_IS_EMPTY);
+        }
+        adminGasMapping.setDescription(productGasDto.getDescription());
+        adminGasMapping.setPrice(productGasDto.getPrice());
+        adminGasMappingRepo.save(adminGasMapping);
+        return Constants.SUCCESS_STR;
     }
 }
