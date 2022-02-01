@@ -2,6 +2,7 @@ package com.moderngas.restcontroller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.moderngas.exception.BadRequestException;
+import com.moderngas.pojo.ResponseStatus;
 import com.moderngas.pojo.user.UserSearchDto;
 import com.moderngas.service.EmployeeService;
 import lombok.extern.slf4j.Slf4j;
@@ -65,7 +66,7 @@ public class EmployeeController {
     public ResponseEntity<?> assignCylinderToUser(@PathVariable("orderId") Long orderId,
                                                   @RequestBody List<String> cylinderCodes) throws BadRequestException {
         log.info("EmployeeController :: assignCylinderToUser >>> Start ");
-        return new ResponseEntity<>(employeeService.assignCylinderToUser(orderId, cylinderCodes), HttpStatus.OK);
+        return new ResponseEntity<>(new ResponseStatus(employeeService.assignCylinderToUser(orderId, cylinderCodes)), HttpStatus.OK);
     }
 
     /**
@@ -80,7 +81,7 @@ public class EmployeeController {
     public ResponseEntity<?> receiveCylinderFromUser(@PathVariable("orderId") Long orderId,
                                                      @RequestBody List<String> cylinderCodes) throws BadRequestException {
         log.info("EmployeeController :: receiveCylinderFromUser >>> Start ");
-        return new ResponseEntity<>(employeeService.receiveCylinderFromUser(orderId, cylinderCodes), HttpStatus.OK);
+        return new ResponseEntity<>(new ResponseStatus(employeeService.receiveCylinderFromUser(orderId, cylinderCodes)), HttpStatus.OK);
     }
 
     /**

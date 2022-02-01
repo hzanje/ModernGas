@@ -52,8 +52,7 @@ public class AdminController {
     public ResponseEntity<ResponseStatus> addCylinder(@PathVariable("adminId") Long adminId,
                                                       @RequestBody List<CylinderDto> cylinderDtoList) throws BadRequestException {
         log.info("AdminController :: addCylinder >>> Start ");
-        String response = inventoryService.addCylinder(adminId, cylinderDtoList);
-        return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
+        return new ResponseEntity<>(new ResponseStatus(inventoryService.addCylinder(adminId, cylinderDtoList)), HttpStatus.OK);
     }
 
     /**
@@ -229,7 +228,7 @@ public class AdminController {
     public ResponseEntity<?> placeOrder(@PathVariable("adminId") Long adminId,
                                         @RequestBody OpenOrderDto openOrderDto) throws BadRequestException, NoSuchAlgorithmException {
         log.info("AdminController :: placeOrder :: adminId > {} >>> Start ", adminId);
-        return new ResponseEntity<>(orderService.placeAdminInitiatedOrder(openOrderDto, adminId), HttpStatus.OK);
+        return new ResponseEntity<>(new ResponseStatus(orderService.placeAdminInitiatedOrder(openOrderDto, adminId)), HttpStatus.OK);
     }
 
     /**
@@ -258,7 +257,7 @@ public class AdminController {
     public ResponseEntity<?> updateAdminGas(@PathVariable("adminId") Long adminId,
                                             @RequestBody ProductGasDto productGasDto) throws BadRequestException {
         log.info("AdminController ::  >>> Admin : {}", adminId);
-        return new ResponseEntity<>(adminService.updateAdminGas(adminId, productGasDto), HttpStatus.OK);
+        return new ResponseEntity<>(new ResponseStatus(adminService.updateAdminGas(adminId, productGasDto)), HttpStatus.OK);
     }
 
 }

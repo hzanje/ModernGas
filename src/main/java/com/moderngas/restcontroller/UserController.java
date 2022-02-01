@@ -234,7 +234,6 @@ public class UserController {
     public ResponseEntity<ResponseStatus> addCylinder(@PathVariable("userId") Long userId,
                                                       @RequestBody List<CylinderDto> cylinderDtoList) throws BadRequestException {
         log.info("UserController :: addCylinder >>> Start ");
-        String response = inventoryService.addCylinder(userId, cylinderDtoList);
-        return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
+        return new ResponseEntity<>(new ResponseStatus(inventoryService.addCylinder(userId, cylinderDtoList)), HttpStatus.OK);
     }
 }

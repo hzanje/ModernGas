@@ -211,6 +211,7 @@ public class OrderServiceImpl implements OrderService {
         orderEntity.setGasMaster(gasMaster);
         orderEntity.setRefill(false);
         orderEntity.setRefillCount(0);
+        orderEntity.setQuantity(openOrderDto.getQuantity());
         orderEntity.setAddressEntity(addressEntity);
         orderEntity.setOrderNumber("REEK_ORD_" + String.format("%05d", genericService.generateRandomOrderNumber()));
         orderRepo.save(orderEntity);
