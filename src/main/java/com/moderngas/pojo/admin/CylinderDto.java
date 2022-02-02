@@ -15,11 +15,11 @@ public class CylinderDto {
 
     private String manufacturer;
 
-    private Date manufacturingDate;
+    private String manufacturingDate;
 
-    private Date expiryDate;
+    private String expiryDate;
 
-    private Date lastService;
+    private String lastService;
 
-    private Date nextService;
+    private String nextService;
 }

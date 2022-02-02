@@ -15,10 +15,6 @@ public class CylinderInventoryDetailsEntity extends BaseEntity {
     @Column(name = "is_transit")
     private boolean isTransit;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "cylinder_id", referencedColumnName = "id")
-    private CylinderEntity cylinderEntity;
-
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "delivery_vehicle_id", referencedColumnName = "id")
     private DeliveryVehicleEntity deliveryVehicleEntity;

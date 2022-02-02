@@ -68,6 +68,7 @@ public class ResourceCentreServiceImpl implements ResourceCentreService {
 
     @Override
     public String deleteResourceCentre(Long id) throws BadRequestException {
+        validationService.validateResourceCentreEntity(id);
         resourceCentreRepo.deleteById(id);
         return Constants.SUCCESS_STR;
     }
@@ -87,7 +88,6 @@ public class ResourceCentreServiceImpl implements ResourceCentreService {
             cylinderInventoryEntity.setTransit(false);
             cylinderInventoryEntity.setDeliveryVehicleEntity(null);
             cylinderInventoryEntity.setResourceCentreEntity(resourceCentreEntity);
-            cylinderInventoryEntity.setCylinderEntity(cylinderEntity);
             cylinderEntity.setCylinderInventoryDetailsEntity(cylinderInventoryEntity);
         }
         inventoryRepo.saveAll(cylinderEntityList);

@@ -2,14 +2,12 @@ package com.moderngas.service.serviceImpl;
 
 import com.moderngas.constants.Constants;
 import com.moderngas.constants.ExceptionConstants;
-import com.moderngas.enums.CylinderType;
-import com.moderngas.enums.OrderStatus;
-import com.moderngas.enums.UserPrivilege;
-import com.moderngas.enums.UserRole;
+import com.moderngas.enums.*;
 import com.moderngas.exception.BadRequestException;
 import com.moderngas.jpaentity.*;
 import com.moderngas.pojo.CylinderTypeDto;
 import com.moderngas.pojo.OrderDateStatusDto;
+import com.moderngas.pojo.admin.CylinderDto;
 import com.moderngas.pojo.admin.DeliveryVehicleDto;
 import com.moderngas.pojo.admin.FilterDto;
 import com.moderngas.pojo.admin.OnboardingDto;
@@ -17,10 +15,7 @@ import com.moderngas.pojo.employee.PrivilegeDto;
 import com.moderngas.pojo.superadmin.AdminEntityDto;
 import com.moderngas.pojo.superadmin.GasNameCylinderTypeDto;
 import com.moderngas.pojo.user.*;
-import com.moderngas.repository.AddressRepo;
-import com.moderngas.repository.DeliveryVehicleRepo;
-import com.moderngas.repository.GasRepo;
-import com.moderngas.repository.UserRepo;
+import com.moderngas.repository.*;
 import com.moderngas.service.GenericService;
 import com.moderngas.service.ResourceCentreService;
 import com.moderngas.service.ValidationService;
@@ -64,6 +59,9 @@ public class GenericServiceImpl implements GenericService {
 
     @Autowired
     private ValidationService validationService;
+
+    @Autowired
+    private InventoryRepo inventoryRepo;
 
     @Override
     public UserEntity convertDtoToUserData(UserEntityDto userEntityDto) throws BadRequestException {
@@ -409,6 +407,35 @@ public class GenericServiceImpl implements GenericService {
             }
         }
         return cartDto;
+    }
+
+    @Override
+    public CylinderEntity convertDtoToCylinderEntity(CylinderDto cylinderDto) throws BadRequestException {
+        ResourceCentreEntity resourceCentreEntity = validationService.validateResourceCentreEntity(cylinderDto.getResourceCentreId());
+        CylinderEntity cylinderEntity = new CylinderEntity();
+        if (!inventoryRepo.checkIfCylinderCodeExist(cylinderDto.getCylinderCode()).isPresent()) {
+            CylinderStatus cylinderStatus = CylinderStatus.getByStatus(cylinderDto.getStatus());
+            cylinderEntity.setCode(cylinderDto.getCylinderCode());
+            cylinderEntity.setCylinderStatus(cylinderStatus);
+            cylinderEntity.setManufacturer(cylinderDto.getManufacturer());
+            if (!ObjectUtils.isEmpty(cylinderDto.getExpiryDate())) {
+                cylinderEntity.setManufacturingDate(new Date(Long.parseLong(cylinderDto.getManufacturingDate())));
+            }
+            if (!ObjectUtils.isEmpty(cylinderDto.getExpiryDate())) {
+                cylinderEntity.setExpiryDate(new Date(Long.parseLong(cylinderDto.getExpiryDate())));
+            }
+            if (!ObjectUtils.isEmpty(cylinderDto.getLastService())) {
+                cylinderEntity.setLastService(new Date(Long.parseLong(cylinderDto.getLastService())));
+            }
+            if (!ObjectUtils.isEmpty(cylinderDto.getNextService())) {
+                cylinderEntity.setNextService(new Date(Long.parseLong(cylinderDto.getNextService())));
+            }
+            CylinderInventoryDetailsEntity cylinderInventoryDetailsEntity = new CylinderInventoryDetailsEntity();
+            cylinderInventoryDetailsEntity.setInventoryStatus(InventoryStatus.INVENTORY_STATUS_IN);
+            cylinderInventoryDetailsEntity.setResourceCentreEntity(resourceCentreEntity);
+            cylinderEntity.setCylinderInventoryDetailsEntity(cylinderInventoryDetailsEntity);
+        }
+        return cylinderEntity;
     }
 
     @Override

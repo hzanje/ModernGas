@@ -327,6 +327,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public String deleteVehicle(Long vehicleId) throws BadRequestException {
+        validationService.validateDeliveryVehicleEntity(vehicleId);
+        deliveryVehicleRepo.deleteById(vehicleId);
+        return Constants.SUCCESS_STR;
+    }
+
+    @Override
     public List<NameIdDto> getVehicleNumberList(Long userId) {
         return deliveryVehicleRepo.getVehicleNumberList(userId);
     }

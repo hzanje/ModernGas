@@ -13,6 +13,7 @@ import com.moderngas.pojo.admin.CylinderInventoryDto;
 import com.moderngas.pojo.user.InventoryDetailsDto;
 import com.moderngas.repository.InventoryRepo;
 import com.moderngas.repository.UserRepo;
+import com.moderngas.service.GenericService;
 import com.moderngas.service.InventoryService;
 import com.moderngas.service.UserService;
 import com.moderngas.service.ValidationService;
@@ -20,11 +21,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -42,6 +41,9 @@ public class InventoryServiceImpl implements InventoryService {
     @Autowired
     private ValidationService validationService;
 
+    @Autowired
+    private GenericService genericService;
+
     @Override
     public String addCylinder(Long adminId, List<CylinderDto> cylinderDtoList) throws BadRequestException {
         if (CollectionUtils.isEmpty(cylinderDtoList)) {
@@ -51,22 +53,7 @@ public class InventoryServiceImpl implements InventoryService {
         UserEntity adminEntity = validationService.validateUserEntity(adminId);
         List<CylinderEntity> cylinderEntityList = new ArrayList<>();
         for (CylinderDto cylinderDto : cylinderDtoList) {
-            if (!inventoryRepo.checkIfCylinderCodeExist(cylinderDto.getCylinderCode()).isPresent()) {
-                CylinderEntity cylinderEntity = new CylinderEntity();
-                CylinderStatus cylinderStatus = CylinderStatus.getByStatus(cylinderDto.getStatus());
-                cylinderEntity.setCode(cylinderDto.getCylinderCode());
-                cylinderEntity.setCylinderStatus(cylinderStatus);
-                cylinderEntity.setManufacturer(cylinderDto.getManufacturer());
-                cylinderEntity.setManufacturingDate(cylinderDto.getManufacturingDate());
-                cylinderEntity.setExpiryDate(cylinderDto.getExpiryDate());
-                cylinderEntity.setLastService(cylinderDto.getLastService());
-                cylinderEntity.setNextService(cylinderDto.getNextService());
-                CylinderInventoryDetailsEntity cylinderInventoryDetailsEntity = new CylinderInventoryDetailsEntity();
-                cylinderInventoryDetailsEntity.setInventoryStatus(InventoryStatus.INVENTORY_STATUS_IN);
-                cylinderInventoryDetailsEntity.setResourceCentreEntity(validationService.validateResourceCentreEntity(cylinderDto.getResourceCentreId()));
-                cylinderEntity.setCylinderInventoryDetailsEntity(cylinderInventoryDetailsEntity);
-                cylinderEntityList.add(cylinderEntity);
-            }
+            cylinderEntityList.add(genericService.convertDtoToCylinderEntity(cylinderDto));
         }
         Set<CylinderEntity> cylinderEntitySet = adminEntity.getCylinderEntitySet();
         cylinderEntitySet.addAll(cylinderEntityList);

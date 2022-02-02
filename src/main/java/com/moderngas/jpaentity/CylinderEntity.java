@@ -47,6 +47,7 @@ public class CylinderEntity extends BaseEntity {
     @Enumerated(EnumType.ORDINAL)
     private CylinderStatus cylinderStatus;
 
-    @OneToOne(cascade = CascadeType.ALL, mappedBy = "cylinderEntity")
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "cylinder_detail_id", referencedColumnName = "id")
     private CylinderInventoryDetailsEntity cylinderInventoryDetailsEntity;
 }

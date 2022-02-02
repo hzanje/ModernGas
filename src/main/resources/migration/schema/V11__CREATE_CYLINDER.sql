@@ -7,6 +7,7 @@ CREATE TABLE `cylinder`(
   `cylinder_status_id` BIGINT(20) NOT NULL,
   `assigned_user_id` BIGINT(20),
   `user_id` BIGINT(20),
+  `cylinder_detail_id` BIGINT(20),
   `manufacturer` TEXT(255),
   `manufacturing_date` DATETIME,
   `expiry_date` DATETIME,

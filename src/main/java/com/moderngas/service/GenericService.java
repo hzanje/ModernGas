@@ -3,6 +3,7 @@ package com.moderngas.service;
 import com.moderngas.enums.OrderStatus;
 import com.moderngas.exception.BadRequestException;
 import com.moderngas.jpaentity.*;
+import com.moderngas.pojo.admin.CylinderDto;
 import com.moderngas.pojo.admin.DeliveryVehicleDto;
 import com.moderngas.pojo.admin.FilterDto;
 import com.moderngas.pojo.admin.OnboardingDto;
@@ -43,6 +44,8 @@ public interface GenericService {
     CartEntity convertDtoToCartEntity(CartDto cartDto) throws BadRequestException;
 
     CartDto convertCartEntityToDto(CartEntity cartEntity);
+
+    CylinderEntity convertDtoToCylinderEntity(CylinderDto cylinderDto) throws BadRequestException;
 
     List<OrderEntity> convertCartToOrderEntity(List<CartEntity> cartEntityList, Long addressId) throws BadRequestException;
 

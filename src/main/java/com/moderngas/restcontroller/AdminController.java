@@ -111,6 +111,13 @@ public class AdminController {
         return new ResponseEntity<>(userService.getVehicleNumberList(userId), HttpStatus.OK);
     }
 
+    @Secured("ROLE_ADMIN")
+    @DeleteMapping("/vehicle/{id}")
+    public ResponseEntity<?> deleteVehicle(@PathVariable("id") Long vehicleId) throws BadRequestException {
+        log.info("AdminController :: deleteVehicle {} >>> Start", vehicleId);
+        return new ResponseEntity<>(new ResponseStatus(userService.deleteVehicle(vehicleId)), HttpStatus.OK);
+    }
+
     /**
      * Get Cylinder Inventory List.
      *

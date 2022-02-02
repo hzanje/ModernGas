@@ -73,7 +73,6 @@ public class EmployeeServiceImpl implements EmployeeService {
             }
             cylinderDetailsEntity.setTransit(true);
             cylinderDetailsEntity.setDeliveryVehicleEntity(orderEntity.getDeliveryVehicle());
-            cylinderDetailsEntity.setCylinderEntity(cylinderEntity);
             cylinderEntity.setCylinderInventoryDetailsEntity(cylinderDetailsEntity);
         }
         inventoryRepo.saveAll(cylinderEntityList);

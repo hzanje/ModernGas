@@ -49,6 +49,8 @@ public interface UserService {
 
     String addVehicle(DeliveryVehicleDto deliveryVehicleDto) throws BadRequestException;
 
+    String deleteVehicle(Long vehicleId) throws BadRequestException;
+
     List<NameIdDto> getVehicleNumberList(Long userId);
 
     Page<UserSearchDto> getAllUserByAdmin(Pageable pageable, String search, Long adminId) throws BadRequestException;
