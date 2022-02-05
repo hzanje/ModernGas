@@ -65,9 +65,9 @@ public interface InventoryRepo extends JpaRepository<CylinderEntity, Long> {
 
     class QUERIES {
 
-        private static final String FETCH_CYLINDER_BY_RESOURCE_CENTRE = "SELECT new com.moderngas.pojo.admin.CylinderInventoryDto(ce.id, ce.code, ce.cylinderStatus, ue.id, ue.name) FROM CylinderEntity ce " +
-                "LEFT JOIN UserEntity ue ON ce.assignedUserId = ue.id " +
-                "WHERE ce.cylinderInventoryDetailsEntity.resourceCentreEntity.id = :resourceCentreId";
+        private static final String FETCH_CYLINDER_BY_RESOURCE_CENTRE = "SELECT new com.moderngas.pojo.admin.CylinderInventoryDto(ce.id, ce.code, ce.cylinderStatus, ue.id, ue.name) FROM UserEntity ue " +
+                "INNER JOIN ue.cylinderEntitySet ce " +
+                "WHERE (:resourceCentreId IS NULL OR ce.cylinderInventoryDetailsEntity.resourceCentreEntity.id = :resourceCentreId) ";
 
         private static final String FETCH_CYLINDER_BY_RESOURCE_CENTRE_AND_STATUS = FETCH_CYLINDER_BY_RESOURCE_CENTRE + " AND ce.cylinderStatus = :cylinderStatus ";
 

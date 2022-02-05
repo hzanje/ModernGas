@@ -141,7 +141,10 @@ public class ResourceCentreServiceImpl implements ResourceCentreService {
 
     @Override
     public List<CylinderInventoryDto> fetchCylinderFromResourceCentre(Long resourceCentreId, String cylinderStatus) throws BadRequestException {
-        ResourceCentreEntity resourceCentreEntity = validationService.validateResourceCentreEntity(resourceCentreId);
+        ResourceCentreEntity resourceCentreEntity = new ResourceCentreEntity();
+        if (null != resourceCentreId) {
+            resourceCentreEntity = validationService.validateResourceCentreEntity(resourceCentreId);
+        }
         List<CylinderInventoryDto> cylinderCodeIdList;
         if (ObjectUtils.isEmpty(cylinderStatus)) {
             cylinderCodeIdList = inventoryRepo.fetchCylinderFromResourceCentreById(resourceCentreEntity.getId());
