@@ -108,8 +108,9 @@ public class OperatorController {
      */
     @GetMapping("/fetchCylinderFromResourceCentre")
     public ResponseEntity<?> fetchCylinderFromResourceCentre(@RequestParam(value = "id", required = false) Long resourceCentreId,
-                                                             @RequestParam(value = "cylinderStatus", required = false) String cylinderStatus) throws BadRequestException {
-        return new ResponseEntity<>(resourceCentreService.fetchCylinderFromResourceCentre(resourceCentreId, cylinderStatus), HttpStatus.OK);
+                                                             @RequestParam(value = "cylinderStatus", required = false) String cylinderStatus,
+                                                             @RequestParam("adminId") Long adminId) throws BadRequestException {
+        return new ResponseEntity<>(resourceCentreService.fetchCylinderFromResourceCentre(resourceCentreId, cylinderStatus, adminId), HttpStatus.OK);
     }
 
     /**

@@ -20,7 +20,7 @@ public interface ResourceCentreService {
 
     String addPublicCylinderToResourceCentre(Long resourceCentreId, Long userId, List<String> cylinderCodes) throws BadRequestException;
 
-    List<CylinderInventoryDto> fetchCylinderFromResourceCentre(Long resourceCentreId, String cylinderStatus) throws BadRequestException;
+    List<CylinderInventoryDto> fetchCylinderFromResourceCentre(Long resourceCentreId, String cylinderStatus, Long adminId) throws BadRequestException;
 
     String fillCylinder(List<String> cylinderCodes) throws BadRequestException;
 

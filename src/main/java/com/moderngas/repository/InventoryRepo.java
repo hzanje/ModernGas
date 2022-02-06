@@ -50,12 +50,10 @@ public interface InventoryRepo extends JpaRepository<CylinderEntity, Long> {
             "WHERE ce.assignedUserId=:assignedUserId")
     List<CylinderInventoryDto> getAssignedCylinderByUserId(@Param("assignedUserId") Long assignedUserId);
 
-    @Query(value = QUERIES.FETCH_CYLINDER_BY_RESOURCE_CENTRE)
-    List<CylinderInventoryDto> fetchCylinderFromResourceCentreById(@Param("resourceCentreId") Long resourceCentreId);
-
     @Query(value = QUERIES.FETCH_CYLINDER_BY_RESOURCE_CENTRE_AND_STATUS)
-    List<CylinderInventoryDto> fetchCylinderFromResourceCentreByIdAndStatus(@Param("resourceCentreId") Long resourceCentreId,
-                                                                            @Param("cylinderStatus") CylinderStatus cylinderStatus);
+    List<CylinderInventoryDto> fetchCylinderFromResourceCentreByIdAndStatus(@Param("resourceCentreIds") Set<Long> resourceCentreId,
+                                                                            @Param("cylinderStatus") CylinderStatus cylinderStatus,
+                                                                            @Param("adminId") Long adminId);
 
     @Query("SELECT new com.moderngas.pojo.user.InventoryDetailsDto(ce.id, ce.code, ue.id, ue.name, ue.name) FROM UserEntity ue INNER JOIN ue.cylinderEntitySet ce WHERE ce.assignedUserId = :id ")
     Set<InventoryDetailsDto> getInventoryCylinderAssignedToUser(@Param("id") Long id);
@@ -67,9 +65,10 @@ public interface InventoryRepo extends JpaRepository<CylinderEntity, Long> {
 
         private static final String FETCH_CYLINDER_BY_RESOURCE_CENTRE = "SELECT new com.moderngas.pojo.admin.CylinderInventoryDto(ce.id, ce.code, ce.cylinderStatus, ue.id, ue.name) FROM UserEntity ue " +
                 "INNER JOIN ue.cylinderEntitySet ce " +
-                "WHERE (:resourceCentreId IS NULL OR ce.cylinderInventoryDetailsEntity.resourceCentreEntity.id = :resourceCentreId) ";
+                "WHERE ue.id = :adminId " +
+                "AND ce.cylinderInventoryDetailsEntity.resourceCentreEntity.id IN :resourceCentreIds ";
 
-        private static final String FETCH_CYLINDER_BY_RESOURCE_CENTRE_AND_STATUS = FETCH_CYLINDER_BY_RESOURCE_CENTRE + " AND ce.cylinderStatus = :cylinderStatus ";
+        private static final String FETCH_CYLINDER_BY_RESOURCE_CENTRE_AND_STATUS = FETCH_CYLINDER_BY_RESOURCE_CENTRE + " AND (:cylinderStatus IS NULL OR ce.cylinderStatus = :cylinderStatus) ";
 
         private QUERIES() {
         }

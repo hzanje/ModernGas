@@ -21,6 +21,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -140,18 +141,19 @@ public class ResourceCentreServiceImpl implements ResourceCentreService {
     }
 
     @Override
-    public List<CylinderInventoryDto> fetchCylinderFromResourceCentre(Long resourceCentreId, String cylinderStatus) throws BadRequestException {
+    public List<CylinderInventoryDto> fetchCylinderFromResourceCentre(Long resourceCentreId, String cylinderStatus, Long adminId) throws BadRequestException {
+        UserEntity adminEntity = validationService.validateUserEntity(adminId);
+        Set<Long> resourceCentreSet = new HashSet<>();
         ResourceCentreEntity resourceCentreEntity = new ResourceCentreEntity();
         if (null != resourceCentreId) {
             resourceCentreEntity = validationService.validateResourceCentreEntity(resourceCentreId);
+            resourceCentreSet.add(resourceCentreEntity.getId());
+        } else {
+            resourceCentreSet.addAll(adminEntity.getResourceCentreEntitySet().stream().map(BaseEntity::getId).collect(Collectors.toSet()));
         }
         List<CylinderInventoryDto> cylinderCodeIdList;
-        if (ObjectUtils.isEmpty(cylinderStatus)) {
-            cylinderCodeIdList = inventoryRepo.fetchCylinderFromResourceCentreById(resourceCentreEntity.getId());
-        } else {
-            CylinderStatus cylinderStatusEnum = CylinderStatus.getByStatus(cylinderStatus);
-            cylinderCodeIdList = inventoryRepo.fetchCylinderFromResourceCentreByIdAndStatus(resourceCentreEntity.getId(), cylinderStatusEnum);
-        }
+        CylinderStatus cylinderStatusEnum = CylinderStatus.getByStatus(cylinderStatus);
+        cylinderCodeIdList = inventoryRepo.fetchCylinderFromResourceCentreByIdAndStatus(resourceCentreSet, cylinderStatusEnum, adminEntity.getId());
         return cylinderCodeIdList;
     }
 
