@@ -76,7 +76,7 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public String updateAdminGas(Long adminId, @NonNull ProductGasDto productGasDto) throws BadRequestException {
-        UserEntity adminEntity = validationService.validateUserEntity(adminId);
+        UserEntity adminEntity = validationService.validateAdminEntity(adminId);
         GasMaster gasMaster = validationService.validateGasMaster(productGasDto.getId());
         AdminGasMapping adminGasMapping = adminGasMappingRepo.getGasMappingByGasIdAndAdminId(gasMaster.getId(), adminEntity.getId());
         if (null == adminGasMapping) {

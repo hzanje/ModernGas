@@ -198,7 +198,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public String placeAdminInitiatedOrder(@NonNull OpenOrderDto openOrderDto, Long adminId) throws BadRequestException, NoSuchAlgorithmException {
-        UserEntity adminEntity = validationService.validateUserEntity(adminId);
+        UserEntity adminEntity = validationService.validateAdminEntity(adminId);
         UserEntity userEntity = validationService.validateUserEntity(openOrderDto.getUserId());
         AddressEntity addressEntity = validationService.validateAddressEntity(openOrderDto.getAddressId());
         GasMaster gasMaster = validationService.validateGasMaster(openOrderDto.getProductId());

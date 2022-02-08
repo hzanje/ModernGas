@@ -2,11 +2,8 @@ package com.moderngas.service.serviceImpl;
 
 import com.moderngas.constants.Constants;
 import com.moderngas.constants.ExceptionConstants;
-import com.moderngas.enums.CylinderStatus;
-import com.moderngas.enums.InventoryStatus;
 import com.moderngas.exception.BadRequestException;
 import com.moderngas.jpaentity.CylinderEntity;
-import com.moderngas.jpaentity.CylinderInventoryDetailsEntity;
 import com.moderngas.jpaentity.UserEntity;
 import com.moderngas.pojo.admin.CylinderDto;
 import com.moderngas.pojo.admin.CylinderInventoryDto;
@@ -21,9 +18,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.ObjectUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -50,7 +49,7 @@ public class InventoryServiceImpl implements InventoryService {
             throw new BadRequestException(ExceptionConstants.INVALID_REQUEST_DATA);
         }
 
-        UserEntity adminEntity = validationService.validateUserEntity(adminId);
+        UserEntity adminEntity = validationService.validateAdminEntity(adminId);
         List<CylinderEntity> cylinderEntityList = new ArrayList<>();
         for (CylinderDto cylinderDto : cylinderDtoList) {
             cylinderEntityList.add(genericService.convertDtoToCylinderEntity(cylinderDto));

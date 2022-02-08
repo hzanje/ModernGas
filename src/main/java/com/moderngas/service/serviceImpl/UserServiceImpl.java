@@ -100,7 +100,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Page<UserSearchDto> getAllUserByAdmin(Pageable pageable, String search, Long adminId) throws BadRequestException {
-        UserEntity adminEntity = validationService.validateUserEntity(adminId);
+        UserEntity adminEntity = validationService.validateAdminEntity(adminId);
         return userRepo.getAllUserByAdmin(pageable, search, adminEntity.getId(), UserRole.USER_ROLE_USER.getRole());
     }
 
@@ -203,7 +203,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<GasDto> getAllGasList(Long adminId) throws BadRequestException{
-        UserEntity adminEntity = validationService.validateUserEntity(adminId);
+        UserEntity adminEntity = validationService.validateAdminEntity(adminId);
         List<AdminGasMapping> adminGasMappingList = adminGasMappingRepo.getGasMappingList(adminEntity.getId());
         List<GasDto> gasDtoList = new ArrayList<>();
         for (AdminGasMapping adminGasMapping : adminGasMappingList) {

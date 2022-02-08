@@ -43,7 +43,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public Page<UserSearchDto> getAllEmployeeByAdmin(Pageable pageable, String search, Long adminId) throws BadRequestException {
-        UserEntity adminEntity = validationService.validateUserEntity(adminId);
+        UserEntity adminEntity = validationService.validateAdminEntity(adminId);
         return userRepo.getAllUserByAdmin(pageable, search, adminEntity.getId(), UserRole.USER_ROLE_EMPLOYEE.getRole());
     }
 

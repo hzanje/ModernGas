@@ -142,7 +142,7 @@ public class ResourceCentreServiceImpl implements ResourceCentreService {
 
     @Override
     public List<CylinderInventoryDto> fetchCylinderFromResourceCentre(Long resourceCentreId, String cylinderStatus, Long adminId) throws BadRequestException {
-        UserEntity adminEntity = validationService.validateUserEntity(adminId);
+        UserEntity adminEntity = validationService.validateAdminEntity(adminId);
         Set<Long> resourceCentreSet = new HashSet<>();
         ResourceCentreEntity resourceCentreEntity = new ResourceCentreEntity();
         if (null != resourceCentreId) {

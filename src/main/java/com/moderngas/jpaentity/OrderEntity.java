@@ -2,10 +2,8 @@ package com.moderngas.jpaentity;
 
 import com.moderngas.enums.CylinderType;
 import com.moderngas.enums.OrderStatus;
-import com.moderngas.service.serviceImpl.MyGenerator;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.util.Date;

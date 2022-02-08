@@ -67,7 +67,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
                 // If so, then grab user details and create spring auth token using username, pass, authorities/roles
                 if (userName != null) {
                     UserEntity userEntity = userRepo.findByMobileNumber(Long.parseLong(userName))
-                            .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER));
+                            .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_REGISTER_USER));
                     UserDetailsImpl userDetails = new UserDetailsImpl(userEntity);
                     return new UsernamePasswordAuthenticationToken(userName, null, userDetails.getAuthorities());
                 }

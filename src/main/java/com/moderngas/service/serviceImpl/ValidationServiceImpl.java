@@ -1,6 +1,7 @@
 package com.moderngas.service.serviceImpl;
 
 import com.moderngas.constants.ExceptionConstants;
+import com.moderngas.enums.UserRole;
 import com.moderngas.exception.BadRequestException;
 import com.moderngas.jpaentity.*;
 import com.moderngas.repository.*;
@@ -39,8 +40,28 @@ public class ValidationServiceImpl implements ValidationService {
 
     @Override
     public UserEntity validateUserEntity(Long userId) throws BadRequestException {
-        return userRepo.findById(userId)
-                .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER_ADMIN));
+        UserEntity userEntity = validateUser(userId);
+        if (!userEntity.getRoleEntitySet().stream()
+                .anyMatch(e -> e.getRole().equals(UserRole.USER_ROLE_USER.getRole()))) {
+            throw new BadRequestException(ExceptionConstants.INVALID_USER);
+        }
+        return userEntity;
+    }
+
+    @Override
+    public UserEntity validateAdminEntity(Long userId) throws BadRequestException {
+        UserEntity userEntity = validateUser(userId);
+        if (!userEntity.getRoleEntitySet().stream()
+                .anyMatch(e -> e.getRole().equals(UserRole.USER_ROLE_ADMIN.getRole())
+                        || e.getRole().equals(UserRole.USER_ROLE_EMPLOYEE.getRole()))) {
+            throw new BadRequestException(ExceptionConstants.INVALID_ADMIN);
+        }
+        return userEntity;
+    }
+
+    private UserEntity validateUser(Long id) throws BadRequestException {
+        return userRepo.findById(id)
+                .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_REGISTER_USER));
     }
 
     @Override

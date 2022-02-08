@@ -67,7 +67,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
         /* Create JWT Token */
         /* If token already exist return same else create new token */
-        UserEntity userEntity = userRepo.findByMobileNumber(Long.parseLong(principal.getUsername())).orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER));
+        UserEntity userEntity = userRepo.findByMobileNumber(Long.parseLong(principal.getUsername())).orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_REGISTER_USER));
         String token = JWT.create()
                 .withSubject(principal.getUsername())
                 .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.EXPIRATION_TIME))

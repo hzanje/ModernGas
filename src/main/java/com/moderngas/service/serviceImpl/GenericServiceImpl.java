@@ -204,7 +204,7 @@ public class GenericServiceImpl implements GenericService {
 
     private UserEntityDto setAdminDtoForSingleAdminUser(UserEntityDto userEntityDto, UserEntity userEntity) throws BadRequestException {
         if (!CollectionUtils.isEmpty(userEntityDto.getRoles()) && userEntityDto.getRoles().size() == 1) {
-            UserEntity adminEntity = validationService.validateUserEntity(userEntity.getAdminIdSet().iterator().next());
+            UserEntity adminEntity = validationService.validateAdminEntity(userEntity.getAdminIdSet().iterator().next());
             userEntityDto.setAdminDto(new AdminDto(adminEntity.getId(), adminEntity.getName(),
                     adminEntity.getCompanyName(), convertAddressEntitySetToDto(adminEntity.getAddressEntitySet())));
         }
@@ -418,7 +418,7 @@ public class GenericServiceImpl implements GenericService {
             cylinderEntity.setCode(cylinderDto.getCylinderCode());
             cylinderEntity.setCylinderStatus(cylinderStatus);
             cylinderEntity.setManufacturer(cylinderDto.getManufacturer());
-            if (!ObjectUtils.isEmpty(cylinderDto.getExpiryDate())) {
+            if (!ObjectUtils.isEmpty(cylinderDto.getManufacturingDate())) {
                 cylinderEntity.setManufacturingDate(new Date(Long.parseLong(cylinderDto.getManufacturingDate())));
             }
             if (!ObjectUtils.isEmpty(cylinderDto.getExpiryDate())) {
@@ -538,7 +538,7 @@ public class GenericServiceImpl implements GenericService {
     @Override
     public UserEntity getUserAdminDetails() throws BadRequestException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        return userRepo.findByMobileNumber(Long.parseLong((String) auth.getPrincipal())).orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER));
+        return userRepo.findByMobileNumber(Long.parseLong((String) auth.getPrincipal())).orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_REGISTER_USER));
     }
 
     @Override
