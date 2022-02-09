@@ -16,6 +16,8 @@ import com.moderngas.service.ResourceCentreService;
 import com.moderngas.service.ValidationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
@@ -141,7 +143,7 @@ public class ResourceCentreServiceImpl implements ResourceCentreService {
     }
 
     @Override
-    public List<CylinderInventoryDto> fetchCylinderFromResourceCentre(Long resourceCentreId, String cylinderStatus, Long adminId) throws BadRequestException {
+    public Page<CylinderInventoryDto> fetchCylinderFromResourceCentre(Pageable pageable, String search, Long resourceCentreId, String cylinderStatus, Long adminId) throws BadRequestException {
         UserEntity adminEntity = validationService.validateAdminEntity(adminId);
         Set<Long> resourceCentreSet = new HashSet<>();
         ResourceCentreEntity resourceCentreEntity = new ResourceCentreEntity();
@@ -151,10 +153,8 @@ public class ResourceCentreServiceImpl implements ResourceCentreService {
         } else {
             resourceCentreSet.addAll(adminEntity.getResourceCentreEntitySet().stream().map(BaseEntity::getId).collect(Collectors.toSet()));
         }
-        List<CylinderInventoryDto> cylinderCodeIdList;
         CylinderStatus cylinderStatusEnum = CylinderStatus.getByStatus(cylinderStatus);
-        cylinderCodeIdList = inventoryRepo.fetchCylinderFromResourceCentreByIdAndStatus(resourceCentreSet, cylinderStatusEnum, adminEntity.getId());
-        return cylinderCodeIdList;
+        return inventoryRepo.fetchCylinderFromResourceCentreByIdAndStatus(pageable, search, resourceCentreSet, cylinderStatusEnum, adminEntity.getId());
     }
 
     @Override

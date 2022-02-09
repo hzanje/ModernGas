@@ -5,6 +5,8 @@ import com.moderngas.enums.CylinderStatus;
 import com.moderngas.jpaentity.CylinderEntity;
 import com.moderngas.pojo.admin.CylinderInventoryDto;
 import com.moderngas.pojo.user.InventoryDetailsDto;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -41,17 +43,19 @@ public interface InventoryRepo extends JpaRepository<CylinderEntity, Long> {
     @Query(" FROM CylinderEntity WHERE code IN (:codeList)")
     List<CylinderEntity> getCylinderFromCodeList(@Param("codeList") List<String> codeList);
 
-    @Query("SELECT new com.moderngas.pojo.admin.CylinderInventoryDto(ce.id, ce.code, ce.cylinderStatus, ue.id, ue.name) FROM CylinderEntity ce " +
+    @Query("SELECT new com.moderngas.pojo.admin.CylinderInventoryDto(ce.id, ce.code, ce.cylinderStatus, ue.id, ue.name, ce.cylinderInventoryDetailsEntity.isTransit, ce.cylinderInventoryDetailsEntity.resourceCentreEntity.id, ce.cylinderInventoryDetailsEntity.resourceCentreEntity.name) FROM CylinderEntity ce " +
             "LEFT JOIN UserEntity ue ON ce.assignedUserId = ue.id ")
     List<CylinderInventoryDto> getInventoryCylinderForAdmin();
 
-    @Query("SELECT new com.moderngas.pojo.admin.CylinderInventoryDto(ce.id, ce.code, ce.cylinderStatus, ue.id, ue.name) FROM CylinderEntity ce " +
+    @Query("SELECT new com.moderngas.pojo.admin.CylinderInventoryDto(ce.id, ce.code, ce.cylinderStatus, ue.id, ue.name, ce.cylinderInventoryDetailsEntity.isTransit, ce.cylinderInventoryDetailsEntity.resourceCentreEntity.id, ce.cylinderInventoryDetailsEntity.resourceCentreEntity.name) FROM CylinderEntity ce " +
             "LEFT JOIN UserEntity ue ON ce.assignedUserId = ue.id " +
             "WHERE ce.assignedUserId=:assignedUserId")
     List<CylinderInventoryDto> getAssignedCylinderByUserId(@Param("assignedUserId") Long assignedUserId);
 
     @Query(value = QUERIES.FETCH_CYLINDER_BY_RESOURCE_CENTRE_AND_STATUS)
-    List<CylinderInventoryDto> fetchCylinderFromResourceCentreByIdAndStatus(@Param("resourceCentreIds") Set<Long> resourceCentreId,
+    Page<CylinderInventoryDto> fetchCylinderFromResourceCentreByIdAndStatus(Pageable pageable,
+                                                                            @Param("search") String search,
+                                                                            @Param("resourceCentreIds") Set<Long> resourceCentreId,
                                                                             @Param("cylinderStatus") CylinderStatus cylinderStatus,
                                                                             @Param("adminId") Long adminId);
 
@@ -63,9 +67,10 @@ public interface InventoryRepo extends JpaRepository<CylinderEntity, Long> {
 
     class QUERIES {
 
-        private static final String FETCH_CYLINDER_BY_RESOURCE_CENTRE = "SELECT new com.moderngas.pojo.admin.CylinderInventoryDto(ce.id, ce.code, ce.cylinderStatus, ue.id, ue.name) FROM UserEntity ue " +
+        private static final String FETCH_CYLINDER_BY_RESOURCE_CENTRE = "SELECT new com.moderngas.pojo.admin.CylinderInventoryDto(ce.id, ce.code, ce.cylinderStatus, ue.id, ue.name, ce.cylinderInventoryDetailsEntity.isTransit, ce.cylinderInventoryDetailsEntity.resourceCentreEntity.id, ce.cylinderInventoryDetailsEntity.resourceCentreEntity.name) FROM UserEntity ue " +
                 "INNER JOIN ue.cylinderEntitySet ce " +
                 "WHERE ue.id = :adminId " +
+                "AND (:search IS NULL OR ce.code LIKE :search%) " +
                 "AND ce.cylinderInventoryDetailsEntity.resourceCentreEntity.id IN :resourceCentreIds ";
 
         private static final String FETCH_CYLINDER_BY_RESOURCE_CENTRE_AND_STATUS = FETCH_CYLINDER_BY_RESOURCE_CENTRE + " AND (:cylinderStatus IS NULL OR ce.cylinderStatus = :cylinderStatus) ";

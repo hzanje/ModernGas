@@ -3,6 +3,8 @@ package com.moderngas.service;
 import com.moderngas.exception.BadRequestException;
 import com.moderngas.pojo.admin.CylinderInventoryDto;
 import com.moderngas.pojo.admin.ResourceCentreDto;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -20,7 +22,7 @@ public interface ResourceCentreService {
 
     String addPublicCylinderToResourceCentre(Long resourceCentreId, Long userId, List<String> cylinderCodes) throws BadRequestException;
 
-    List<CylinderInventoryDto> fetchCylinderFromResourceCentre(Long resourceCentreId, String cylinderStatus, Long adminId) throws BadRequestException;
+    Page<CylinderInventoryDto> fetchCylinderFromResourceCentre(Pageable pageable, String search, Long resourceCentreId, String cylinderStatus, Long adminId) throws BadRequestException;
 
     String fillCylinder(List<String> cylinderCodes) throws BadRequestException;
 

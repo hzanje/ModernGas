@@ -2,9 +2,21 @@ package com.moderngas.restcontroller;
 
 import com.moderngas.exception.BadRequestException;
 import com.moderngas.pojo.ResponseStatus;
+import com.moderngas.pojo.admin.CylinderInventoryDto;
+import com.moderngas.pojo.user.UserSearchDto;
 import com.moderngas.service.ResourceCentreService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.PagedModel;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -107,10 +119,20 @@ public class OperatorController {
      * @throws BadRequestException
      */
     @GetMapping("/fetchCylinderFromResourceCentre")
-    public ResponseEntity<?> fetchCylinderFromResourceCentre(@RequestParam(value = "id", required = false) Long resourceCentreId,
-                                                             @RequestParam(value = "cylinderStatus", required = false) String cylinderStatus,
-                                                             @RequestParam("adminId") Long adminId) throws BadRequestException {
-        return new ResponseEntity<>(resourceCentreService.fetchCylinderFromResourceCentre(resourceCentreId, cylinderStatus, adminId), HttpStatus.OK);
+    public HttpEntity<PagedModel<EntityModel<CylinderInventoryDto>>> fetchCylinderFromResourceCentre(PagedResourcesAssembler<CylinderInventoryDto> assembler,
+                                                                                                     @RequestParam(value = "size", defaultValue = "0") Integer size,
+                                                                                                     @RequestParam(value = "page", defaultValue = "0") Integer page,
+                                                                                                     @RequestParam(value = "search", required = false) String search,
+                                                                                                     @RequestParam(value = "id", required = false) Long resourceCentreId,
+                                                                                                     @RequestParam(value = "cylinderStatus", required = false) String cylinderStatus,
+                                                                                                     @RequestParam("adminId") Long adminId) throws BadRequestException {
+        log.info("OperatorController :: fetchCylinderFromResourceCentre >>> Start ");
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "id"));
+        Page<CylinderInventoryDto> cylinderInventoryDtoList = resourceCentreService.fetchCylinderFromResourceCentre(pageable, search, resourceCentreId, cylinderStatus, adminId);
+        Link link = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(OperatorController.class)
+                .fetchCylinderFromResourceCentre(assembler, size, page, search, resourceCentreId, cylinderStatus, adminId)).withSelfRel();
+        PagedModel<EntityModel<CylinderInventoryDto>> model = assembler.toModel(cylinderInventoryDtoList, link);
+        return new ResponseEntity<>(model, HttpStatus.OK);
     }
 
     /**
