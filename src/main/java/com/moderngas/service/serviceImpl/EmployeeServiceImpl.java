@@ -50,10 +50,11 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public String assignCylinderToUser(Long orderId, List<String> cylinderCodes) throws BadRequestException {
         OrderEntity orderEntity = validationService.validateOrderEntity(orderId);
+        UserEntity userEntity = validationService.validateUserEntity(orderEntity.getUserId());
         if (CollectionUtils.isEmpty(cylinderCodes)) {
             throw new BadRequestException(ExceptionConstants.INVALID_REQUEST_DATA);
         }
-        inventoryRepo.updateCylinderToAssigned(orderEntity.getUserId(), cylinderCodes, CylinderStatus.CYLINDER_STATUS_ASSIGNED);
+        inventoryRepo.updateCylinderToAssigned(userEntity.getId(), userEntity.getName(), cylinderCodes, CylinderStatus.CYLINDER_STATUS_ASSIGNED);
         return Constants.SUCCESS_STR;
     }
 

@@ -6,6 +6,7 @@ CREATE TABLE `cylinder`(
   `cylinder_code` TEXT(255) NOT NULL,
   `cylinder_status_id` BIGINT(20) NOT NULL,
   `assigned_user_id` BIGINT(20),
+  `assigned_user_name` TEXT(255) NOT NULL,
   `user_id` BIGINT(20),
   `cylinder_detail_id` BIGINT(20),
   `manufacturer` TEXT(255),

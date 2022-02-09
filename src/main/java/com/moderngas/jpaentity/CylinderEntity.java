@@ -20,6 +20,9 @@ public class CylinderEntity extends BaseEntity {
     @Column(name = "assigned_user_id")
     private Long assignedUserId;
 
+    @Column(name = "assigned_user_name")
+    private String assignedUserName;
+
     @Column(name = "manufacturer")
     private String manufacturer;
 
