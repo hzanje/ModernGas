@@ -1,8 +1,11 @@
 package com.moderngas.service;
 
 import com.moderngas.enums.OrderStatus;
+import com.moderngas.enums.UserPrivilege;
+import com.moderngas.enums.UserRole;
 import com.moderngas.exception.BadRequestException;
 import com.moderngas.jpaentity.*;
+import com.moderngas.pojo.UserDto;
 import com.moderngas.pojo.admin.CylinderDto;
 import com.moderngas.pojo.admin.DeliveryVehicleDto;
 import com.moderngas.pojo.admin.FilterDto;
@@ -17,11 +20,18 @@ import java.util.Set;
 
 public interface GenericService {
 
-    UserEntity convertDtoToUserData(UserEntityDto userEntityDto) throws BadRequestException;
+
+    UserEntity convertUserDtoToEntity(UserEntity entity, UserDto userDto, UserEntity adminEntity, UserRole userRole) throws BadRequestException;
+
+    Set<Long> addOrUpdateUserAdmin(UserEntity entity, Long adminId) throws BadRequestException;
+
+    Set<UserRoleEntity> addOrUpdateUserRoleAndPrivilege(UserEntity entity, Set<String> privilegeSet, UserRole userRoleUser) throws BadRequestException;
+
+    Set<UserPrivilegeEntity> addOrUpdateUserPrivilege(List<UserPrivilege> privilegeList) throws BadRequestException;
 
     UserEntity convertDtoToUserData(AdminEntityDto adminEntityDto) throws BadRequestException;
 
-    UserEntityDto convertUserDataToDto(UserEntity clientEntity) throws BadRequestException;
+    UserEntityResponseDto convertUserDataToDto(UserEntity clientEntity) throws BadRequestException;
 
     String encodeUserPassword(String password);
 
@@ -64,4 +74,5 @@ public interface GenericService {
     Set<UserDashboardDto> convertGasMappingToDashboardDto(List<AdminGasMapping> adminGasMappingList);
 
     Set<PrivilegeDto> convertToPrivilegeDto(Set<UserPrivilegeEntity> userPrivilegeEntitySet) throws BadRequestException;
+
 }

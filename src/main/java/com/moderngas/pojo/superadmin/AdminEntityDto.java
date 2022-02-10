@@ -17,8 +17,6 @@ public class AdminEntityDto {
 
     private String email;
 
-    private String password;
-
     private String companyName;
 
     private List<String> roles;

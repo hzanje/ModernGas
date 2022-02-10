@@ -3,7 +3,6 @@ package com.moderngas.restcontroller;
 import com.moderngas.exception.BadRequestException;
 import com.moderngas.pojo.ResponseStatus;
 import com.moderngas.pojo.admin.CylinderInventoryDto;
-import com.moderngas.pojo.user.UserSearchDto;
 import com.moderngas.service.ResourceCentreService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -120,7 +119,7 @@ public class OperatorController {
      */
     @GetMapping("/fetchCylinderFromResourceCentre")
     public HttpEntity<PagedModel<EntityModel<CylinderInventoryDto>>> fetchCylinderFromResourceCentre(PagedResourcesAssembler<CylinderInventoryDto> assembler,
-                                                                                                     @RequestParam(value = "size", defaultValue = "0") Integer size,
+                                                                                                     @RequestParam(value = "size", defaultValue = "10") Integer size,
                                                                                                      @RequestParam(value = "page", defaultValue = "0") Integer page,
                                                                                                      @RequestParam(value = "search", required = false) String search,
                                                                                                      @RequestParam(value = "id", required = false) Long resourceCentreId,

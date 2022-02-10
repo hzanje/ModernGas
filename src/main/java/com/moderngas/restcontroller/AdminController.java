@@ -2,8 +2,8 @@ package com.moderngas.restcontroller;
 
 import com.moderngas.exception.BadRequestException;
 import com.moderngas.pojo.ResponseStatus;
+import com.moderngas.pojo.UserDto;
 import com.moderngas.pojo.admin.*;
-import com.moderngas.pojo.user.UserEntityDto;
 import com.moderngas.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +30,9 @@ public class AdminController {
     private UserService userService;
 
     @Autowired
+    private EmployeeService employeeService;
+
+    @Autowired
     private GenericService genericService;
 
     @Autowired
@@ -38,6 +41,64 @@ public class AdminController {
     @Autowired
     private AdminService adminService;
 
+
+    /**
+     * Add User To System
+     *
+     * @param userDto
+     * @return ResponseEntity
+     * @throws BadRequestException
+     */
+    @Secured("ROLE_ADMIN")
+    @PostMapping(value = "/addUser/{adminId}")
+    public ResponseEntity<ResponseStatus> addUser(@PathVariable("adminId") Long adminId,
+                                                  @RequestBody UserDto userDto) throws BadRequestException, NoSuchAlgorithmException {
+        log.info("AdminController :: userEntityDto >>> Start");
+        return new ResponseEntity<>(new ResponseStatus(userService.addUser(adminId, userDto)), HttpStatus.OK);
+    }
+
+    /**
+     * Update User To System.
+     *
+     * @param userDto
+     * @return
+     */
+    @PutMapping(value = "/updateUser/{adminId}")
+    public ResponseEntity<ResponseStatus> updateUser(@PathVariable("adminId") Long adminId,
+                                                     @RequestBody UserDto userDto) throws BadRequestException {
+        log.info("UserController :: updateUser >>> Start");
+        return new ResponseEntity<>(new ResponseStatus(userService.updateUser(adminId, userDto)), HttpStatus.OK);
+    }
+
+
+    /**
+     * Add Employee To System
+     *
+     * @param adminId
+     * @param userDto
+     * @return
+     */
+    @Secured("ROLE_ADMIN")
+    @PostMapping("/addEmployee/{adminId}")
+    public ResponseEntity<?> addEmployee(@PathVariable("adminId") Long adminId,
+                                         @RequestBody UserDto userDto) throws BadRequestException, NoSuchAlgorithmException {
+        log.info("EmployeeController >>> addEmployee :: Start");
+        return new ResponseEntity<>(new ResponseStatus(employeeService.addEmployee(adminId, userDto)), HttpStatus.OK);
+    }
+
+    /**
+     * Update Employee To System
+     *
+     * @param adminId
+     * @param userDto
+     * @return
+     */
+    @PostMapping("/updateEmployee/{adminId}")
+    public ResponseEntity<?> updateEmployee(@PathVariable("adminId") Long adminId,
+                                            @RequestBody UserDto userDto) throws BadRequestException {
+        log.info("EmployeeController >>> addEmployee :: Start");
+        return new ResponseEntity<>(new ResponseStatus(employeeService.updateEmployee(adminId, userDto)), HttpStatus.OK);
+    }
 
     /**
      * Add Cylinder for Specific Admin by Cylinder Code
@@ -54,22 +115,6 @@ public class AdminController {
         log.info("AdminController :: addCylinder >>> Start ");
         return new ResponseEntity<>(new ResponseStatus(inventoryService.addCylinder(adminId, cylinderDtoList)), HttpStatus.OK);
     }
-
-    /**
-     * Add User By Roles - Admin Only
-     *
-     * @param userEntityDto
-     * @return ResponseEntity
-     * @throws BadRequestException
-     */
-    @Secured("ROLE_ADMIN")
-    @PostMapping(value = "/addUser")
-    public ResponseEntity<ResponseStatus> addUser(@RequestBody UserEntityDto userEntityDto) throws BadRequestException {
-        log.info("AdminController :: userEntityDto >>> Start");
-        String response = userService.addUser(userEntityDto);
-        return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
-    }
-
 
     /**
      * Get Filter for Admin in Order Tab

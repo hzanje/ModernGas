@@ -146,7 +146,7 @@ public class ResourceCentreServiceImpl implements ResourceCentreService {
     public Page<CylinderInventoryDto> fetchCylinderFromResourceCentre(Pageable pageable, String search, Long resourceCentreId, String cylinderStatus, Long adminId) throws BadRequestException {
         UserEntity adminEntity = validationService.validateAdminEntity(adminId);
         Set<Long> resourceCentreSet = new HashSet<>();
-        ResourceCentreEntity resourceCentreEntity = new ResourceCentreEntity();
+        ResourceCentreEntity resourceCentreEntity;
         if (null != resourceCentreId) {
             resourceCentreEntity = validationService.validateResourceCentreEntity(resourceCentreId);
             resourceCentreSet.add(resourceCentreEntity.getId());

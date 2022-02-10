@@ -93,7 +93,7 @@ public class OrderController {
     @Secured("ROLE_ADMIN")
     @GetMapping("/adminOrderList")
     public HttpEntity<PagedModel<EntityModel<com.moderngas.pojo.admin.OrderDto>>> getAllOrderList(PagedResourcesAssembler<com.moderngas.pojo.admin.OrderDto> assembler,
-                                                                                                  @RequestParam(value = "size", defaultValue = "0") Integer size,
+                                                                                                  @RequestParam(value = "size", defaultValue = "10") Integer size,
                                                                                                   @RequestParam(value = "page", defaultValue = "0") Integer page,
                                                                                                   @RequestParam(value = "status", required = false) String status,
                                                                                                   @RequestParam(value = "cylinderType", required = false) List<String> cylinderType,

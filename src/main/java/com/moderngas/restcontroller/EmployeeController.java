@@ -41,7 +41,7 @@ public class EmployeeController {
     @Secured("ROLE_EMPLOYEE")
     @GetMapping("/getAllEmployee")
     public HttpEntity<PagedModel<EntityModel<UserSearchDto>>> getAllEmployee(PagedResourcesAssembler<UserSearchDto> assembler,
-                                                                                 @RequestParam(value = "size", defaultValue = "0") Integer size,
+                                                                                 @RequestParam(value = "size", defaultValue = "10") Integer size,
                                                                                  @RequestParam(value = "page", defaultValue = "0") Integer page,
                                                                                  @RequestParam(value = "search", required = false) String search,
                                                                                  @RequestParam(value = "adminId") Long adminId) throws JsonProcessingException, BadRequestException {

@@ -4,7 +4,6 @@ import com.moderngas.exception.BadRequestException;
 import com.moderngas.pojo.ResponseStatus;
 import com.moderngas.pojo.admin.CylinderDto;
 import com.moderngas.pojo.user.AddressDto;
-import com.moderngas.pojo.user.UserEntityDto;
 import com.moderngas.pojo.user.UserSearchDto;
 import com.moderngas.service.GenericService;
 import com.moderngas.service.InventoryService;
@@ -53,7 +52,7 @@ public class UserController {
     @Secured("ROLE_EMPLOYEE")
     @GetMapping("/getAllUser")
     public HttpEntity<PagedModel<EntityModel<UserSearchDto>>> getAllClient(PagedResourcesAssembler<UserSearchDto> assembler,
-                                                                           @RequestParam(value = "size", defaultValue = "0") Integer size,
+                                                                           @RequestParam(value = "size", defaultValue = "10") Integer size,
                                                                            @RequestParam(value = "page", defaultValue = "0") Integer page,
                                                                            @RequestParam(value = "search", required = false) String search,
                                                                            @RequestParam(value = "adminId") Long adminId) throws BadRequestException {
@@ -65,7 +64,6 @@ public class UserController {
         PagedModel<EntityModel<UserSearchDto>> model = assembler.toModel(userSearchDtoList, link);
         return new ResponseEntity<>(model, HttpStatus.OK);
     }
-
 
     /**
      * Get Client/User by Id.
@@ -149,18 +147,6 @@ public class UserController {
         return new ResponseEntity<>(userService.getGasDetailsById(id, adminId), HttpStatus.OK);
     }
 
-    /**
-     * Update User Details.
-     *
-     * @param userEntityDto
-     * @return
-     */
-    @PostMapping(value = "/updateUser")
-    public ResponseEntity<ResponseStatus> updateUser(@RequestBody UserEntityDto userEntityDto) throws BadRequestException {
-        log.info("UserController :: updateUser >>> Start");
-        String response = userService.updateUser(genericService.convertDtoToUserData(userEntityDto));
-        return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
-    }
 
     /**
      * Add or Update User Address

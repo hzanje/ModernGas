@@ -41,19 +41,19 @@ public class ValidationServiceImpl implements ValidationService {
     @Override
     public UserEntity validateUserEntity(Long userId) throws BadRequestException {
         UserEntity userEntity = validateUser(userId);
-        if (!userEntity.getRoleEntitySet().stream()
-                .anyMatch(e -> e.getRole().equals(UserRole.USER_ROLE_USER.getRole()))) {
+        if (userEntity.getRoleEntitySet().stream()
+                .noneMatch(e -> e.getRole().equals(UserRole.USER_ROLE_USER.getRole()))) {
             throw new BadRequestException(ExceptionConstants.INVALID_USER);
         }
         return userEntity;
     }
 
     @Override
-    public UserEntity validateAdminEntity(Long userId) throws BadRequestException {
-        UserEntity userEntity = validateUser(userId);
-        if (!userEntity.getRoleEntitySet().stream()
-                .anyMatch(e -> e.getRole().equals(UserRole.USER_ROLE_ADMIN.getRole())
-                        || e.getRole().equals(UserRole.USER_ROLE_EMPLOYEE.getRole()))) {
+    public UserEntity validateAdminEntity(Long adminId) throws BadRequestException {
+        UserEntity userEntity = validateUser(adminId);
+        if (userEntity.getRoleEntitySet().stream()
+                .noneMatch(e -> e.getRole().equals(UserRole.USER_ROLE_ADMIN.getRole())
+                        && e.getRole().equals(UserRole.USER_ROLE_EMPLOYEE.getRole()))) {
             throw new BadRequestException(ExceptionConstants.INVALID_ADMIN);
         }
         return userEntity;

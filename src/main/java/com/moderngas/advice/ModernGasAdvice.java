@@ -66,4 +66,11 @@ public class ModernGasAdvice {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(status);
     }
 
+    @ExceptionHandler({IllegalArgumentException.class})
+    public ResponseEntity<ResponseStatus> illegalArgumentException(IllegalArgumentException illegalArgumentException) {
+        ResponseStatus status = new ResponseStatus();
+        status.setStatus("Please Enter Valid Argument");
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(status);
+    }
+
 }

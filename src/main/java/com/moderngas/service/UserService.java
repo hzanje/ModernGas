@@ -3,6 +3,7 @@ package com.moderngas.service;
 import com.moderngas.exception.BadRequestException;
 import com.moderngas.jpaentity.UserEntity;
 import com.moderngas.pojo.NameIdDto;
+import com.moderngas.pojo.UserDto;
 import com.moderngas.pojo.admin.DeliveryVehicleDto;
 import com.moderngas.pojo.admin.UserDetails;
 import com.moderngas.pojo.user.*;
@@ -10,16 +11,14 @@ import net.minidev.json.JSONObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Set;
 
 public interface UserService {
 
-    String addUser(UserEntityDto userEntityDto) throws BadRequestException;
 
-    String updateUser(UserEntity userEntity) throws BadRequestException;
-
-    UserEntityDto getUserById(Long userId) throws BadRequestException;
+    UserEntityResponseDto getUserById(Long userId) throws BadRequestException;
 
     String checkUserExist(Long mobileNumber);
 
@@ -58,4 +57,8 @@ public interface UserService {
     UserDetails getUserDetailsForAdmin(Long id) throws BadRequestException;
 
     String logout(String token) throws BadRequestException;
+
+    String addUser(Long adminId, UserDto userDto) throws BadRequestException, NoSuchAlgorithmException;
+
+    String updateUser(Long adminId, UserDto userDto) throws BadRequestException;
 }

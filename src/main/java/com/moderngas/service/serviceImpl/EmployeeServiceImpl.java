@@ -9,12 +9,14 @@ import com.moderngas.jpaentity.CylinderEntity;
 import com.moderngas.jpaentity.CylinderInventoryDetailsEntity;
 import com.moderngas.jpaentity.OrderEntity;
 import com.moderngas.jpaentity.UserEntity;
+import com.moderngas.pojo.UserDto;
 import com.moderngas.pojo.admin.CylinderInventoryDto;
 import com.moderngas.pojo.user.UserSearchDto;
 import com.moderngas.repository.DeliveryVehicleRepo;
 import com.moderngas.repository.InventoryRepo;
 import com.moderngas.repository.UserRepo;
 import com.moderngas.service.EmployeeService;
+import com.moderngas.service.GenericService;
 import com.moderngas.service.ValidationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +24,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 @Slf4j
@@ -39,7 +43,36 @@ public class EmployeeServiceImpl implements EmployeeService {
     private ValidationService validationService;
 
     @Autowired
+    private GenericService genericService;
+
+    @Autowired
     private UserRepo userRepo;
+
+    @Override
+    public String addEmployee(Long adminId, UserDto userDto) throws BadRequestException, NoSuchAlgorithmException {
+        UserEntity adminEntity = validationService.validateAdminEntity(adminId);
+        UserEntity employeeEntity = new UserEntity();
+        if (!ObjectUtils.isEmpty(userDto.getId())) {
+            employeeEntity = validationService.validateAdminEntity(userDto.getId());
+        }
+        employeeEntity = genericService.convertUserDtoToEntity(employeeEntity, userDto, adminEntity, UserRole.USER_ROLE_EMPLOYEE);
+        employeeEntity.setPassword(genericService.encodeUserPassword(genericService.generateRandomPassword()));
+        userRepo.save(employeeEntity);
+        return Constants.SUCCESS_STR;
+    }
+
+    @Override
+    public String updateEmployee(Long adminId, UserDto userDto) throws BadRequestException {
+        UserEntity adminEntity = validationService.validateAdminEntity(adminId);
+        UserEntity employeeEntity = validationService.validateAdminEntity(userDto.getId());
+        employeeEntity = genericService.convertUserDtoToEntity(employeeEntity, userDto, adminEntity, UserRole.USER_ROLE_EMPLOYEE);
+        employeeEntity.setCompanyName(userDto.getCompanyName());
+        if (null != userDto.getPassword() && !userDto.getPassword().isEmpty()) {
+            employeeEntity.setPassword(genericService.encodeUserPassword(userDto.getPassword()));
+        }
+        userRepo.save(employeeEntity);
+        return Constants.SUCCESS_STR;
+    }
 
     @Override
     public Page<UserSearchDto> getAllEmployeeByAdmin(Pageable pageable, String search, Long adminId) throws BadRequestException {

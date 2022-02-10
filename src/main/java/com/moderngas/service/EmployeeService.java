@@ -1,11 +1,13 @@
 package com.moderngas.service;
 
 import com.moderngas.exception.BadRequestException;
+import com.moderngas.pojo.UserDto;
 import com.moderngas.pojo.admin.CylinderInventoryDto;
 import com.moderngas.pojo.user.UserSearchDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 public interface EmployeeService {
@@ -20,4 +22,7 @@ public interface EmployeeService {
 
     List<CylinderInventoryDto> getAssignedCylinderByUserId(Long userId) throws BadRequestException;
 
+    String addEmployee(Long adminId, UserDto userDto) throws BadRequestException, NoSuchAlgorithmException;
+
+    String updateEmployee(Long adminId, UserDto userDto) throws BadRequestException;
 }

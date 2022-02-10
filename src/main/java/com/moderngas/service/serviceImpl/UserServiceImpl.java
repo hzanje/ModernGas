@@ -9,6 +9,7 @@ import com.moderngas.exception.BadRequestException;
 import com.moderngas.jpaentity.*;
 import com.moderngas.pojo.CylinderTypeDto;
 import com.moderngas.pojo.NameIdDto;
+import com.moderngas.pojo.UserDto;
 import com.moderngas.pojo.admin.DeliveryVehicleDto;
 import com.moderngas.pojo.admin.UserDetails;
 import com.moderngas.pojo.user.*;
@@ -18,6 +19,7 @@ import com.moderngas.service.EmailService;
 import com.moderngas.service.GenericService;
 import com.moderngas.service.UserService;
 import com.moderngas.service.ValidationService;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +28,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -67,35 +71,31 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private ValidationService validationService;
 
-
     @Override
-    public String addUser(UserEntityDto userEntityDto) throws BadRequestException {
-        log.info("UserService >> Create New User");
-        /* Add new Client to DataBase */
-        String response = Constants.FAILURE_STR;
-        userEntityDto.setRoles(new ArrayList<>(Arrays.asList(UserRole.USER_ROLE_USER.getRole())));
-        UserEntity userEntity = genericService.convertDtoToUserData(userEntityDto);
-        userEntity = userRepo.save(userEntity);
-        if (userEntity.getId() != null) {
-            response = Constants.SUCCESS_STR;
+    public String addUser(Long adminId, UserDto userDto) throws BadRequestException, NoSuchAlgorithmException {
+        UserEntity adminEntity = validationService.validateAdminEntity(adminId);
+        UserEntity userEntity = new UserEntity();
+        if (!ObjectUtils.isEmpty(userDto.getId())) {
+            userEntity = validationService.validateUserEntity(userDto.getId());
         }
-        return response;
+        userEntity = genericService.convertUserDtoToEntity(userEntity, userDto, adminEntity, UserRole.USER_ROLE_USER);
+        userEntity.setCompanyName(userDto.getCompanyName());
+        userEntity.setPassword(genericService.encodeUserPassword(genericService.generateRandomPassword()));
+        userRepo.save(userEntity);
+        return Constants.SUCCESS_STR;
     }
 
-    public String updateUser(UserEntity userEntity) throws BadRequestException {
-        log.info("UserService >> Update User");
-        String response = Constants.FAILURE_STR;
-        Optional<UserEntity> user = userRepo.findByMobileNumber(userEntity.getMobileNumber());
-        if (user.isPresent()) {
-            UserEntity tempUser = user.get();
-            tempUser.setName(userEntity.getName());
-            tempUser.setEmail(userEntity.getEmail());
-            tempUser.setCompanyName(userEntity.getCompanyName());
-
-            userRepo.save(tempUser);
-            response = Constants.SUCCESS_STR;
+    @Override
+    public String updateUser(Long adminId, UserDto userDto) throws BadRequestException {
+        UserEntity adminEntity = validationService.validateAdminEntity(adminId);
+        UserEntity userEntity = validationService.validateUserEntity(userDto.getId());
+        userEntity = genericService.convertUserDtoToEntity(userEntity, userDto, adminEntity, UserRole.USER_ROLE_USER);
+        userEntity.setCompanyName(userDto.getCompanyName());
+        if (null != userDto.getPassword() && !userDto.getPassword().isEmpty()) {
+            userEntity.setPassword(genericService.encodeUserPassword(userDto.getPassword()));
         }
-        return response;
+        userRepo.save(userEntity);
+        return Constants.SUCCESS_STR;
     }
 
     @Override
@@ -105,7 +105,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserEntityDto getUserById(Long userId) throws BadRequestException {
+    public UserEntityResponseDto getUserById(Long userId) throws BadRequestException {
         UserEntity userEntity = validationService.validateUserEntity(userId);
         return genericService.convertUserDataToDto(userEntity);
     }

@@ -7,7 +7,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class UserEntityDto {
+public class UserEntityResponseDto {
 
     private Long id;
 

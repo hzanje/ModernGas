@@ -7,6 +7,7 @@ import com.moderngas.exception.BadRequestException;
 import com.moderngas.jpaentity.*;
 import com.moderngas.pojo.CylinderTypeDto;
 import com.moderngas.pojo.OrderDateStatusDto;
+import com.moderngas.pojo.UserDto;
 import com.moderngas.pojo.admin.CylinderDto;
 import com.moderngas.pojo.admin.DeliveryVehicleDto;
 import com.moderngas.pojo.admin.FilterDto;
@@ -64,33 +65,59 @@ public class GenericServiceImpl implements GenericService {
     private InventoryRepo inventoryRepo;
 
     @Override
-    public UserEntity convertDtoToUserData(UserEntityDto userEntityDto) throws BadRequestException {
-        if (null == userEntityDto) {
-            throw new BadRequestException(ExceptionConstants.INVALID_REQUEST_DATA);
-        }
-        UserEntity adminEntity = getUserAdminDetails();
-        UserEntity userEntity = userRepo.findByMobileNumber(userEntityDto.getMobileNumber())
-                .orElse(new UserEntity());
-        userEntity.setName(userEntityDto.getName());
-        userEntity.setEmail(userEntityDto.getEmail());
-        userEntity.setMobileNumber(userEntityDto.getMobileNumber());
-        userEntity.setCompanyName(userEntityDto.getCompanyName());
-        if (null == userEntity.getId()) {
-            // Add User Role to User
-            userEntity.setRoleEntitySet(addUserRole(userEntityDto.getRoles(), userEntity.getRoleEntitySet()));
-            if (null != userEntityDto.getPassword() && !userEntityDto.getPassword().isEmpty()) {
-                userEntity.setPassword(encodeUserPassword(userEntityDto.getPassword()));
-            }
-            userEntity.setAdminIdSet(new HashSet<>(Arrays.asList(adminEntity.getId())));
-
-        } else {
-            Set<Long> updatedAdminIdList = userEntity.getAdminIdSet();
-            updatedAdminIdList.add(adminEntity.getId());
-            userEntity.setAdminIdSet(updatedAdminIdList);
-        }
-        return userEntity;
+    public UserEntity convertUserDtoToEntity(UserEntity entity, @NonNull UserDto userDto, UserEntity adminEntity, UserRole userRole) throws BadRequestException {
+        entity.setName(userDto.getName());
+        entity.setMobileNumber(userDto.getMobileNumber());
+        entity.setEmail(userDto.getEmail());
+        entity.setAdminIdSet(addOrUpdateUserAdmin(entity, adminEntity.getId()));
+        Set<String> privilegeSet = userDto.getPrivilegeDtoList().stream()
+                .filter(PrivilegeDto::isActive)
+                .map(PrivilegeDto::getPrivilege).collect(Collectors.toSet());
+        entity.setRoleEntitySet(addOrUpdateUserRoleAndPrivilege(entity, privilegeSet, userRole));
+        return entity;
     }
 
+    @Override
+    public Set<Long> addOrUpdateUserAdmin(UserEntity entity, Long adminId) throws BadRequestException {
+        Set<Long> adminIdSet = new HashSet<>();
+        if (!ObjectUtils.isEmpty(entity.getId())) {
+            adminIdSet = entity.getAdminIdSet();
+        }
+        adminIdSet.add(adminId);
+        return adminIdSet;
+    }
+
+    @Override
+    public Set<UserRoleEntity> addOrUpdateUserRoleAndPrivilege(UserEntity entity, Set<String> privilegeSet, UserRole userRole) throws BadRequestException {
+        Set<UserRoleEntity> roleEntitySet = new HashSet<>();
+        if (!CollectionUtils.isEmpty(entity.getRoleEntitySet())) {
+            roleEntitySet = entity.getRoleEntitySet();
+        }
+        UserRoleEntity userRoleEntity = new UserRoleEntity();
+        userRoleEntity.setRole(userRole.getRole());
+        if (UserRole.USER_ROLE_EMPLOYEE == userRole && !CollectionUtils.isEmpty(privilegeSet)) {
+            List<UserPrivilege> privilegeList = new ArrayList<>();
+            for (String privilegeName : privilegeSet) {
+                privilegeList.add(UserPrivilege.getUserPrivilegeByName(privilegeName));
+            }
+            userRoleEntity.setUserPrivilegeSet(addOrUpdateUserPrivilege(privilegeList));
+        }
+        roleEntitySet.add(userRoleEntity);
+        return roleEntitySet;
+    }
+
+    @Override
+    public Set<UserPrivilegeEntity> addOrUpdateUserPrivilege(List<UserPrivilege> privilegeList) throws BadRequestException {
+        Set<UserPrivilegeEntity> userPrivilegeEntitySet = new HashSet<>();
+        for (UserPrivilege userPrivilege : privilegeList) {
+            UserPrivilegeEntity userPrivilegeEntity = new UserPrivilegeEntity();
+            userPrivilegeEntity.setPrivilege(userPrivilege.getPrivilege());
+            userPrivilegeEntitySet.add(userPrivilegeEntity);
+        }
+        return userPrivilegeEntitySet;
+    }
+
+    @Deprecated(forRemoval = true)
     @Override
     public UserEntity convertDtoToUserData(AdminEntityDto adminEntityDto) throws BadRequestException {
         if (ObjectUtils.isEmpty(adminEntityDto.getMobileNumber())) {
@@ -114,7 +141,7 @@ public class GenericServiceImpl implements GenericService {
         userEntity.setEmail(adminEntityDto.getEmail());
         userEntity.setMobileNumber(adminEntityDto.getMobileNumber());
         userEntity.setCompanyName(adminEntityDto.getCompanyName());
-        userEntity.setRoleEntitySet(addUserRole(adminEntityDto.getRoles(), userEntity.getRoleEntitySet()));
+        //userEntity.setRoleEntitySet(addUserRole(adminEntityDto.getRoles(), userEntity.getRoleEntitySet()));
         userEntity.setContactPersonSet(adminEntityDto.getContactPersonSet());
         userEntity.setAdminGasMappings(gasMappingByNameAndType(adminEntityDto.getGasNameCylinderTypes()));
         return userEntity;
@@ -167,55 +194,41 @@ public class GenericServiceImpl implements GenericService {
         return selectedCylinderType;
     }
 
-    private Set<UserRoleEntity> addUserRole(List<String> roles, Set<UserRoleEntity> userRoleEntitySet) {
-        if (CollectionUtils.isEmpty(roles)) {
-            return Collections.emptySet();
-        }
-        if (CollectionUtils.isEmpty(userRoleEntitySet)) {
-            userRoleEntitySet = new HashSet<>();
-        }
-        for (String role : roles) {
-            UserRoleEntity userRole = new UserRoleEntity();
-            userRole.setRole(UserRole.getByRole(role).getRole());
-            userRoleEntitySet.add(userRole);
-        }
-        return userRoleEntitySet;
-    }
 
     @Override
-    public UserEntityDto convertUserDataToDto(UserEntity userEntity) throws BadRequestException {
+    public UserEntityResponseDto convertUserDataToDto(UserEntity userEntity) throws BadRequestException {
         if (null != userEntity) {
-            UserEntityDto userEntityDto = new UserEntityDto();
-            userEntityDto.setId(userEntity.getId());
-            userEntityDto.setName(userEntity.getName());
-            userEntityDto.setEmail(userEntity.getEmail());
-            userEntityDto.setMobileNumber(userEntity.getMobileNumber());
-            userEntityDto.setCompanyName(userEntity.getCompanyName());
-            userEntityDto.setOnboard(userEntity.isOnboarding());
-            userEntityDto.setForgetPassword(userEntity.isForgetPassword());
-            userEntityDto.setRoles(userEntity.getRoleEntitySet()
+            UserEntityResponseDto userEntityResponseDto = new UserEntityResponseDto();
+            userEntityResponseDto.setId(userEntity.getId());
+            userEntityResponseDto.setName(userEntity.getName());
+            userEntityResponseDto.setEmail(userEntity.getEmail());
+            userEntityResponseDto.setMobileNumber(userEntity.getMobileNumber());
+            userEntityResponseDto.setCompanyName(userEntity.getCompanyName());
+            userEntityResponseDto.setOnboard(userEntity.isOnboarding());
+            userEntityResponseDto.setForgetPassword(userEntity.isForgetPassword());
+            userEntityResponseDto.setRoles(userEntity.getRoleEntitySet()
                     .stream().map(UserRoleEntity::getRole).toList());
-            setResourceCentreForOperatorUser(userEntityDto);
-            setAdminDtoForSingleAdminUser(userEntityDto, userEntity);
-            return userEntityDto;
+            setResourceCentreForOperatorUser(userEntityResponseDto);
+            setAdminDtoForSingleAdminUser(userEntityResponseDto, userEntity);
+            return userEntityResponseDto;
         }
         return null;
     }
 
-    private UserEntityDto setAdminDtoForSingleAdminUser(UserEntityDto userEntityDto, UserEntity userEntity) throws BadRequestException {
-        if (!CollectionUtils.isEmpty(userEntityDto.getRoles()) && userEntityDto.getRoles().size() == 1) {
+    private UserEntityResponseDto setAdminDtoForSingleAdminUser(UserEntityResponseDto userEntityResponseDto, UserEntity userEntity) throws BadRequestException {
+        if (!CollectionUtils.isEmpty(userEntityResponseDto.getRoles()) && userEntityResponseDto.getRoles().size() == 1) {
             UserEntity adminEntity = validationService.validateAdminEntity(userEntity.getAdminIdSet().iterator().next());
-            userEntityDto.setAdminDto(new AdminDto(adminEntity.getId(), adminEntity.getName(),
+            userEntityResponseDto.setAdminDto(new AdminDto(adminEntity.getId(), adminEntity.getName(),
                     adminEntity.getCompanyName(), convertAddressEntitySetToDto(adminEntity.getAddressEntitySet())));
         }
-        return userEntityDto;
+        return userEntityResponseDto;
     }
 
-    private UserEntityDto setResourceCentreForOperatorUser(UserEntityDto userEntityDto) throws BadRequestException {
-        if (userEntityDto.getRoles().contains(UserRole.USER_ROLE_EMPLOYEE.getRole())) {
-            userEntityDto.setResourceCentreDtoList(resourceCentreService.getResourceCentre());
+    private UserEntityResponseDto setResourceCentreForOperatorUser(UserEntityResponseDto userEntityResponseDto) throws BadRequestException {
+        if (userEntityResponseDto.getRoles().contains(UserRole.USER_ROLE_EMPLOYEE.getRole())) {
+            userEntityResponseDto.setResourceCentreDtoList(resourceCentreService.getResourceCentre());
         }
-        return userEntityDto;
+        return userEntityResponseDto;
     }
 
     @Override
@@ -252,7 +265,8 @@ public class GenericServiceImpl implements GenericService {
     @Override
     public Integer generateRandomOrderNumber() {
         Random random = new Random();
-        int min = 0, max = 50000;
+        int min = 0;
+        int max = 50000;
         return random.ints(min,(max + 1)).findFirst().getAsInt();
     }
 
@@ -359,7 +373,6 @@ public class GenericServiceImpl implements GenericService {
                         createDateStatusDto(OrderStatus.ORDER_STATUS_LOADED, orderEntity.getLoadedDate()));
                 orderDateStatusDtoList.add(
                         createDateStatusDto(OrderStatus.ORDER_STATUS_DEVLIVERED, orderEntity.getDeliveredDate()));
-
             }
 
             case ORDER_STATUS_CANCELLED -> {
@@ -469,9 +482,8 @@ public class GenericServiceImpl implements GenericService {
                 orderEntity.setDeliveryVehicle(deliveryVehicleRepo.getVehicleById(deliveryVehicleId));
             }
 
-            case ORDER_STATUS_DEVLIVERED -> {
-                orderEntity.setDeliveredDate(new Date());
-            }
+            case ORDER_STATUS_DEVLIVERED -> orderEntity.setDeliveredDate(new Date());
+
 
             case ORDER_STATUS_CANCELLED -> {
                 orderEntity.setActiveFlag(false);
@@ -560,4 +572,5 @@ public class GenericServiceImpl implements GenericService {
         return Arrays.stream(UserPrivilege.values()).map(e -> new PrivilegeDto(e.getPrivilege(),
                 userPrivilegeEntitySet.stream().anyMatch(p -> p.getPrivilege().equals(e.getPrivilege())))).collect(Collectors.toSet());
     }
+
 }
