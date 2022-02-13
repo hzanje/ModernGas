@@ -1,6 +1,7 @@
 package com.moderngas.pojo.superadmin;
 
 import com.moderngas.jpaentity.ContactPersonEntity;
+import com.moderngas.pojo.UserDto;
 import lombok.Data;
 
 import java.util.List;
@@ -9,15 +10,7 @@ import java.util.Set;
 @Data
 public class AdminEntityDto {
 
-    private Long id;
-
-    private String name;
-
-    private Long mobileNumber;
-
-    private String email;
-
-    private String companyName;
+    private UserDto userDto;
 
     private List<String> roles;
 

@@ -53,8 +53,17 @@ public class ValidationServiceImpl implements ValidationService {
         UserEntity userEntity = validateUser(adminId);
         if (userEntity.getRoleEntitySet().stream()
                 .noneMatch(e -> e.getRole().equals(UserRole.USER_ROLE_ADMIN.getRole())
-                        && e.getRole().equals(UserRole.USER_ROLE_EMPLOYEE.getRole()))) {
+                        || e.getRole().equals(UserRole.USER_ROLE_EMPLOYEE.getRole()))) {
             throw new BadRequestException(ExceptionConstants.INVALID_ADMIN);
+        }
+        return userEntity;
+    }
+
+    @Override
+    public UserEntity validateSuperAdminEntity(Long superId) throws BadRequestException {
+        UserEntity userEntity = validateUser(superId);
+        if (userEntity.getRoleEntitySet().stream().noneMatch(e -> e.getRole().equals(UserRole.USER_ROLE_SUPER_ADMIN))) {
+            throw new BadRequestException(ExceptionConstants.INVALID_SUPER_ADMIN);
         }
         return userEntity;
     }

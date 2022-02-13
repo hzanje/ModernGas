@@ -9,6 +9,8 @@ public interface ValidationService {
 
     UserEntity validateAdminEntity(Long adminId) throws BadRequestException;
 
+    UserEntity validateSuperAdminEntity(Long superId) throws BadRequestException;
+
     AddressEntity validateAddressEntity(Long addressId) throws BadRequestException;
 
     CartEntity validateCartEntity(Long cartId) throws BadRequestException;

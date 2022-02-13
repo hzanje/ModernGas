@@ -5,6 +5,7 @@ public class ExceptionConstants {
     public static final String INVALID_USER = "Please Enter Valid User Id";
     public static final String INVALID_REGISTER_USER = "Please Enter Valid Register User";
     public static final String INVALID_ADMIN = "Please enter valid Admin Id";
+    public static final String INVALID_SUPER_ADMIN = "Please enter valid Super Admin Id";
     public static final String INVALID_EMPLOYEE = "Please enter valid Employee Id";
     public static final String INVALID_USER_ADMIN = "Please enter valid Admin for User";
     public static final String INVALID_USER_NAME = "Please enter valid UserName";

@@ -5,5 +5,5 @@ import com.moderngas.pojo.superadmin.AdminEntityDto;
 
 public interface SuperAdminService {
 
-    String createAdmin(AdminEntityDto adminEntityDto) throws BadRequestException;
+    String createAdmin(Long superId, AdminEntityDto adminEntityDto) throws BadRequestException;
 }

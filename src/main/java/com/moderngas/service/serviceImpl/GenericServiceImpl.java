@@ -116,37 +116,6 @@ public class GenericServiceImpl implements GenericService {
         }
         return userPrivilegeEntitySet;
     }
-
-    @Deprecated(forRemoval = true)
-    @Override
-    public UserEntity convertDtoToUserData(AdminEntityDto adminEntityDto) throws BadRequestException {
-        if (ObjectUtils.isEmpty(adminEntityDto.getMobileNumber())) {
-            throw new BadRequestException(ExceptionConstants.USER_MOBILE_IS_EMPTY);
-        }
-        UserEntity userEntity = new UserEntity();
-        Optional<UserEntity> user = userRepo.findByMobileNumber(adminEntityDto.getMobileNumber());
-        if (user.isPresent()) {
-            userEntity = user.get();
-        }
-        if (ObjectUtils.isEmpty(adminEntityDto.getEmail())) {
-            throw new BadRequestException(ExceptionConstants.USER_EMAIL_IS_EMPTY);
-        }
-        if (ObjectUtils.isEmpty(adminEntityDto.getRoles())) {
-            throw new BadRequestException(ExceptionConstants.USER_ROLE_IS_EMPTY);
-        }
-        if (CollectionUtils.isEmpty(adminEntityDto.getGasNameCylinderTypes())) {
-            throw new BadRequestException(ExceptionConstants.ADMIN_GAS_IS_EMPTY);
-        }
-        userEntity.setName(adminEntityDto.getName());
-        userEntity.setEmail(adminEntityDto.getEmail());
-        userEntity.setMobileNumber(adminEntityDto.getMobileNumber());
-        userEntity.setCompanyName(adminEntityDto.getCompanyName());
-        //userEntity.setRoleEntitySet(addUserRole(adminEntityDto.getRoles(), userEntity.getRoleEntitySet()));
-        userEntity.setContactPersonSet(adminEntityDto.getContactPersonSet());
-        userEntity.setAdminGasMappings(gasMappingByNameAndType(adminEntityDto.getGasNameCylinderTypes()));
-        return userEntity;
-    }
-
     /**
      * Get Gas Mapping By Name and Type(Category)
      * Create The Mapping of Admin Gas while creation of Admin
@@ -155,7 +124,8 @@ public class GenericServiceImpl implements GenericService {
      * @return AdminGasMapping Set
      * @throws BadRequestException
      */
-    private Set<AdminGasMapping> gasMappingByNameAndType(List<GasNameCylinderTypeDto> gasNameCylinderTypes) throws BadRequestException {
+    @Override
+    public Set<AdminGasMapping> gasMappingByNameAndType(List<GasNameCylinderTypeDto> gasNameCylinderTypes) throws BadRequestException {
         if (CollectionUtils.isEmpty(gasNameCylinderTypes)) {
             return Collections.emptySet();
         }

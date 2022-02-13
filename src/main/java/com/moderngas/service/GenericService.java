@@ -12,6 +12,7 @@ import com.moderngas.pojo.admin.FilterDto;
 import com.moderngas.pojo.admin.OnboardingDto;
 import com.moderngas.pojo.employee.PrivilegeDto;
 import com.moderngas.pojo.superadmin.AdminEntityDto;
+import com.moderngas.pojo.superadmin.GasNameCylinderTypeDto;
 import com.moderngas.pojo.user.*;
 
 import java.security.NoSuchAlgorithmException;
@@ -29,9 +30,9 @@ public interface GenericService {
 
     Set<UserPrivilegeEntity> addOrUpdateUserPrivilege(List<UserPrivilege> privilegeList) throws BadRequestException;
 
-    UserEntity convertDtoToUserData(AdminEntityDto adminEntityDto) throws BadRequestException;
-
     UserEntityResponseDto convertUserDataToDto(UserEntity clientEntity) throws BadRequestException;
+
+    Set<AdminGasMapping> gasMappingByNameAndType(List<GasNameCylinderTypeDto> gasNameCylinderTypes) throws BadRequestException;
 
     String encodeUserPassword(String password);
 

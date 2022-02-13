@@ -9,10 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
@@ -23,10 +20,11 @@ public class SuperAdminController {
     private SuperAdminService superAdminService;
 
     @Secured("ROLE_SUPER_ADMIN")
-    @PostMapping("/createAdmin")
-    public ResponseEntity<ResponseStatus> createAdmin(@RequestBody AdminEntityDto adminEntityDto) throws BadRequestException {
+    @PostMapping("/createAdmin/{superId}")
+    public ResponseEntity<ResponseStatus> createAdmin(@PathVariable("superId") Long superId,
+                                                      @RequestBody AdminEntityDto adminEntityDto) throws BadRequestException {
         log.info("SuperAdminController :: createAdmin >>> Start");
-        String response = superAdminService.createAdmin(adminEntityDto);
+        String response = superAdminService.createAdmin(superId, adminEntityDto);
         return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
     }
 }
