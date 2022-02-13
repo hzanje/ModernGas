@@ -101,6 +101,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         for (CylinderEntity cylinderEntity : cylinderEntityList) {
             cylinderEntity.setCylinderStatus(CylinderStatus.CYLINDER_STATUS_EMPTY);
             cylinderEntity.setAssignedUserId(null);
+            cylinderEntity.setAssignedUserName(null);
             CylinderInventoryDetailsEntity cylinderDetailsEntity = new CylinderInventoryDetailsEntity();
             if (cylinderEntity.getCylinderInventoryDetailsEntity() != null) {
                 cylinderDetailsEntity = cylinderEntity.getCylinderInventoryDetailsEntity();

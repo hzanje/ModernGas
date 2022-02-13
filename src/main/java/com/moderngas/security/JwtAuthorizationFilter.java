@@ -8,6 +8,7 @@ import com.moderngas.exception.BadRequestException;
 import com.moderngas.jpaentity.UserEntity;
 import com.moderngas.repository.UserRepo;
 import io.jsonwebtoken.ExpiredJwtException;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -16,10 +17,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 
 public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
@@ -32,8 +31,9 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         this.userRepo = userRepo;
     }
 
+    @SneakyThrows
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) {
         // Read the Authorization header, where the JWT token should be
         String header = request.getHeader(JwtProperties.HEADER_STRING);
 
@@ -54,13 +54,14 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
     private Authentication getUsernamePasswordAuthentication(HttpServletRequest request) {
         String token = request.getHeader(JwtProperties.HEADER_STRING)
                 .replace(JwtProperties.TOKEN_PREFIX, "");
+        String decryptedToken = AESUtil.decrypt(token);
 
         try {
             if (isTokenExist(token)) {
                 // parse the token and validate it
                 String userName = JWT.require(Algorithm.HMAC512(JwtProperties.SECRET.getBytes()))
                         .build()
-                        .verify(token)
+                        .verify(decryptedToken)
                         .getSubject();
 
                 // Search in the DB if we find the user by token subject (username)

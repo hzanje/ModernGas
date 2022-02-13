@@ -19,7 +19,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.util.CollectionUtils;
 
 import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -61,7 +60,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
     @SneakyThrows
     @Override
-    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
+    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) {
         /* Grab Principal */
         UserDetailsImpl principal = (UserDetailsImpl) authResult.getPrincipal();
 
@@ -73,10 +72,11 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                 .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.EXPIRATION_TIME))
                 .sign(Algorithm.HMAC512(JwtProperties.SECRET.getBytes()));
         Date expiredDate = new Date(System.currentTimeMillis() + JwtProperties.EXPIRATION_TIME);
-        saveUserToken(token, expiredDate, userEntity);
+        String encryptedToken = AESUtil.encrypt(token);
+        saveUserToken(encryptedToken, expiredDate, userEntity);
 
         /* Add token in Response */
-        response.addHeader(JwtProperties.HEADER_STRING, JwtProperties.TOKEN_PREFIX + token);
+        response.addHeader(JwtProperties.HEADER_STRING, JwtProperties.TOKEN_PREFIX + encryptedToken);
     }
 
     private void saveUserToken(String token, Date expiredDate, UserEntity userEntity) {

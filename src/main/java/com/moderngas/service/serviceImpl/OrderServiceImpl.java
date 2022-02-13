@@ -21,6 +21,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -147,15 +148,14 @@ public class OrderServiceImpl implements OrderService {
     public String updateOrderStatus(Long orderId, String status, Long deliveryVehicleId) throws BadRequestException {
         log.info("OrderService >>");
         OrderEntity orderEntity = validationService.validateOrderEntity(orderId);
-        DeliveryVehicleEntity deliveryVehicleEntity = validationService.validateDeliveryVehicleEntity(deliveryVehicleId);
-        OrderStatus orderStatus = validateOrderStatus(status);
-        String response = Constants.FAILURE_STR;
-        if (null != orderEntity) {
-            orderEntity = genericService.changeOrderStatus(orderEntity, orderStatus, deliveryVehicleEntity.getId());
-            orderRepo.save(orderEntity);
-            response = Constants.SUCCESS_STR;
+        DeliveryVehicleEntity deliveryVehicleEntity = new DeliveryVehicleEntity();
+        if (!ObjectUtils.isEmpty(deliveryVehicleId)) {
+            deliveryVehicleEntity = validationService.validateDeliveryVehicleEntity(deliveryVehicleId);
         }
-        return response;
+        OrderStatus orderStatus = validateOrderStatus(status);
+        orderEntity = genericService.changeOrderStatus(orderEntity, orderStatus, deliveryVehicleEntity.getId());
+        orderRepo.save(orderEntity);
+        return Constants.SUCCESS_STR;
     }
 
     @Override
