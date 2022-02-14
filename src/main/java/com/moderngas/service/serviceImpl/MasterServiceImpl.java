@@ -57,7 +57,7 @@ public class MasterServiceImpl implements MasterService {
     public List<String> getPrivilegeList() {
         List<String> privilegeList = new ArrayList<>();
         for (UserPrivilege userPrivilege : UserPrivilege.values()) {
-            privilegeList.add(userPrivilege.getPrivilege());
+            privilegeList.add(userPrivilege.getName());
         }
         return privilegeList;
     }
