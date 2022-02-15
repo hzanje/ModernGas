@@ -70,9 +70,12 @@ public class GenericServiceImpl implements GenericService {
         entity.setMobileNumber(userDto.getMobileNumber());
         entity.setEmail(userDto.getEmail());
         entity.setAdminIdSet(addOrUpdateUserAdmin(entity, adminEntity.getId()));
-        Set<String> privilegeSet = userDto.getPrivilegeDtoList().stream()
-                .filter(PrivilegeDto::isActive)
-                .map(PrivilegeDto::getPrivilege).collect(Collectors.toSet());
+        Set<String> privilegeSet = new HashSet<>();
+        if (!CollectionUtils.isEmpty(userDto.getPrivilegeDtoList())) {
+            privilegeSet = userDto.getPrivilegeDtoList().stream()
+                    .filter(PrivilegeDto::isActive)
+                    .map(PrivilegeDto::getPrivilege).collect(Collectors.toSet());
+        }
         entity.setRoleEntitySet(addOrUpdateUserRoleAndPrivilege(entity, privilegeSet, userRole));
         return entity;
     }
@@ -106,6 +109,7 @@ public class GenericServiceImpl implements GenericService {
         return roleEntitySet;
     }
 
+    @Secured("ROLE_EMPLOYEE")
     @Override
     public Set<UserPrivilegeEntity> addOrUpdateUserPrivilege(List<UserPrivilege> privilegeList) throws BadRequestException {
         Set<UserPrivilegeEntity> userPrivilegeEntitySet = new HashSet<>();
@@ -116,6 +120,7 @@ public class GenericServiceImpl implements GenericService {
         }
         return userPrivilegeEntitySet;
     }
+
     /**
      * Get Gas Mapping By Name and Type(Category)
      * Create The Mapping of Admin Gas while creation of Admin
@@ -539,7 +544,7 @@ public class GenericServiceImpl implements GenericService {
 
     @Override
     public Set<PrivilegeDto> convertToPrivilegeDto(Set<UserPrivilegeEntity> userPrivilegeEntitySet) throws BadRequestException {
-        return Arrays.stream(UserPrivilege.values()).map(e -> new PrivilegeDto(e.getPrivilege(),
+        return Arrays.stream(UserPrivilege.values()).map(e -> new PrivilegeDto(e.getName(),
                 userPrivilegeEntitySet.stream().anyMatch(p -> p.getPrivilege().equals(e.getPrivilege())))).collect(Collectors.toSet());
     }
 

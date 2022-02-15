@@ -63,6 +63,7 @@ public class AdminController {
      * @param userDto
      * @return
      */
+    @Secured("ROLE_USER")
     @PutMapping(value = "/updateUser/{adminId}")
     public ResponseEntity<ResponseStatus> updateUser(@PathVariable("adminId") Long adminId,
                                                      @RequestBody UserDto userDto) throws BadRequestException {
@@ -93,6 +94,7 @@ public class AdminController {
      * @param userDto
      * @return
      */
+    @Secured("ROLE_EMPLOYEE")
     @PostMapping("/updateEmployee/{adminId}")
     public ResponseEntity<?> updateEmployee(@PathVariable("adminId") Long adminId,
                                             @RequestBody UserDto userDto) throws BadRequestException {
@@ -108,7 +110,7 @@ public class AdminController {
      * @return
      * @throws BadRequestException
      */
-    @Secured({"ROLE_ADMIN", "ROLE_USER"})
+    @Secured("ROLE_ADMIN")
     @PostMapping("/addCylinder/{adminId}")
     public ResponseEntity<ResponseStatus> addCylinder(@PathVariable("adminId") Long adminId,
                                                       @RequestBody List<CylinderDto> cylinderDtoList) throws BadRequestException {

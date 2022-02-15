@@ -21,7 +21,6 @@ import java.security.spec.KeySpec;
 import java.util.Base64;
 
 @Component
-@PropertySource("application.properties")
 public class AESUtil {
 
     @Autowired

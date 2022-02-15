@@ -27,8 +27,9 @@ public class MethodSecurityConfig extends GlobalMethodSecurityConfiguration {
     public void SecurityConfig() {
         roleHierarchy.setHierarchy("ROLE_SUPER_ADMIN > ROLE_ADMIN and " +
                 "ROLE_ADMIN > ROLE_EMPLOYEE and " +
-                "ROLE_ADMIN > ROLE_USER" +
-                "ROLE_EMPLOYEE > Order");
+                "ROLE_ADMIN > ROLE_USER and " +
+                "ROLE_EMPLOYEE > ROLE_PRIVILEGE_ORDER and " +
+                "ROLE_EMPLOYEE > ROLE_PRIVILEGE_USER");
     }
 
     @Bean

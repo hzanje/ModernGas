@@ -5,12 +5,10 @@ import com.moderngas.constants.ExceptionConstants;
 import com.moderngas.enums.CylinderStatus;
 import com.moderngas.enums.UserRole;
 import com.moderngas.exception.BadRequestException;
-import com.moderngas.jpaentity.CylinderEntity;
-import com.moderngas.jpaentity.CylinderInventoryDetailsEntity;
-import com.moderngas.jpaentity.OrderEntity;
-import com.moderngas.jpaentity.UserEntity;
+import com.moderngas.jpaentity.*;
 import com.moderngas.pojo.UserDto;
 import com.moderngas.pojo.admin.CylinderInventoryDto;
+import com.moderngas.pojo.employee.EmployeeEntityResponseDto;
 import com.moderngas.pojo.user.UserSearchDto;
 import com.moderngas.repository.DeliveryVehicleRepo;
 import com.moderngas.repository.InventoryRepo;
@@ -78,6 +76,25 @@ public class EmployeeServiceImpl implements EmployeeService {
     public Page<UserSearchDto> getAllEmployeeByAdmin(Pageable pageable, String search, Long adminId) throws BadRequestException {
         UserEntity adminEntity = validationService.validateAdminEntity(adminId);
         return userRepo.getAllUserByAdmin(pageable, search, adminEntity.getId(), UserRole.USER_ROLE_EMPLOYEE.getRole());
+    }
+
+    @Override
+    public EmployeeEntityResponseDto getEmployeeById(Long employeeId) throws BadRequestException {
+        UserEntity employeeEntity = validationService.validateAdminEntity(employeeId);
+        EmployeeEntityResponseDto employeeEntityResponseDto = new EmployeeEntityResponseDto();
+        employeeEntityResponseDto.setId(employeeEntity.getId());
+        employeeEntityResponseDto.setName(employeeEntity.getName());
+        employeeEntityResponseDto.setMobileNumber(employeeEntity.getMobileNumber());
+        employeeEntityResponseDto.setEmail(employeeEntity.getEmail());
+        employeeEntityResponseDto.setCompany(employeeEntity.getCompanyName());
+        if (!CollectionUtils.isEmpty(employeeEntity.getRoleEntitySet())) {
+            UserRoleEntity employeeRole = employeeEntity.getRoleEntitySet().stream()
+                    .filter(e -> e.getRole().equals(UserRole.USER_ROLE_EMPLOYEE.getRole()))
+                    .findFirst()
+                    .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_EMPLOYEE));
+            employeeEntityResponseDto.setPrivilegeDtoSet(genericService.convertToPrivilegeDto(employeeRole.getUserPrivilegeSet()));
+        }
+        return employeeEntityResponseDto;
     }
 
     @Override

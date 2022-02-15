@@ -53,6 +53,13 @@ public class EmployeeController {
         PagedModel<EntityModel<UserSearchDto>> model = assembler.toModel(employeeSearchDtoList, link);
         return new ResponseEntity<>(model, HttpStatus.OK);
     }
+    @Secured("ROLE_EMPLOYEE")
+    @GetMapping("/getEmployeeById/{id}")
+    public ResponseEntity<?> getEmployeeById(@PathVariable("id") Long employeeId) throws BadRequestException {
+        log.info("EmployeeController :: getEmployeeById >>> {}", employeeId);
+        return new ResponseEntity<>(employeeService.getEmployeeById(employeeId), HttpStatus.OK);
+    }
+
 
     /**
      * Assigned Cylinder to Order.

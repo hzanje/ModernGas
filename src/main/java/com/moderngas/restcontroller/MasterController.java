@@ -58,7 +58,7 @@ public class MasterController {
     /**
      * @return
      */
-    @Secured("USER_ADMIN")
+    @Secured("ROLE_ADMIN")
     @GetMapping("/privilege")
     public ResponseEntity<?> getPrivilegeList() {
         log.info("MasterController :: getPrivilegeList >>> Start");
