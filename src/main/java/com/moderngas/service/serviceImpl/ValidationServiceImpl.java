@@ -10,6 +10,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Slf4j
 @Service
 public class ValidationServiceImpl implements ValidationService {
@@ -37,6 +39,14 @@ public class ValidationServiceImpl implements ValidationService {
 
     @Autowired
     private ResourceCentreRepo resourceCentreRepo;
+
+    @Override
+    public void checkUserAlreadyExistInSystem(Long mobileNumber) throws BadRequestException {
+        Optional<UserEntity> userEntity = userRepo.findByMobileNumber(mobileNumber);
+        if (userEntity.isPresent()) {
+            throw new BadRequestException(ExceptionConstants.USER_ALREADY_REGISTER);
+        }
+    }
 
     @Override
     public UserEntity validateUserEntity(Long userId) throws BadRequestException {

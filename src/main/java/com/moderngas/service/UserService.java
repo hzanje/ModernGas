@@ -20,8 +20,6 @@ public interface UserService {
 
     UserEntityResponseDto getUserById(Long userId) throws BadRequestException;
 
-    String checkUserExist(Long mobileNumber);
-
     UserEntity getUserByLoginId(Long username) throws BadRequestException;
 
     String changePassword(Long username, String newPassword) throws BadRequestException;

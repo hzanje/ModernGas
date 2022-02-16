@@ -9,7 +9,6 @@ import com.moderngas.repository.UserRepo;
 import com.moderngas.service.GenericService;
 import com.moderngas.service.SuperAdminService;
 import com.moderngas.service.ValidationService;
-import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;

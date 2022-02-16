@@ -1,9 +1,8 @@
 package com.moderngas.security;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
@@ -20,23 +19,21 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 import java.util.Base64;
 
+@Slf4j
 @Component
 public class AESUtil {
 
     @Autowired
     private Environment environment;
 
-    @Value("${cust.aes.secret.key}")
-    private static String SECRET_KEY;
+    @Value("${aes.secret.key}")
+    private static String secretKey;
 
-    @Value("${cust.aes.salt.value}")
-    private static String SALT_VALUE;
-
-    @Value("${spring.mail.username}")
-    private static String userName;
+    @Value("${aes.salt.value}")
+    private static String saltValue;
 
     /* Generate IV */
-    public static IvParameterSpec generateIv() throws NoSuchAlgorithmException {
+    public static IvParameterSpec generateIv() {
         byte[] iv = new byte[16];
         new SecureRandom().nextBytes(iv);
         return new IvParameterSpec(iv);
@@ -46,31 +43,8 @@ public class AESUtil {
     public static SecretKey generateKey(int n) throws NoSuchAlgorithmException {
         KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
         keyGenerator.init(n);
-        SecretKey key = keyGenerator.generateKey();
-        return key;
+        return keyGenerator.generateKey();
     }
-
-    /*public static String encrypt(String input) throws NoSuchPaddingException, NoSuchAlgorithmException,
-            InvalidAlgorithmParameterException, InvalidKeyException,
-            BadPaddingException, IllegalBlockSizeException {
-
-        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5PADDING");
-        cipher.init(Cipher.ENCRYPT_MODE, generateKey(256), generateIv());
-        byte[] cipherText = cipher.doFinal(input.getBytes());
-        return Base64.getEncoder()
-                .encodeToString(cipherText);
-    }*/
-
-    /*public static String decrypt(String cipherText) throws NoSuchPaddingException, NoSuchAlgorithmException,
-            InvalidAlgorithmParameterException, InvalidKeyException,
-            BadPaddingException, IllegalBlockSizeException {
-
-        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5PADDING");
-        cipher.init(Cipher.DECRYPT_MODE, generateKey(256), generateIv());
-        byte[] plainText = cipher.doFinal(Base64.getDecoder()
-                .decode(cipherText));
-        return new String(plainText);
-    }*/
 
     /* Encryption Method */
     public static String encrypt(String strToEncrypt)
@@ -79,22 +53,22 @@ public class AESUtil {
         {
             /* Declare a byte array. */
             byte[] iv = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-            IvParameterSpec ivspec = new IvParameterSpec(iv);
+            IvParameterSpec parameterSpec = new IvParameterSpec(iv);
             /* Create factory for secret keys. */
             SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
             /* PBEKeySpec class implements KeySpec interface. */
-            KeySpec spec = new PBEKeySpec("chaLLenge@Reek2022Encrypt".toCharArray(), "tokenModern".getBytes(), 65536, 256);
-            SecretKey tmp = factory.generateSecret(spec);
-            SecretKeySpec secretKey = new SecretKeySpec(tmp.getEncoded(), "AES");
+            KeySpec pbeKeySpec = new PBEKeySpec(secretKey.toCharArray(), saltValue.getBytes(), 65536, 256);
+            SecretKey secret = factory.generateSecret(pbeKeySpec);
+            SecretKeySpec keySpec = new SecretKeySpec(secret.getEncoded(), "AES");
             Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-            cipher.init(Cipher.ENCRYPT_MODE, secretKey, ivspec);
-            /* Retruns encrypted value. */
+            cipher.init(Cipher.ENCRYPT_MODE, keySpec, parameterSpec);
+            /* Return encrypted value. */
             return Base64.getEncoder()
                     .encodeToString(cipher.doFinal(strToEncrypt.getBytes(StandardCharsets.UTF_8)));
         }
         catch (InvalidAlgorithmParameterException | InvalidKeyException | NoSuchAlgorithmException | BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException | InvalidKeySpecException e)
         {
-            System.out.println("Error occurred during encryption: " + e.toString());
+            log.error("Error occurred during encryption: {}", e);
         }
         return null;
     }
@@ -106,21 +80,21 @@ public class AESUtil {
         {
             /* Declare a byte array. */
             byte[] iv = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-            IvParameterSpec ivspec = new IvParameterSpec(iv);
+            IvParameterSpec parameterSpec = new IvParameterSpec(iv);
             /* Create factory for secret keys. */
             SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
             /* PBEKeySpec class implements KeySpec interface. */
-            KeySpec spec = new PBEKeySpec("chaLLenge@Reek2022Encrypt".toCharArray(), "tokenModern".getBytes(), 65536, 256);
-            SecretKey tmp = factory.generateSecret(spec);
-            SecretKeySpec secretKey = new SecretKeySpec(tmp.getEncoded(), "AES");
+            KeySpec keySpec = new PBEKeySpec(secretKey.toCharArray(), saltValue.getBytes(), 65536, 256);
+            SecretKey secret = factory.generateSecret(keySpec);
+            SecretKeySpec secretKey = new SecretKeySpec(secret.getEncoded(), "AES");
             Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5PADDING");
-            cipher.init(Cipher.DECRYPT_MODE, secretKey, ivspec);
-            /* Retruns decrypted value. */
+            cipher.init(Cipher.DECRYPT_MODE, secretKey, parameterSpec);
+            /* Return decrypted value. */
             return new String(cipher.doFinal(Base64.getDecoder().decode(strToDecrypt)));
         }
         catch (InvalidAlgorithmParameterException | InvalidKeyException | NoSuchAlgorithmException | InvalidKeySpecException | BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException e)
         {
-            System.out.println("Error occured during decryption: " + e.toString());
+            log.info("Error occured during decryption: {}" + e);
         }
         return null;
     }

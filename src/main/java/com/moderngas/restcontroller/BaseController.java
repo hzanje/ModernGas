@@ -25,18 +25,6 @@ public class BaseController {
     @Autowired
     private UserService userService;
 
-    /**
-     * Check if User Exist in System.
-     *
-     * @param mobileNumber
-     * @return
-     */
-    @GetMapping(value = "/checkUserExist/{mobileNumber}")
-    public ResponseEntity<ResponseStatus> checkUserExist(@PathVariable("mobileNumber") Long mobileNumber) {
-        log.info("BaseController :: checkUserExist >>> Start ");
-        String response = userService.checkUserExist(mobileNumber);
-        return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
-    }
 
     /**
      * API for Forget Password.

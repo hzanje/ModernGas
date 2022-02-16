@@ -3,6 +3,7 @@ package com.moderngas.constants;
 public class ExceptionConstants {
 
     public static final String INVALID_USER = "Please Enter Valid User Id";
+    public static final String USER_ALREADY_REGISTER = "User With Same Mobile Number Already Exist";
     public static final String INVALID_REGISTER_USER = "Please Enter Valid Register User";
     public static final String INVALID_ADMIN = "Please enter valid Admin Id";
     public static final String INVALID_SUPER_ADMIN = "Please enter valid Super Admin Id";

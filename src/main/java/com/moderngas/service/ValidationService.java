@@ -5,6 +5,8 @@ import com.moderngas.jpaentity.*;
 
 public interface ValidationService {
 
+    void checkUserAlreadyExistInSystem(Long mobileNumber) throws BadRequestException;
+
     UserEntity validateUserEntity(Long userId) throws BadRequestException;
 
     UserEntity validateAdminEntity(Long adminId) throws BadRequestException;

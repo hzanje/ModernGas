@@ -19,7 +19,6 @@ import com.moderngas.service.EmailService;
 import com.moderngas.service.GenericService;
 import com.moderngas.service.UserService;
 import com.moderngas.service.ValidationService;
-import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,6 +73,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public String addUser(Long adminId, UserDto userDto) throws BadRequestException, NoSuchAlgorithmException {
         UserEntity adminEntity = validationService.validateAdminEntity(adminId);
+        validationService.checkUserAlreadyExistInSystem(userDto.getMobileNumber());
         UserEntity userEntity = new UserEntity();
         if (!ObjectUtils.isEmpty(userDto.getId())) {
             userEntity = validationService.validateUserEntity(userDto.getId());
@@ -108,16 +108,6 @@ public class UserServiceImpl implements UserService {
     public UserEntityResponseDto getUserById(Long userId) throws BadRequestException {
         UserEntity userEntity = validationService.validateUserEntity(userId);
         return genericService.convertUserDataToDto(userEntity);
-    }
-
-    @Override
-    public String checkUserExist(Long mobileNumber) {
-        String result = Constants.FAILURE_STR;
-        Optional<UserEntity> userEntity = userRepo.findByMobileNumber(mobileNumber);
-        if (userEntity.isPresent()) {
-            result = Constants.SUCCESS_STR;
-        }
-        return result;
     }
 
     @Override

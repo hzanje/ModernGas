@@ -13,7 +13,6 @@ import com.moderngas.pojo.admin.DeliveryVehicleDto;
 import com.moderngas.pojo.admin.FilterDto;
 import com.moderngas.pojo.admin.OnboardingDto;
 import com.moderngas.pojo.employee.PrivilegeDto;
-import com.moderngas.pojo.superadmin.AdminEntityDto;
 import com.moderngas.pojo.superadmin.GasNameCylinderTypeDto;
 import com.moderngas.pojo.user.*;
 import com.moderngas.repository.*;
@@ -96,14 +95,15 @@ public class GenericServiceImpl implements GenericService {
         if (!CollectionUtils.isEmpty(entity.getRoleEntitySet())) {
             roleEntitySet = entity.getRoleEntitySet();
         }
-        UserRoleEntity userRoleEntity = new UserRoleEntity();
+        UserRoleEntity userRoleEntity = roleEntitySet.stream().filter(e -> e.getRole().equals(userRole.getRole()))
+                .findAny().orElse(new UserRoleEntity());
         userRoleEntity.setRole(userRole.getRole());
         if (UserRole.USER_ROLE_EMPLOYEE == userRole && !CollectionUtils.isEmpty(privilegeSet)) {
             List<UserPrivilege> privilegeList = new ArrayList<>();
             for (String privilegeName : privilegeSet) {
                 privilegeList.add(UserPrivilege.getUserPrivilegeByName(privilegeName));
             }
-            userRoleEntity.setUserPrivilegeSet(addOrUpdateUserPrivilege(privilegeList));
+            userRoleEntity.setUserPrivilegeSet(addOrUpdateUserPrivilege(userRoleEntity.getUserPrivilegeSet(), privilegeList));
         }
         roleEntitySet.add(userRoleEntity);
         return roleEntitySet;
@@ -111,8 +111,8 @@ public class GenericServiceImpl implements GenericService {
 
     @Secured("ROLE_EMPLOYEE")
     @Override
-    public Set<UserPrivilegeEntity> addOrUpdateUserPrivilege(List<UserPrivilege> privilegeList) throws BadRequestException {
-        Set<UserPrivilegeEntity> userPrivilegeEntitySet = new HashSet<>();
+    public Set<UserPrivilegeEntity> addOrUpdateUserPrivilege(Set<UserPrivilegeEntity> existingPrivilege, List<UserPrivilege> privilegeList) throws BadRequestException {
+        Set<UserPrivilegeEntity> userPrivilegeEntitySet = CollectionUtils.isEmpty(existingPrivilege) ? new HashSet<>() : existingPrivilege;
         for (UserPrivilege userPrivilege : privilegeList) {
             UserPrivilegeEntity userPrivilegeEntity = new UserPrivilegeEntity();
             userPrivilegeEntity.setPrivilege(userPrivilege.getPrivilege());
@@ -238,11 +238,15 @@ public class GenericServiceImpl implements GenericService {
     }
 
     @Override
-    public Integer generateRandomOrderNumber() {
-        Random random = new Random();
-        int min = 0;
-        int max = 50000;
-        return random.ints(min,(max + 1)).findFirst().getAsInt();
+    public Integer generateRandomOrderNumber() throws BadRequestException {
+        try {
+            Random random = SecureRandom.getInstanceStrong();
+            int min = 0;
+            int max = 50000;
+            return random.ints(min,(max + 1)).findFirst().getAsInt();
+        } catch (NoSuchAlgorithmException e) {
+            throw new BadRequestException(e.getMessage());
+        }
     }
 
     @Override

@@ -49,6 +49,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public String addEmployee(Long adminId, UserDto userDto) throws BadRequestException, NoSuchAlgorithmException {
         UserEntity adminEntity = validationService.validateAdminEntity(adminId);
+        validationService.checkUserAlreadyExistInSystem(userDto.getMobileNumber());
         UserEntity employeeEntity = new UserEntity();
         if (!ObjectUtils.isEmpty(userDto.getId())) {
             employeeEntity = validationService.validateAdminEntity(userDto.getId());
