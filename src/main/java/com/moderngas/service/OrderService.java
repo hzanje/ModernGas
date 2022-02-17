@@ -26,7 +26,7 @@ public interface OrderService {
 
     String deleteCart(Long cartId) throws BadRequestException;
 
-    String placeOrderFromCart(Long userId, Long adminId, Long addressId) throws BadRequestException, NoSuchAlgorithmException;
+    String placeOrderFromCart(Long userId, Long adminId, Long addressId) throws BadRequestException;
 
     OrderDto getOrderDetailsById(Long orderId) throws BadRequestException;
 

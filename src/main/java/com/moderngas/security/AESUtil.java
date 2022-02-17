@@ -57,7 +57,8 @@ public class AESUtil {
             /* Create factory for secret keys. */
             SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
             /* PBEKeySpec class implements KeySpec interface. */
-            KeySpec pbeKeySpec = new PBEKeySpec(secretKey.toCharArray(), saltValue.getBytes(), 65536, 256);
+            //KeySpec pbeKeySpec = new PBEKeySpec(secretKey.toCharArray(), saltValue.getBytes(), 65536, 256);
+            KeySpec pbeKeySpec = new PBEKeySpec("chaLLenge@Reek2022Encrypt".toCharArray(), "tokenModern".getBytes(), 65536, 256);
             SecretKey secret = factory.generateSecret(pbeKeySpec);
             SecretKeySpec keySpec = new SecretKeySpec(secret.getEncoded(), "AES");
             Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
@@ -84,7 +85,8 @@ public class AESUtil {
             /* Create factory for secret keys. */
             SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
             /* PBEKeySpec class implements KeySpec interface. */
-            KeySpec keySpec = new PBEKeySpec(secretKey.toCharArray(), saltValue.getBytes(), 65536, 256);
+            //KeySpec keySpec = new PBEKeySpec(secretKey.toCharArray(), saltValue.getBytes(), 65536, 256);
+            KeySpec keySpec = new PBEKeySpec("chaLLenge@Reek2022Encrypt".toCharArray(), "tokenModern".getBytes(), 65536, 256);
             SecretKey secret = factory.generateSecret(keySpec);
             SecretKeySpec secretKey = new SecretKeySpec(secret.getEncoded(), "AES");
             Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5PADDING");

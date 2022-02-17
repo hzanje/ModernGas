@@ -41,8 +41,9 @@ public interface InventoryRepo extends JpaRepository<CylinderEntity, Long> {
     @Query(" FROM CylinderEntity WHERE code = :code")
     Optional<CylinderEntity> checkIfCylinderCodeExist(@Param("code") String code);
 
-    @Query(" FROM CylinderEntity WHERE code IN (:codeList)")
+    @Query("SELECT ce FROM CylinderEntity ce INNER JOIN ce.cylinderInventoryDetailsEntity WHERE ce.code IN (:codeList)")
     List<CylinderEntity> getCylinderFromCodeList(@Param("codeList") List<String> codeList);
+
 
     @Query("SELECT new com.moderngas.pojo.admin.CylinderInventoryDto(ce.id, ce.code, ce.cylinderStatus, ue.id, ue.name, ce.cylinderInventoryDetailsEntity.isTransit, ce.cylinderInventoryDetailsEntity.resourceCentreEntity.id, ce.cylinderInventoryDetailsEntity.resourceCentreEntity.name) FROM CylinderEntity ce " +
             "LEFT JOIN UserEntity ue ON ce.assignedUserId = ue.id ")
@@ -53,7 +54,7 @@ public interface InventoryRepo extends JpaRepository<CylinderEntity, Long> {
             "WHERE ce.assignedUserId=:assignedUserId")
     List<CylinderInventoryDto> getAssignedCylinderByUserId(@Param("assignedUserId") Long assignedUserId);
 
-    @Query(value = QUERIES.FETCH_CYLINDER_BY_RESOURCE_CENTRE_AND_STATUS)
+    @Query(value = QUERIES.FETCH_CYLINDER_BY_RESOURCE_CENTRE_AND_STATUS, countQuery = QUERIES.FETCH_CYLINDER_BY_RESOURCE_CENTRE_AND_STATUS_COUNT)
     Page<CylinderInventoryDto> fetchCylinderFromResourceCentreByIdAndStatus(Pageable pageable,
                                                                             @Param("search") String search,
                                                                             @Param("resourceCentreIds") Set<Long> resourceCentreId,
@@ -70,11 +71,19 @@ public interface InventoryRepo extends JpaRepository<CylinderEntity, Long> {
 
         private static final String FETCH_CYLINDER_BY_RESOURCE_CENTRE = "SELECT new com.moderngas.pojo.admin.CylinderInventoryDto(ce.id, ce.code, ce.cylinderStatus, ue.id, ue.name, ce.cylinderInventoryDetailsEntity.isTransit, ce.cylinderInventoryDetailsEntity.resourceCentreEntity.id, ce.cylinderInventoryDetailsEntity.resourceCentreEntity.name) FROM UserEntity ue " +
                 "INNER JOIN ue.cylinderEntitySet ce " +
-                "WHERE ue.id = :adminId " +
-                "AND (:search IS NULL OR ce.code LIKE :search%) " +
+                "WHERE ue.id = :adminId ";
+
+        private static final String FETCH_CYLINDER_BY_RESOURCE_CENTRE_COUNT = "SELECT COUNT(*) FROM UserEntity ue " +
+                "INNER JOIN ue.cylinderEntitySet ce " +
+                "WHERE ue.id = :adminId ";
+
+        private static final String FETCH_CYLINDER_BY_RESOURCE_CENTRE_AND_SEARCH = "AND (:search IS NULL OR ce.code LIKE :search%) " +
                 "AND ce.cylinderInventoryDetailsEntity.resourceCentreEntity.id IN :resourceCentreIds ";
 
-        private static final String FETCH_CYLINDER_BY_RESOURCE_CENTRE_AND_STATUS = FETCH_CYLINDER_BY_RESOURCE_CENTRE + " AND (:cylinderStatus IS NULL OR ce.cylinderStatus = :cylinderStatus) ";
+        private static final String FETCH_CYLINDER_BY_RESOURCE_CENTRE_AND_STATUS = FETCH_CYLINDER_BY_RESOURCE_CENTRE + FETCH_CYLINDER_BY_RESOURCE_CENTRE_AND_SEARCH + " AND (:cylinderStatus IS NULL OR ce.cylinderStatus = :cylinderStatus) ";
+
+        private static final String FETCH_CYLINDER_BY_RESOURCE_CENTRE_AND_STATUS_COUNT = FETCH_CYLINDER_BY_RESOURCE_CENTRE_COUNT + FETCH_CYLINDER_BY_RESOURCE_CENTRE_AND_SEARCH + " AND (:cylinderStatus IS NULL OR ce.cylinderStatus = :cylinderStatus) ";
+
 
         private QUERIES() {
         }
