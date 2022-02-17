@@ -19,7 +19,7 @@ public class CylinderInventoryDetailsEntity extends BaseEntity {
     @JoinColumn(name = "delivery_vehicle_id", referencedColumnName = "id")
     private DeliveryVehicleEntity deliveryVehicleEntity;
 
-    @OneToOne(cascade = {CascadeType.DETACH, CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.REMOVE}, fetch = FetchType.EAGER, orphanRemoval = true)
+    @OneToOne(cascade = {CascadeType.DETACH, CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.REMOVE}, fetch = FetchType.EAGER)
     @JoinColumn(name = "resource_centre_id", referencedColumnName = "id")
     private ResourceCentreEntity resourceCentreEntity;
 

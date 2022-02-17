@@ -41,7 +41,7 @@ public interface InventoryRepo extends JpaRepository<CylinderEntity, Long> {
     @Query(" FROM CylinderEntity WHERE code = :code")
     Optional<CylinderEntity> checkIfCylinderCodeExist(@Param("code") String code);
 
-    @Query("SELECT ce FROM CylinderEntity ce INNER JOIN ce.cylinderInventoryDetailsEntity WHERE ce.code IN (:codeList)")
+    @Query("SELECT ce FROM CylinderEntity ce INNER JOIN ce.cylinderInventoryDetailsEntity WHERE ce.code IN :codeList")
     List<CylinderEntity> getCylinderFromCodeList(@Param("codeList") List<String> codeList);
 
 

@@ -84,9 +84,9 @@ public class ResourceCentreServiceImpl implements ResourceCentreService {
             return Constants.FAILURE_STR;
         }
         for (CylinderEntity cylinderEntity : cylinderEntityList) {
-            CylinderInventoryDetailsEntity cylinderInventoryEntity = new CylinderInventoryDetailsEntity();
-            if (null != cylinderEntity.getCylinderInventoryDetailsEntity()) {
-                cylinderInventoryEntity = cylinderEntity.getCylinderInventoryDetailsEntity();
+            CylinderInventoryDetailsEntity cylinderInventoryEntity = cylinderEntity.getCylinderInventoryDetailsEntity();
+            if (null == cylinderEntity.getCylinderInventoryDetailsEntity()) {
+                cylinderInventoryEntity = new CylinderInventoryDetailsEntity();
             }
             cylinderInventoryEntity.setTransit(false);
             cylinderInventoryEntity.setDeliveryVehicleEntity(null);

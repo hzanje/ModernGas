@@ -20,7 +20,6 @@ public class UserDto {
     @NonNull
     private String email;
 
-    @NonNull
     private String companyName;
 
     private String password;

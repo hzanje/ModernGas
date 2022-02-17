@@ -1,11 +1,14 @@
 package com.moderngas.security;
 
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
@@ -23,14 +26,21 @@ import java.util.Base64;
 @Component
 public class AESUtil {
 
-    @Autowired
-    private Environment environment;
-
-    @Value("${aes.secret.key}")
     private static String secretKey;
 
-    @Value("${aes.salt.value}")
     private static String saltValue;
+
+    @Autowired
+    public AESUtil(@Value("${aes.secret.key}") String key,
+                   @Value("${aes.salt.value}") String salt) {
+        this.secretKey = key;
+        this.saltValue = salt;
+    }
+
+    @PostConstruct
+    public void init() {
+        log.info("AESUtil >>> Started");
+    }
 
     /* Generate IV */
     public static IvParameterSpec generateIv() {
@@ -57,8 +67,8 @@ public class AESUtil {
             /* Create factory for secret keys. */
             SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
             /* PBEKeySpec class implements KeySpec interface. */
-            //KeySpec pbeKeySpec = new PBEKeySpec(secretKey.toCharArray(), saltValue.getBytes(), 65536, 256);
-            KeySpec pbeKeySpec = new PBEKeySpec("chaLLenge@Reek2022Encrypt".toCharArray(), "tokenModern".getBytes(), 65536, 256);
+            KeySpec pbeKeySpec = new PBEKeySpec(secretKey.toCharArray(), saltValue.getBytes(), 65536, 256);
+            //KeySpec pbeKeySpec = new PBEKeySpec("chaLLenge@Reek2022Encrypt".toCharArray(), "tokenModern".getBytes(), 65536, 256);
             SecretKey secret = factory.generateSecret(pbeKeySpec);
             SecretKeySpec keySpec = new SecretKeySpec(secret.getEncoded(), "AES");
             Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
@@ -85,8 +95,8 @@ public class AESUtil {
             /* Create factory for secret keys. */
             SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
             /* PBEKeySpec class implements KeySpec interface. */
-            //KeySpec keySpec = new PBEKeySpec(secretKey.toCharArray(), saltValue.getBytes(), 65536, 256);
-            KeySpec keySpec = new PBEKeySpec("chaLLenge@Reek2022Encrypt".toCharArray(), "tokenModern".getBytes(), 65536, 256);
+            KeySpec keySpec = new PBEKeySpec(secretKey.toCharArray(), saltValue.getBytes(), 65536, 256);
+            //KeySpec keySpec = new PBEKeySpec("chaLLenge@Reek2022Encrypt".toCharArray(), "tokenModern".getBytes(), 65536, 256);
             SecretKey secret = factory.generateSecret(keySpec);
             SecretKeySpec secretKey = new SecretKeySpec(secret.getEncoded(), "AES");
             Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5PADDING");
