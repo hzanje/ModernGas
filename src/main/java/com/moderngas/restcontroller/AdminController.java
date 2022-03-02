@@ -115,7 +115,7 @@ public class AdminController {
     public ResponseEntity<ResponseStatus> addCylinder(@PathVariable("adminId") Long adminId,
                                                       @RequestBody List<CylinderDto> cylinderDtoList) throws BadRequestException {
         log.info("AdminController :: addCylinder >>> Start ");
-        return new ResponseEntity<>(new ResponseStatus(inventoryService.addCylinder(adminId, cylinderDtoList)), HttpStatus.OK);
+        return new ResponseEntity<>(new ResponseStatus(inventoryService.addAdminCylinder(adminId, cylinderDtoList)), HttpStatus.OK);
     }
 
     /**

@@ -2,13 +2,16 @@ package com.moderngas.jpaentity;
 
 import com.moderngas.enums.CylinderStatus;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import net.minidev.json.annotate.JsonIgnore;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.util.Date;
 
-@Data
+@Getter @Setter
 @Entity
 @Where(clause = "active_flag = 1")
 @Table(name = "cylinder")
@@ -50,7 +53,13 @@ public class CylinderEntity extends BaseEntity {
     @Enumerated(EnumType.ORDINAL)
     private CylinderStatus cylinderStatus;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
+    private UserEntity userEntity;
+
     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "cylinder_detail_id", referencedColumnName = "id")
     private CylinderInventoryDetailsEntity cylinderInventoryDetailsEntity;
+
 }
+

@@ -1,7 +1,6 @@
 package com.moderngas.jpaentity;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
@@ -9,8 +8,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Data
-@NoArgsConstructor
+@Getter
+@Setter
 @Where(clause = "active_flag = 1")
 @Table(name = "user")
 public class UserEntity extends BaseEntity {
@@ -58,12 +57,12 @@ public class UserEntity extends BaseEntity {
     @JoinColumn(name = "admin_id", referencedColumnName = "id", nullable = false)
     private Set<AdminGasMapping> adminGasMappings;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "userEntity",  orphanRemoval = true)
+    //@JoinColumn(name = "user_id", nullable = false)
     private Set<CylinderEntity> cylinderEntitySet;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "userEntity", orphanRemoval = true)
+    //@JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     private Set<ResourceCentreEntity> resourceCentreEntitySet;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)

@@ -55,7 +55,7 @@ public interface GenericService {
 
     CartDto convertCartEntityToDto(CartEntity cartEntity);
 
-    CylinderEntity convertDtoToCylinderEntity(CylinderDto cylinderDto) throws BadRequestException;
+    CylinderEntity convertDtoToCylinderEntity(CylinderDto cylinderDto, String role) throws BadRequestException;
 
     List<OrderEntity> convertCartToOrderEntity(List<CartEntity> cartEntityList, Long addressId) throws BadRequestException;
 

@@ -402,8 +402,11 @@ public class GenericServiceImpl implements GenericService {
     }
 
     @Override
-    public CylinderEntity convertDtoToCylinderEntity(CylinderDto cylinderDto) throws BadRequestException {
-        ResourceCentreEntity resourceCentreEntity = validationService.validateResourceCentreEntity(cylinderDto.getResourceCentreId());
+    public CylinderEntity convertDtoToCylinderEntity(CylinderDto cylinderDto, String requestedRole) throws BadRequestException {
+        ResourceCentreEntity resourceCentreEntity = null;
+        if (!requestedRole.equals(UserRole.USER_ROLE_USER.getRole())) {
+            resourceCentreEntity = validationService.validateResourceCentreEntity(cylinderDto.getResourceCentreId());
+        }
         CylinderEntity cylinderEntity = new CylinderEntity();
         if (!inventoryRepo.checkIfCylinderCodeExist(cylinderDto.getCylinderCode()).isPresent()) {
             CylinderStatus cylinderStatus = CylinderStatus.getByStatus(cylinderDto.getStatus());

@@ -1,16 +1,16 @@
 package com.moderngas.jpaentity;
 
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @NoArgsConstructor
-@Data
+@Getter @Setter
 @Entity
 @SQLDelete(sql = "UPDATE resource_centre a SET active_flag = 0 WHERE id = ? ")
 @Where(clause = "active_flag = 1")
@@ -22,6 +22,10 @@ public class ResourceCentreEntity extends BaseEntity {
 
     @Column(name = "alias")
     private String alias;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
+    private UserEntity userEntity;
 
     public ResourceCentreEntity(Long id, String name, String alias) {
         this.id = id;

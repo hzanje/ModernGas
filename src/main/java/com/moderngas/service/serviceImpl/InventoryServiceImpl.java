@@ -2,6 +2,7 @@ package com.moderngas.service.serviceImpl;
 
 import com.moderngas.constants.Constants;
 import com.moderngas.constants.ExceptionConstants;
+import com.moderngas.enums.UserRole;
 import com.moderngas.exception.BadRequestException;
 import com.moderngas.jpaentity.CylinderEntity;
 import com.moderngas.jpaentity.UserEntity;
@@ -44,21 +45,32 @@ public class InventoryServiceImpl implements InventoryService {
     private GenericService genericService;
 
     @Override
-    public String addCylinder(Long adminId, List<CylinderDto> cylinderDtoList) throws BadRequestException {
+    public String addAdminCylinder(Long adminId, List<CylinderDto> cylinderDtoList) throws BadRequestException {
         if (CollectionUtils.isEmpty(cylinderDtoList)) {
             throw new BadRequestException(ExceptionConstants.INVALID_REQUEST_DATA);
         }
-
         UserEntity adminEntity = validationService.validateAdminEntity(adminId);
+        return addCylinders(adminEntity, cylinderDtoList, UserRole.USER_ROLE_ADMIN.getRole());
+    }
+
+    @Override
+    public String addUserCylinder(Long userId, List<CylinderDto> cylinderDtoList) throws BadRequestException {
+        if (CollectionUtils.isEmpty(cylinderDtoList)) {
+            throw new BadRequestException(ExceptionConstants.INVALID_REQUEST_DATA);
+        }
+        UserEntity userEntity = validationService.validateUserEntity(userId);
+        return addCylinders(userEntity, cylinderDtoList, UserRole.USER_ROLE_USER.getRole());
+    }
+
+    private String addCylinders(UserEntity entity, List<CylinderDto> cylinderDtoList, String requestedRole) throws BadRequestException {
         List<CylinderEntity> cylinderEntityList = new ArrayList<>();
         for (CylinderDto cylinderDto : cylinderDtoList) {
-            cylinderEntityList.add(genericService.convertDtoToCylinderEntity(cylinderDto));
+            cylinderEntityList.add(genericService.convertDtoToCylinderEntity(cylinderDto, requestedRole));
         }
-        Set<CylinderEntity> cylinderEntitySet = adminEntity.getCylinderEntitySet();
+        Set<CylinderEntity> cylinderEntitySet = entity.getCylinderEntitySet();
         cylinderEntitySet.addAll(cylinderEntityList);
-        adminEntity.setCylinderEntitySet(cylinderEntitySet);
-        userRepo.save(adminEntity);
-
+        entity.setCylinderEntitySet(cylinderEntitySet);
+        userRepo.save(entity);
         return Constants.SUCCESS_STR;
     }
 

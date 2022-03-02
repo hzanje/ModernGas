@@ -10,7 +10,9 @@ import java.util.Set;
 
 public interface InventoryService {
 
-    String addCylinder(Long adminId, List<CylinderDto> cylinderDtoList) throws BadRequestException;
+    String addAdminCylinder(Long adminId, List<CylinderDto> cylinderDtoList) throws BadRequestException;
+
+    String addUserCylinder(Long adminId, List<CylinderDto> cylinderDtoList) throws BadRequestException;
 
     List<CylinderInventoryDto> getInventoryCylinderForAdmin(Long adminId);
 

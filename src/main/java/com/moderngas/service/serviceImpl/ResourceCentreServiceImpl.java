@@ -92,6 +92,11 @@ public class ResourceCentreServiceImpl implements ResourceCentreService {
             cylinderInventoryEntity.setDeliveryVehicleEntity(null);
             cylinderInventoryEntity.setResourceCentreEntity(resourceCentreEntity);
             cylinderEntity.setCylinderInventoryDetailsEntity(cylinderInventoryEntity);
+            // Add only other's owner cylinder
+            if (!resourceCentreEntity.getUserEntity().getId().equals(cylinderEntity.getUserEntity().getId())) {
+                cylinderEntity.setAssignedUserId(resourceCentreEntity.getUserEntity().getId());
+                cylinderEntity.setAssignedUserName(resourceCentreEntity.getUserEntity().getName());
+            }
         }
         inventoryRepo.saveAll(cylinderEntityList);
         return Constants.SUCCESS_STR;

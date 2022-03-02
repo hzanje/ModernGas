@@ -102,6 +102,15 @@
             <artifactId>firebase-admin</artifactId>
             <version>8.1.0</version>
         </dependency>
-
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+        <finalName>reek-cylinder-ims</finalName>
+    </build>
 </project>
