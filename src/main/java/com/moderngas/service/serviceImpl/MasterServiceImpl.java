@@ -7,16 +7,18 @@ import com.moderngas.enums.UserPrivilege;
 import com.moderngas.pojo.NameIdDto;
 import com.moderngas.repository.GasRepo;
 import com.moderngas.service.MasterService;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Slf4j
 @Service
 public class MasterServiceImpl implements MasterService {
+
+    private static Logger log = LoggerFactory.getLogger(MasterServiceImpl.class.getName());
 
     @Autowired
     private GasRepo gasRepo;

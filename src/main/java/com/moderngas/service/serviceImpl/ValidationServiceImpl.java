@@ -6,15 +6,17 @@ import com.moderngas.exception.BadRequestException;
 import com.moderngas.jpaentity.*;
 import com.moderngas.repository.*;
 import com.moderngas.service.ValidationService;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
-@Slf4j
 @Service
 public class ValidationServiceImpl implements ValidationService {
+
+    private static Logger log = LoggerFactory.getLogger(ValidationService.class.getName());
 
     @Autowired
     private UserRepo userRepo;

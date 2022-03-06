@@ -8,8 +8,9 @@ import com.moderngas.pojo.user.UserSearchDto;
 import com.moderngas.service.GenericService;
 import com.moderngas.service.InventoryService;
 import com.moderngas.service.UserService;
-import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -29,10 +30,11 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 
-@Slf4j
 @RestController
 @RequestMapping(value = "/client", produces = "application/json")
 public class UserController {
+
+    private static Logger log = LoggerFactory.getLogger(UserController.class.getName());
 
     @Autowired
     private UserService userService;
@@ -56,7 +58,7 @@ public class UserController {
                                                                            @RequestParam(value = "page", defaultValue = "0") Integer page,
                                                                            @RequestParam(value = "search", required = false) String search,
                                                                            @RequestParam(value = "adminId") Long adminId) throws BadRequestException {
-        log.info("UserController :: getAllClient >>> Start ");
+        log.info("UserController :: getAllClient >>> Admin Id : {} and search : {}", adminId, search);
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "createdDate"));
         Page<UserSearchDto> userSearchDtoList = userService.getAllUserByAdmin(pageable, search, adminId);
         Link link = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(UserController.class)
@@ -74,7 +76,7 @@ public class UserController {
      */
     @GetMapping(value = "/getClientById/{userId}")
     public ResponseEntity<?> getClientById(@PathVariable("userId") Long userId) throws BadRequestException {
-        log.info("UserController :: getClientById >>> Start");
+        log.info("UserController :: getClientById >>> userId : {}", userId);
         return new ResponseEntity<>(userService.getUserById(userId), HttpStatus.OK);
     }
 
@@ -86,7 +88,7 @@ public class UserController {
      */
     @GetMapping(value = "/getUser")
     public ResponseEntity<?> getUser(@RequestParam("userName") Long userName) throws BadRequestException {
-        log.info("UserController :: getUser >>> Start");
+        log.info("UserController :: getUser >>> userName : {}", userName);
         return new ResponseEntity<>(genericService.convertUserDataToDto(userService.getUserByLoginId(userName)), HttpStatus.OK);
     }
 
@@ -101,7 +103,7 @@ public class UserController {
     @PostMapping(value = "/changePassword")
     public ResponseEntity<ResponseStatus> changePassword(@RequestParam("userName") final Long username,
                                                          @RequestParam("newPassword") final String newPassword) throws BadRequestException {
-        log.info("UserController :: changePassword >>> Start");
+        log.info("UserController :: changePassword >>> userName : {}", username);
         String response = userService.changePassword(username, newPassword);
         return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
     }
@@ -116,7 +118,7 @@ public class UserController {
     @GetMapping(value = "/getUserDashboard")
     public ResponseEntity<?> getUserDashboard(@RequestParam("id") Long userId,
                                               @RequestParam("adminId") Long adminId) throws BadRequestException {
-        log.info("UserController :: getUserDashboard >>> Start");
+        log.info("UserController :: getUserDashboard >>> userId : {}, adminId : {}", userId, adminId);
         return new ResponseEntity<>(userService.getUserDashboard(userId, adminId), HttpStatus.OK);
     }
 
@@ -129,7 +131,7 @@ public class UserController {
     @GetMapping(value = "/getGasListByCategoryId")
     public ResponseEntity<?> getGasListByCategoryId(@RequestParam("id") Long categoryId,
                                                     @RequestParam("adminId") Long adminId) throws BadRequestException {
-        log.info("UserController :: getGasListByCategoryId >>> Start");
+        log.info("UserController :: getGasListByCategoryId >>> categoryId : {}, adminId : {}", categoryId, adminId);
         return new ResponseEntity<>(userService.getGasListByCategoryId(categoryId, adminId), HttpStatus.OK);
     }
 
@@ -143,7 +145,7 @@ public class UserController {
      */
     @GetMapping(value = "/getGasDetailsById")
     public ResponseEntity<?> getGasDetailsById(@RequestParam("id") Long id, @RequestParam("adminId") Long adminId) throws BadRequestException {
-        log.info("UserController :: getGasDetailsById >>> Start");
+        log.info("UserController :: getGasDetailsById >>> GasId : {}, AdminId : {}",id, adminId);
         return new ResponseEntity<>(userService.getGasDetailsById(id, adminId), HttpStatus.OK);
     }
 
@@ -159,7 +161,7 @@ public class UserController {
     @PostMapping(value = "/address/{userId}")
     public ResponseEntity<ResponseStatus> addOrUpdateAddress(@RequestBody AddressDto addressDto,
                                                              @PathVariable("userId") final Long userId) throws BadRequestException {
-        log.info("UserController :: updateAddress >>> Start");
+        log.info("UserController :: updateAddress >>> User : {}", userId);
         String response = userService.addOrUpdateAddress(addressDto, userId);
         return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
     }
@@ -173,7 +175,7 @@ public class UserController {
      */
     @GetMapping(value = "/address/{userId}")
     public ResponseEntity<?> getAddress(@PathVariable("userId") final Long userId) throws BadRequestException {
-        log.info("UserController :: getAddress >>> Start");
+        log.info("UserController :: getAddress >>> userId : {}", userId);
         JSONObject obj = userService.getAddress(userId);
         if (obj.containsKey("message")) {
             return new ResponseEntity<>(obj, HttpStatus.BAD_REQUEST);
@@ -190,6 +192,7 @@ public class UserController {
      */
     @DeleteMapping(value = "/address/{id}")
     public ResponseEntity<ResponseStatus> deleteUserAddress(@PathVariable("id") Long id) {
+        log.info("UserController :: deleteUserAddress >>> Address : {}", id);
         String response = userService.deleteUserAddress(id);
         return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
     }
@@ -205,6 +208,7 @@ public class UserController {
     @GetMapping(value = "/inventory")
     public ResponseEntity<?> getUserInventory(@RequestParam("id") Long id,
                                               @RequestParam("adminId") Long adminId) throws BadRequestException {
+        log.info("UserController :: getUserInventory >>> UserId : {}, AdminId : {}", id, adminId);
         return new ResponseEntity<>(inventoryService.getUserInventory(id, adminId), HttpStatus.OK);
     }
 
@@ -219,7 +223,7 @@ public class UserController {
     @PostMapping("/addCylinder/{userId}")
     public ResponseEntity<ResponseStatus> addCylinder(@PathVariable("userId") Long userId,
                                                       @RequestBody List<CylinderDto> cylinderDtoList) throws BadRequestException {
-        log.info("UserController :: addCylinder >>> Start ");
+        log.info("UserController :: addCylinder >>> UserId :{} ", userId);
         return new ResponseEntity<>(new ResponseStatus(inventoryService.addUserCylinder(userId, cylinderDtoList)), HttpStatus.OK);
     }
 }

@@ -1,6 +1,7 @@
 package com.moderngas.jpaentity;
 
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;

@@ -1,10 +1,8 @@
 package com.moderngas.jpaentity;
 
 import com.moderngas.enums.CylinderStatus;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 import net.minidev.json.annotate.JsonIgnore;
 import org.hibernate.annotations.Where;
 

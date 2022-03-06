@@ -15,7 +15,8 @@ import com.moderngas.service.GenericService;
 import com.moderngas.service.OrderService;
 import com.moderngas.service.ValidationService;
 import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,13 +24,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
-@Slf4j
 @Service
 public class OrderServiceImpl implements OrderService {
+
+    private static Logger log = LoggerFactory.getLogger(OrderServiceImpl.class.getName());
 
     @Autowired
     private GenericService genericService;

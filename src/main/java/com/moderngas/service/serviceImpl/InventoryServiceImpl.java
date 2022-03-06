@@ -15,7 +15,8 @@ import com.moderngas.service.GenericService;
 import com.moderngas.service.InventoryService;
 import com.moderngas.service.UserService;
 import com.moderngas.service.ValidationService;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -25,9 +26,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-@Slf4j
 @Service
 public class InventoryServiceImpl implements InventoryService {
+
+    private static Logger log = LoggerFactory.getLogger(InventoryService.class.getName());
 
     @Autowired
     private UserService userService;

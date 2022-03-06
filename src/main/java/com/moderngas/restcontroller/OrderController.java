@@ -7,7 +7,8 @@ import com.moderngas.pojo.ResponseStatus;
 import com.moderngas.pojo.user.CartDto;
 import com.moderngas.pojo.user.OrderDto;
 import com.moderngas.service.OrderService;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -25,14 +26,13 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
-
-@Slf4j
 @RestController
 @RequestMapping(value = "/order", produces = "application/json")
 public class OrderController {
+
+    private static Logger log = LoggerFactory.getLogger(OrderController.class.getName());
 
     @Autowired
     private OrderService orderService;
@@ -45,7 +45,7 @@ public class OrderController {
      */
     @PostMapping("/order")
     public ResponseEntity<ResponseStatus> placeOrder(@RequestBody OrderDto orderDto) throws BadRequestException {
-        log.info("OrderController :: placeOrder >>> Start");
+        log.info("OrderController :: placeOrder >>>");
         String response = orderService.placeOrder(orderDto);
         return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
     }
@@ -59,7 +59,7 @@ public class OrderController {
      */
     @DeleteMapping("/order/{id}")
     public ResponseEntity<ResponseStatus> deleteOrder(@PathVariable("id") Long orderId) throws BadRequestException {
-        log.info("OrderController :: deleteOrder >>> Start");
+        log.info("OrderController :: deleteOrder >>> OrderId : {}", orderId);
         String response = orderService.deleteOrder(orderId);
         return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
     }
@@ -73,7 +73,7 @@ public class OrderController {
      */
     @GetMapping("/userOrderList")
     public ResponseEntity<?> getOrderListByUser(@RequestParam("id") Long userId, @RequestParam("adminId") Long adminId) throws BadRequestException {
-        log.info("OrderController :: getOrderListByUser >>> Start");
+        log.info("OrderController :: getOrderListByUser >>> UserId : {}, AdminId : {}", userId, adminId);
         return new ResponseEntity<>(orderService.getOrderListByUser(userId, adminId), HttpStatus.OK);
     }
 
@@ -102,7 +102,7 @@ public class OrderController {
                                                                                                   @RequestParam(value = "id") Long id,
                                                                                                   @RequestParam(value = "quantityOrdering", required = false) String quantityOrder) throws JsonProcessingException, BadRequestException {
 
-        log.info("AdminController :: getAllOrderList >>> Start");
+        log.info("AdminController :: getAllOrderList >>> OrderId : {}", id);
         Sort sortOrdering = getSortingOrder(quantityOrder);
         Pageable pageable = PageRequest.of(page, size, sortOrdering);
         Page<com.moderngas.pojo.admin.OrderDto> orderDtoList = orderService.getAllOrderListForAdmin(pageable, status, cylinderType, search, id, quantityOrder);
@@ -136,7 +136,7 @@ public class OrderController {
      */
     @PostMapping("/cart")
     public ResponseEntity<ResponseStatus> addOrUpdateCart(@RequestBody CartDto cartDto) throws BadRequestException {
-        log.info("OrderController :: addOrUpdateCart >>> Start");
+        log.info("OrderController :: addOrUpdateCart >>>");
         String response = orderService.addOrUpdateCart(cartDto);
         return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
     }
@@ -150,7 +150,7 @@ public class OrderController {
      */
     @DeleteMapping("/cart/{id}")
     public ResponseEntity<ResponseStatus> deleteCart(@PathVariable("id") Long cartId) throws BadRequestException {
-        log.info("OrderController :: deleteCart >>> Start");
+        log.info("OrderController :: deleteCart >>> CartId : {}", cartId);
         String response = orderService.deleteCart(cartId);
         return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
     }
@@ -164,7 +164,7 @@ public class OrderController {
      */
     @GetMapping("/cart")
     public ResponseEntity<?> getCartListByUser(@RequestParam("id") Long userId, @RequestParam("adminId") Long adminId) throws BadRequestException {
-        log.info("OrderController :: getCartListByUser >>> Start");
+        log.info("OrderController :: getCartListByUser >>> userId : {}, AdminId : {}", userId, adminId);
         return new ResponseEntity<>(orderService.getCartByUser(userId, adminId), HttpStatus.OK);
     }
 
@@ -180,7 +180,7 @@ public class OrderController {
     public ResponseEntity<ResponseStatus> placeOrderFromCart(@RequestParam("id") Long userId,
                                                              @RequestParam("adminId") Long adminId,
                                                              @RequestParam("addressId") Long addressId) throws BadRequestException {
-        log.info("OrderController :: placeOrderFromCart >>> Start");
+        log.info("OrderController :: placeOrderFromCart >>> UserId : {}, AdminId : {}", userId, adminId);
         String response = orderService.placeOrderFromCart(userId, adminId, addressId);
         return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
     }
@@ -194,7 +194,7 @@ public class OrderController {
      */
     @GetMapping("/getOrderDetailsById")
     public ResponseEntity<?> getOrderDetailsById(@RequestParam("orderId") Long orderId) throws BadRequestException {
-        log.info("OrderController :: getOrderDetailsById >>> Start");
+        log.info("OrderController :: getOrderDetailsById >>> OrderId : {}", orderId);
         return new ResponseEntity<>(orderService.getOrderDetailsById(orderId), HttpStatus.OK);
     }
 
@@ -211,7 +211,7 @@ public class OrderController {
     public ResponseEntity<ResponseStatus> updateOrderStatus(@RequestParam(value = "orderId") Long orderId,
                                                             @RequestParam(value = "status") String orderStatus,
                                                             @RequestParam(value = "vehicleId", required = false) Long vehicleId) throws BadRequestException {
-        log.info("OrderController :: updateOrderStatus >>> Start");
+        log.info("OrderController :: updateOrderStatus >>> OrderId : {}, Status : {}, Vehicle : {}", orderId,orderStatus,vehicleId);
         return new ResponseEntity<>(new ResponseStatus(orderService.updateOrderStatus(orderId, orderStatus, vehicleId)), HttpStatus.OK);
     }
 

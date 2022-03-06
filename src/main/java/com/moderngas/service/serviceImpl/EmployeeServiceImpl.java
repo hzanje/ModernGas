@@ -16,7 +16,8 @@ import com.moderngas.repository.UserRepo;
 import com.moderngas.service.EmployeeService;
 import com.moderngas.service.GenericService;
 import com.moderngas.service.ValidationService;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,9 +28,10 @@ import org.springframework.util.ObjectUtils;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
-@Slf4j
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
+
+    private static Logger log = LoggerFactory.getLogger(EmployeeServiceImpl.class.getName());
 
     @Autowired
     private DeliveryVehicleRepo deliveryVehicleRepo;

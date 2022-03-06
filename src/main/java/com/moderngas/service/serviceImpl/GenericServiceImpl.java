@@ -20,7 +20,8 @@ import com.moderngas.service.GenericService;
 import com.moderngas.service.ResourceCentreService;
 import com.moderngas.service.ValidationService;
 import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.Authentication;
@@ -35,9 +36,10 @@ import java.security.SecureRandom;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Slf4j
 @Service
 public class GenericServiceImpl implements GenericService {
+
+    private static Logger log = LoggerFactory.getLogger(GenericServiceImpl.class.getName());
 
     @Autowired
     private PasswordEncoder passwordEncoder;

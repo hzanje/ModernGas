@@ -19,8 +19,9 @@ import com.moderngas.service.EmailService;
 import com.moderngas.service.GenericService;
 import com.moderngas.service.UserService;
 import com.moderngas.service.ValidationService;
-import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -33,9 +34,10 @@ import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Slf4j
 @Service
 public class UserServiceImpl implements UserService {
+
+    private static Logger log = LoggerFactory.getLogger(UserServiceImpl.class.getName());
 
     @Autowired
     private UserRepo userRepo;

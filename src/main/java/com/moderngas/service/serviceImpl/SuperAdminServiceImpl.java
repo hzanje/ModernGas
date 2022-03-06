@@ -9,12 +9,16 @@ import com.moderngas.repository.UserRepo;
 import com.moderngas.service.GenericService;
 import com.moderngas.service.SuperAdminService;
 import com.moderngas.service.ValidationService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
 @Service
 public class SuperAdminServiceImpl implements SuperAdminService {
+
+    private static Logger log = LoggerFactory.getLogger(SuperAdminServiceImpl.class.getName());
 
     @Autowired
     private GenericService genericService;
@@ -28,7 +32,6 @@ public class SuperAdminServiceImpl implements SuperAdminService {
     @Override
     public String createAdmin(Long superId, AdminEntityDto adminEntityDto) throws BadRequestException {
         /* Add new Client to DataBase */
-        String response = Constants.FAILURE_STR;
         UserEntity superEntity = validationService.validateSuperAdminEntity(superId);
         UserEntity adminEntity = new UserEntity();
         if (!ObjectUtils.isEmpty(adminEntityDto.getUserDto()) && !ObjectUtils.isEmpty(adminEntityDto.getUserDto().getId())) {

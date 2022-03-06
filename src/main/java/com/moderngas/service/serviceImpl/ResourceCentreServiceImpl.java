@@ -14,7 +14,8 @@ import com.moderngas.repository.UserRepo;
 import com.moderngas.service.GenericService;
 import com.moderngas.service.ResourceCentreService;
 import com.moderngas.service.ValidationService;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,9 +29,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Slf4j
 @Service
 public class ResourceCentreServiceImpl implements ResourceCentreService {
+
+    private static Logger log = LoggerFactory.getLogger(ResourceCentreServiceImpl.class.getName());
 
     @Autowired
     private GenericService genericService;

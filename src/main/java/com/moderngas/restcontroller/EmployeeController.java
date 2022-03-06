@@ -5,7 +5,8 @@ import com.moderngas.exception.BadRequestException;
 import com.moderngas.pojo.ResponseStatus;
 import com.moderngas.pojo.user.UserSearchDto;
 import com.moderngas.service.EmployeeService;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -24,10 +25,11 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Slf4j
 @RestController
 @RequestMapping(value = "/employee", produces = "application/json")
 public class EmployeeController {
+
+    private static Logger log = LoggerFactory.getLogger(EmployeeController.class.getName());
 
     @Autowired
     private EmployeeService employeeService;
@@ -45,7 +47,7 @@ public class EmployeeController {
                                                                                  @RequestParam(value = "page", defaultValue = "0") Integer page,
                                                                                  @RequestParam(value = "search", required = false) String search,
                                                                                  @RequestParam(value = "adminId") Long adminId) throws JsonProcessingException, BadRequestException {
-        log.info("UserController :: searchUser >>> Start ");
+        log.info("UserController :: searchUser >>> AdminId : {}, Search : {} ", adminId, search);
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "createdDate"));
         Page<UserSearchDto> employeeSearchDtoList = employeeService.getAllEmployeeByAdmin(pageable, search, adminId);
         Link link = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(EmployeeController.class)
@@ -56,7 +58,7 @@ public class EmployeeController {
     @Secured("ROLE_EMPLOYEE")
     @GetMapping("/getEmployeeById/{id}")
     public ResponseEntity<?> getEmployeeById(@PathVariable("id") Long employeeId) throws BadRequestException {
-        log.info("EmployeeController :: getEmployeeById >>> {}", employeeId);
+        log.info("EmployeeController :: getEmployeeById >>> EmployeeId : {}", employeeId);
         return new ResponseEntity<>(employeeService.getEmployeeById(employeeId), HttpStatus.OK);
     }
 
@@ -72,7 +74,7 @@ public class EmployeeController {
     @PutMapping("/assign/{orderId}")
     public ResponseEntity<?> assignCylinderToUser(@PathVariable("orderId") Long orderId,
                                                   @RequestBody List<String> cylinderCodes) throws BadRequestException {
-        log.info("EmployeeController :: assignCylinderToUser >>> Start ");
+        log.info("EmployeeController :: assignCylinderToUser >>> OrderId : {}", orderId);
         return new ResponseEntity<>(new ResponseStatus(employeeService.assignCylinderToUser(orderId, cylinderCodes)), HttpStatus.OK);
     }
 
@@ -87,7 +89,7 @@ public class EmployeeController {
     @PutMapping("/receive/{orderId}")
     public ResponseEntity<?> receiveCylinderFromUser(@PathVariable("orderId") Long orderId,
                                                      @RequestBody List<String> cylinderCodes) throws BadRequestException {
-        log.info("EmployeeController :: receiveCylinderFromUser >>> Start ");
+        log.info("EmployeeController :: receiveCylinderFromUser >>> OrderId : {} ", orderId);
         return new ResponseEntity<>(new ResponseStatus(employeeService.receiveCylinderFromUser(orderId, cylinderCodes)), HttpStatus.OK);
     }
 
@@ -98,7 +100,7 @@ public class EmployeeController {
      */
     @GetMapping("/availableCylinder")
     public ResponseEntity<?> getAvailableCylinder() {
-        log.info("EmployeeController :: getAvailableCylinder >>> Start ");
+        log.info("EmployeeController :: getAvailableCylinder >>> ");
         return new ResponseEntity<>(employeeService.getAvailableCylinder(), HttpStatus.OK);
     }
 
@@ -111,7 +113,7 @@ public class EmployeeController {
      */
     @GetMapping("/getAssignedCylinder")
     public ResponseEntity<?> getAssignedCylinder(@RequestParam(value = "id") Long userId) throws BadRequestException {
-        log.info("EmployeeController :: getAssignedCylinder >>> Start ");
+        log.info("EmployeeController :: getAssignedCylinder >>> UserId :{} ", userId);
         return new ResponseEntity<>(employeeService.getAssignedCylinderByUserId(userId), HttpStatus.OK);
     }
 }
