@@ -114,7 +114,7 @@ public class GenericServiceImpl implements GenericService {
     @Secured("ROLE_EMPLOYEE")
     @Override
     public Set<UserPrivilegeEntity> addOrUpdateUserPrivilege(Set<UserPrivilegeEntity> existingPrivilege, List<UserPrivilege> privilegeList) throws BadRequestException {
-        Set<UserPrivilegeEntity> userPrivilegeEntitySet = CollectionUtils.isEmpty(existingPrivilege) ? new HashSet<>() : existingPrivilege;
+        Set<UserPrivilegeEntity> userPrivilegeEntitySet = new HashSet<>();
         for (UserPrivilege userPrivilege : privilegeList) {
             UserPrivilegeEntity userPrivilegeEntity = new UserPrivilegeEntity();
             userPrivilegeEntity.setPrivilege(userPrivilege.getPrivilege());
@@ -404,7 +404,7 @@ public class GenericServiceImpl implements GenericService {
     }
 
     @Override
-    public CylinderEntity convertDtoToCylinderEntity(CylinderDto cylinderDto, String requestedRole) throws BadRequestException {
+    public CylinderEntity convertDtoToCylinderEntity(UserEntity entity, CylinderDto cylinderDto, String requestedRole) throws BadRequestException {
         ResourceCentreEntity resourceCentreEntity = null;
         if (!requestedRole.equals(UserRole.USER_ROLE_USER.getRole())) {
             resourceCentreEntity = validationService.validateResourceCentreEntity(cylinderDto.getResourceCentreId());
@@ -431,6 +431,7 @@ public class GenericServiceImpl implements GenericService {
             cylinderInventoryDetailsEntity.setInventoryStatus(InventoryStatus.INVENTORY_STATUS_IN);
             cylinderInventoryDetailsEntity.setResourceCentreEntity(resourceCentreEntity);
             cylinderEntity.setCylinderInventoryDetailsEntity(cylinderInventoryDetailsEntity);
+            cylinderEntity.setUserEntity(entity);
         }
         return cylinderEntity;
     }

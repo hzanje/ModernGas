@@ -89,13 +89,13 @@ public class EmployeeServiceImpl implements EmployeeService {
         employeeEntityResponseDto.setName(employeeEntity.getName());
         employeeEntityResponseDto.setMobileNumber(employeeEntity.getMobileNumber());
         employeeEntityResponseDto.setEmail(employeeEntity.getEmail());
-        employeeEntityResponseDto.setCompany(employeeEntity.getCompanyName());
+        employeeEntityResponseDto.setCompanyName(employeeEntity.getCompanyName());
         if (!CollectionUtils.isEmpty(employeeEntity.getRoleEntitySet())) {
             UserRoleEntity employeeRole = employeeEntity.getRoleEntitySet().stream()
                     .filter(e -> e.getRole().equals(UserRole.USER_ROLE_EMPLOYEE.getRole()))
                     .findFirst()
                     .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_EMPLOYEE));
-            employeeEntityResponseDto.setPrivilegeDtoSet(genericService.convertToPrivilegeDto(employeeRole.getUserPrivilegeSet()));
+            employeeEntityResponseDto.setPrivilegeDtoList(genericService.convertToPrivilegeDto(employeeRole.getUserPrivilegeSet()));
         }
         return employeeEntityResponseDto;
     }

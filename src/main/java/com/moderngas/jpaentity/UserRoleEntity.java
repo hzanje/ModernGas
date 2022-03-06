@@ -26,7 +26,7 @@ public class UserRoleEntity implements Serializable {
     @Column(name = "role", nullable = false)
     private String role;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "role_id", referencedColumnName = "id", nullable = false)
     private Set<UserPrivilegeEntity> userPrivilegeSet;
 

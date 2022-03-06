@@ -26,9 +26,10 @@ public class ResourceCentreEntity extends BaseEntity {
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     private UserEntity userEntity;
 
-    public ResourceCentreEntity(Long id, String name, String alias) {
+    public ResourceCentreEntity(Long id, String name, String alias, UserEntity entity) {
         this.id = id;
         this.name = name;
         this.alias = alias;
+        this.userEntity = entity;
     }
 }

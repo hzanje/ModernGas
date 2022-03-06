@@ -59,7 +59,7 @@ public class ResourceCentreServiceImpl implements ResourceCentreService {
         }
         UserEntity userEntity = genericService.getUserAdminDetails();
         Set<ResourceCentreEntity> resourceCentreEntityList = resourceCentreDtoList.stream()
-                .map(r -> new ResourceCentreEntity(r.getId(), r.getName(), r.getAlias())).collect(Collectors.toSet());
+                .map(r -> new ResourceCentreEntity(r.getId(), r.getName(), r.getAlias(), userEntity)).collect(Collectors.toSet());
         userEntity.setResourceCentreEntitySet(resourceCentreEntityList);
         userRepo.save(userEntity);
         return Constants.SUCCESS_STR;

@@ -67,7 +67,7 @@ public class InventoryServiceImpl implements InventoryService {
     private String addCylinders(UserEntity entity, List<CylinderDto> cylinderDtoList, String requestedRole) throws BadRequestException {
         List<CylinderEntity> cylinderEntityList = new ArrayList<>();
         for (CylinderDto cylinderDto : cylinderDtoList) {
-            cylinderEntityList.add(genericService.convertDtoToCylinderEntity(cylinderDto, requestedRole));
+            cylinderEntityList.add(genericService.convertDtoToCylinderEntity(entity, cylinderDto, requestedRole));
         }
         Set<CylinderEntity> cylinderEntitySet = entity.getCylinderEntitySet();
         cylinderEntitySet.addAll(cylinderEntityList);

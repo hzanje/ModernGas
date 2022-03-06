@@ -15,7 +15,7 @@ public class EmployeeEntityResponseDto {
 
     private Long mobileNumber;
 
-    private String company;
+    private String companyName;
 
-    private Set<PrivilegeDto> privilegeDtoSet;
+    private Set<PrivilegeDto> privilegeDtoList;
 }
