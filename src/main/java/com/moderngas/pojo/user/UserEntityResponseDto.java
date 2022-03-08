@@ -2,9 +2,11 @@ package com.moderngas.pojo.user;
 
 
 import com.moderngas.pojo.admin.ResourceCentreDto;
+import com.moderngas.pojo.employee.PrivilegeDto;
 import lombok.Data;
 
 import java.util.List;
+import java.util.Set;
 
 @Data
 public class UserEntityResponseDto {
@@ -30,5 +32,7 @@ public class UserEntityResponseDto {
     private List<ResourceCentreDto> resourceCentreDtoList;
 
     private AdminDto adminDto;
+
+    private Set<PrivilegeDto> privilegeDtoList;
 
 }

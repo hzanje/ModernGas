@@ -185,6 +185,10 @@ public class GenericServiceImpl implements GenericService {
             userEntityResponseDto.setForgetPassword(userEntity.isForgetPassword());
             userEntityResponseDto.setRoles(userEntity.getRoleEntitySet()
                     .stream().map(UserRoleEntity::getRole).toList());
+            UserRoleEntity employeeRole = userEntity.getRoleEntitySet().stream()
+                    .filter(e -> e.getRole().equals(UserRole.USER_ROLE_EMPLOYEE.getRole()))
+                    .findFirst().orElse(null);
+            userEntityResponseDto.setPrivilegeDtoList(ObjectUtils.isEmpty(employeeRole) ? null : convertToPrivilegeDto(employeeRole.getUserPrivilegeSet()));
             setResourceCentreForOperatorUser(userEntityResponseDto);
             setAdminDtoForSingleAdminUser(userEntityResponseDto, userEntity);
             return userEntityResponseDto;

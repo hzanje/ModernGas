@@ -12,9 +12,13 @@ public class CylinderInventoryDto {
 
     private String status;
 
-    private Long userId;
+    private Long ownerId;
 
-    private String name;
+    private String ownerName;
+
+    private Long assignedId;
+
+    private String assignedName;
 
     private boolean isTransit;
 
@@ -22,12 +26,14 @@ public class CylinderInventoryDto {
 
     private String resourceCenterName;
 
-    public CylinderInventoryDto(Long id, String code, CylinderStatus cylinderStatus, Long userId, String name, boolean isTransit, Long resourceCenterId, String resourceCenterName) {
+    public CylinderInventoryDto(Long id, String code, CylinderStatus cylinderStatus, Long ownerId, String ownerName, Long assignedId, String assignedName, boolean isTransit, Long resourceCenterId, String resourceCenterName) {
         this.id = id;
         this.code = code;
         this.status = CylinderStatus.isExist(cylinderStatus.getName()) ? cylinderStatus.getName() : "";
-        this.userId = userId;
-        this.name = name;
+        this.ownerId = ownerId;
+        this.ownerName = ownerName;
+        this.assignedId = assignedId;
+        this.assignedName = assignedName;
         this.isTransit = isTransit;
         this.resourceCenterId = resourceCenterId;
         this.resourceCenterName = resourceCenterName;
