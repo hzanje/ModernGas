@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -29,7 +30,7 @@ import java.util.Set;
 @Service
 public class InventoryServiceImpl implements InventoryService {
 
-    private static Logger log = LoggerFactory.getLogger(InventoryService.class.getName());
+    private static Logger log = LoggerFactory.getLogger(InventoryServiceImpl.class.getName());
 
     @Autowired
     private UserService userService;
@@ -65,12 +66,13 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     private String addCylinders(UserEntity entity, List<CylinderDto> cylinderDtoList, String requestedRole) throws BadRequestException {
-        List<CylinderEntity> cylinderEntityList = new ArrayList<>();
+        Set<CylinderEntity> cylinderEntitySet = CollectionUtils.isEmpty(entity.getCylinderEntitySet()) ? new HashSet<>()  : entity.getCylinderEntitySet() ;
         for (CylinderDto cylinderDto : cylinderDtoList) {
-            cylinderEntityList.add(genericService.convertDtoToCylinderEntity(entity, cylinderDto, requestedRole));
+            CylinderEntity cylinderEntity = genericService.convertDtoToCylinderEntity(entity, cylinderDto, requestedRole);
+            if (!ObjectUtils.isEmpty(cylinderEntity)) {
+                cylinderEntitySet.add(cylinderEntity);
+            }
         }
-        Set<CylinderEntity> cylinderEntitySet = entity.getCylinderEntitySet();
-        cylinderEntitySet.addAll(cylinderEntityList);
         entity.setCylinderEntitySet(cylinderEntitySet);
         userRepo.save(entity);
         return Constants.SUCCESS_STR;

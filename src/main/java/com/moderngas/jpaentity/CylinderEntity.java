@@ -8,6 +8,7 @@ import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.Objects;
 
 @Getter @Setter
 @Entity
@@ -59,5 +60,18 @@ public class CylinderEntity extends BaseEntity {
     @JoinColumn(name = "cylinder_detail_id", referencedColumnName = "id")
     private CylinderInventoryDetailsEntity cylinderInventoryDetailsEntity;
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        CylinderEntity that = (CylinderEntity) o;
+        return Objects.equals(code, that.code);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), code);
+    }
 }
 

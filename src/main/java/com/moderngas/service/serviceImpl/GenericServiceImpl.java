@@ -197,10 +197,14 @@ public class GenericServiceImpl implements GenericService {
     }
 
     private UserEntityResponseDto setAdminDtoForSingleAdminUser(UserEntityResponseDto userEntityResponseDto, UserEntity userEntity) throws BadRequestException {
-        if (!CollectionUtils.isEmpty(userEntityResponseDto.getRoles()) && userEntityResponseDto.getRoles().size() == 1) {
-            UserEntity adminEntity = validationService.validateAdminEntity(userEntity.getAdminIdSet().iterator().next());
-            userEntityResponseDto.setAdminDto(new AdminDto(adminEntity.getId(), adminEntity.getName(),
-                    adminEntity.getCompanyName(), convertAddressEntitySetToDto(adminEntity.getAddressEntitySet())));
+        if (userEntity.getRoleEntitySet().stream().anyMatch(e -> e.getRole().equals(UserRole.USER_ROLE_ADMIN))) {
+            List<AdminDto> adminDtoList = new ArrayList<>();
+            for (Long adminId : userEntity.getAdminIdSet()) {
+                UserEntity adminEntity = validationService.validateAdminEntity(adminId);
+                adminDtoList.add(new AdminDto(adminEntity.getId(), adminEntity.getName(),
+                        adminEntity.getCompanyName()));
+            }
+            userEntityResponseDto.setAdminDtoList(adminDtoList);
         }
         return userEntityResponseDto;
     }
@@ -413,8 +417,9 @@ public class GenericServiceImpl implements GenericService {
         if (!requestedRole.equals(UserRole.USER_ROLE_USER.getRole())) {
             resourceCentreEntity = validationService.validateResourceCentreEntity(cylinderDto.getResourceCentreId());
         }
-        CylinderEntity cylinderEntity = new CylinderEntity();
+        CylinderEntity cylinderEntity = null;
         if (!inventoryRepo.checkIfCylinderCodeExist(cylinderDto.getCylinderCode()).isPresent()) {
+            cylinderEntity = new CylinderEntity();
             CylinderStatus cylinderStatus = CylinderStatus.getByStatus(cylinderDto.getStatus());
             cylinderEntity.setCode(cylinderDto.getCylinderCode());
             cylinderEntity.setCylinderStatus(cylinderStatus);
@@ -562,4 +567,18 @@ public class GenericServiceImpl implements GenericService {
                 userPrivilegeEntitySet.stream().anyMatch(p -> p.getPrivilege().equals(e.getPrivilege())))).collect(Collectors.toSet());
     }
 
+    /**
+     * Update Existing User With Admin
+     *
+     * @param entity
+     * @param adminId
+     * @return
+     */
+    @Override
+    public UserEntity updateUserAdminForUser(UserEntity entity, Long adminId) {
+        Set<Long> adminIds = entity.getAdminIdSet();
+        adminIds.add(adminId);
+        entity.setAdminIdSet(adminIds);
+        return entity;
+    }
 }

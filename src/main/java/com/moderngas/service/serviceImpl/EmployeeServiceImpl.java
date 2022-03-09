@@ -51,13 +51,14 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public String addEmployee(Long adminId, UserDto userDto) throws BadRequestException, NoSuchAlgorithmException {
         UserEntity adminEntity = validationService.validateAdminEntity(adminId);
-        validationService.checkUserAlreadyExistInSystem(userDto.getMobileNumber());
-        UserEntity employeeEntity = new UserEntity();
-        if (!ObjectUtils.isEmpty(userDto.getId())) {
-            employeeEntity = validationService.validateAdminEntity(userDto.getId());
+        UserEntity employeeEntity = validationService.checkUserAlreadyExistInSystem(userDto.getMobileNumber(), adminEntity);
+        if (ObjectUtils.isEmpty(employeeEntity)) {
+            if (!ObjectUtils.isEmpty(userDto.getId())) {
+                employeeEntity = validationService.validateAdminEntity(userDto.getId());
+            }
+            employeeEntity = genericService.convertUserDtoToEntity(employeeEntity, userDto, adminEntity, UserRole.USER_ROLE_EMPLOYEE);
+            employeeEntity.setPassword(genericService.encodeUserPassword(genericService.generateRandomPassword()));
         }
-        employeeEntity = genericService.convertUserDtoToEntity(employeeEntity, userDto, adminEntity, UserRole.USER_ROLE_EMPLOYEE);
-        employeeEntity.setPassword(genericService.encodeUserPassword(genericService.generateRandomPassword()));
         userRepo.save(employeeEntity);
         return Constants.SUCCESS_STR;
     }

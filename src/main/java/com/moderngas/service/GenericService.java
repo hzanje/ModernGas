@@ -75,4 +75,5 @@ public interface GenericService {
 
     Set<PrivilegeDto> convertToPrivilegeDto(Set<UserPrivilegeEntity> userPrivilegeEntitySet) throws BadRequestException;
 
+    UserEntity updateUserAdminForUser(UserEntity entity, Long adminId);
 }

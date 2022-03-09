@@ -5,6 +5,7 @@ import com.moderngas.enums.UserRole;
 import com.moderngas.exception.BadRequestException;
 import com.moderngas.jpaentity.*;
 import com.moderngas.repository.*;
+import com.moderngas.service.GenericService;
 import com.moderngas.service.ValidationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,11 +13,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class ValidationServiceImpl implements ValidationService {
 
-    private static Logger log = LoggerFactory.getLogger(ValidationService.class.getName());
+    private static Logger log = LoggerFactory.getLogger(ValidationServiceImpl.class.getName());
 
     @Autowired
     private UserRepo userRepo;
@@ -42,12 +44,30 @@ public class ValidationServiceImpl implements ValidationService {
     @Autowired
     private ResourceCentreRepo resourceCentreRepo;
 
+    @Autowired
+    private GenericService genericService;
+
+    /**
+     * Check is user already exist in system
+     * If User is added for same admin throws Error Status 422
+     * If user is added for different admin update admin and save.
+     *
+     * @param mobileNumber
+     * @param adminEntity
+     * @throws BadRequestException
+     */
     @Override
-    public void checkUserAlreadyExistInSystem(Long mobileNumber) throws BadRequestException {
+    public UserEntity checkUserAlreadyExistInSystem(Long mobileNumber, UserEntity adminEntity) throws BadRequestException {
+        log.info("ValidationService :: checkUserAlreadyExistInSystem >>> {}", mobileNumber);
         Optional<UserEntity> userEntity = userRepo.findByMobileNumber(mobileNumber);
         if (userEntity.isPresent()) {
-            throw new BadRequestException(ExceptionConstants.USER_ALREADY_REGISTER);
+            if (userEntity.get().getAdminIdSet().contains(adminEntity.getId())) {
+                throw new BadRequestException(ExceptionConstants.USER_ALREADY_REGISTER);
+            } else {
+                return genericService.updateUserAdminForUser(userEntity.get(), adminEntity.getId());
+            }
         }
+        return new UserEntity();
     }
 
     @Override
@@ -55,6 +75,7 @@ public class ValidationServiceImpl implements ValidationService {
         UserEntity userEntity = validateUser(userId);
         if (userEntity.getRoleEntitySet().stream()
                 .noneMatch(e -> e.getRole().equals(UserRole.USER_ROLE_USER.getRole()))) {
+            log.error("Validate User : {} >>> {}", userId, ExceptionConstants.INVALID_USER );
             throw new BadRequestException(ExceptionConstants.INVALID_USER);
         }
         return userEntity;

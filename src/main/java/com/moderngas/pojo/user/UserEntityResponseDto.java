@@ -31,7 +31,7 @@ public class UserEntityResponseDto {
 
     private List<ResourceCentreDto> resourceCentreDtoList;
 
-    private AdminDto adminDto;
+    private List<AdminDto> adminDtoList;
 
     private Set<PrivilegeDto> privilegeDtoList;
 

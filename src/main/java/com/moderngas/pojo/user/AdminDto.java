@@ -16,6 +16,4 @@ public class AdminDto {
     private String name;
 
     private String companyName;
-
-    private Set<AddressDto> addressDto;
 }
