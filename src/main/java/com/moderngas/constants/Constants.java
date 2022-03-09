@@ -9,5 +9,6 @@ public class Constants {
     public static final String SUCCESS_STR = "Success";
     public static final String FILTER_ORDERING_MAX_MIN = "Max - Min";
     public static final String FILTER_ORDERING_MIN_MAX = "Min - Max";
+    public static final String USER_ALREADY_REGISTER_ASSIGNED = "User Already Exist In System Is Now Assigned To You";
 
 }

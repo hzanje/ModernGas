@@ -75,19 +75,21 @@ public class UserServiceImpl implements UserService {
     @Override
     public String addUser(Long adminId, UserDto userDto) throws BadRequestException, NoSuchAlgorithmException {
         log.info("UserService :: addUser >>> AdminId : {}", adminId);
+        String response = Constants.SUCCESS_STR;
         UserEntity adminEntity = validationService.validateAdminEntity(adminId);
         UserEntity userEntity = validationService.checkUserAlreadyExistInSystem(userDto.getMobileNumber(), adminEntity);
-        if (ObjectUtils.isEmpty(userEntity)) {
-            if (!ObjectUtils.isEmpty(userDto.getId())) {
-                userEntity = validationService.validateUserEntity(userDto.getId());
-            }
-            userEntity = genericService.convertUserDtoToEntity(userEntity, userDto, adminEntity, UserRole.USER_ROLE_USER);
-            userEntity.setCompanyName(userDto.getCompanyName());
-            userEntity.setPassword(genericService.encodeUserPassword(genericService.generateRandomPassword()));
+        if (!ObjectUtils.isEmpty(userDto.getId())) {
+            userEntity = validationService.validateUserEntity(userDto.getId());
         }
-
+        if (!userEntity.getAdminIdSet().contains(adminId)) {
+            response = Constants.USER_ALREADY_REGISTER_ASSIGNED;
+        }
+        userEntity = genericService.convertUserDtoToEntity(userEntity, userDto, adminEntity, UserRole.USER_ROLE_USER);
+        userEntity.setAdminIdSet(genericService.addOrUpdateUserAdmin(userEntity, adminId));
+        userEntity.setCompanyName(userDto.getCompanyName());
+        userEntity.setPassword(genericService.encodeUserPassword(genericService.generateRandomPassword()));
         userRepo.save(userEntity);
-        return Constants.SUCCESS_STR;
+        return response;
     }
 
     @Override

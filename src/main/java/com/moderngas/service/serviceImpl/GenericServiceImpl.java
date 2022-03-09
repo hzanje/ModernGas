@@ -70,7 +70,6 @@ public class GenericServiceImpl implements GenericService {
         entity.setName(userDto.getName());
         entity.setMobileNumber(userDto.getMobileNumber());
         entity.setEmail(userDto.getEmail());
-        entity.setAdminIdSet(addOrUpdateUserAdmin(entity, adminEntity.getId()));
         Set<String> privilegeSet = new HashSet<>();
         if (!CollectionUtils.isEmpty(userDto.getPrivilegeDtoList())) {
             privilegeSet = userDto.getPrivilegeDtoList().stream()

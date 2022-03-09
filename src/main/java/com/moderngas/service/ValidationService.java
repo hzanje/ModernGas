@@ -2,6 +2,7 @@ package com.moderngas.service;
 
 import com.moderngas.exception.BadRequestException;
 import com.moderngas.jpaentity.*;
+import org.apache.catalina.User;
 
 public interface ValidationService {
 

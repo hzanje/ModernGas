@@ -64,7 +64,7 @@ public class ValidationServiceImpl implements ValidationService {
             if (userEntity.get().getAdminIdSet().contains(adminEntity.getId())) {
                 throw new BadRequestException(ExceptionConstants.USER_ALREADY_REGISTER);
             } else {
-                return genericService.updateUserAdminForUser(userEntity.get(), adminEntity.getId());
+                return userEntity.get();
             }
         }
         return new UserEntity();

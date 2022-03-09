@@ -16,6 +16,7 @@ import com.moderngas.repository.UserRepo;
 import com.moderngas.service.EmployeeService;
 import com.moderngas.service.GenericService;
 import com.moderngas.service.ValidationService;
+import org.apache.catalina.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,17 +51,20 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public String addEmployee(Long adminId, UserDto userDto) throws BadRequestException, NoSuchAlgorithmException {
+        String response = Constants.SUCCESS_STR;
         UserEntity adminEntity = validationService.validateAdminEntity(adminId);
         UserEntity employeeEntity = validationService.checkUserAlreadyExistInSystem(userDto.getMobileNumber(), adminEntity);
-        if (ObjectUtils.isEmpty(employeeEntity)) {
-            if (!ObjectUtils.isEmpty(userDto.getId())) {
-                employeeEntity = validationService.validateAdminEntity(userDto.getId());
-            }
-            employeeEntity = genericService.convertUserDtoToEntity(employeeEntity, userDto, adminEntity, UserRole.USER_ROLE_EMPLOYEE);
-            employeeEntity.setPassword(genericService.encodeUserPassword(genericService.generateRandomPassword()));
+        if (!ObjectUtils.isEmpty(userDto.getId())) {
+            employeeEntity = validationService.validateAdminEntity(userDto.getId());
         }
+        if (!employeeEntity.getAdminIdSet().contains(adminId)) {
+            response = Constants.USER_ALREADY_REGISTER_ASSIGNED;
+        }
+        employeeEntity = genericService.convertUserDtoToEntity(employeeEntity, userDto, adminEntity, UserRole.USER_ROLE_EMPLOYEE);
+        employeeEntity.setAdminIdSet(genericService.addOrUpdateUserAdmin(employeeEntity, adminId));
+        employeeEntity.setPassword(genericService.encodeUserPassword(genericService.generateRandomPassword()));
         userRepo.save(employeeEntity);
-        return Constants.SUCCESS_STR;
+        return response;
     }
 
     @Override

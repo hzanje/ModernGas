@@ -44,6 +44,8 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public List<OnboardingDto> getOnboardingDetails(Long id) throws BadRequestException {
+        log.info("AdminService >>> Get Admin OnBoarding for {}", id
+        );
         UserEntity userEntity = validationService.validateUserEntity(id);
         if (CollectionUtils.isEmpty(userEntity.getRoleEntitySet())) {
             throw new BadRequestException(ExceptionConstants.INVALID_USER_ACCESS);
@@ -53,6 +55,7 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public String saveOnBoardingDetails(OnboardingDtoList onboardingDtoList) throws BadRequestException {
+        log.info("AdminService");
         String response = Constants.FAILURE_STR;
         if (CollectionUtils.isEmpty(onboardingDtoList.getOnBoardingListDto())) {
             return response;
@@ -78,6 +81,7 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public String updateAdminGas(Long adminId, @NonNull ProductGasDto productGasDto) throws BadRequestException {
+        log.info("AdminService");
         UserEntity adminEntity = validationService.validateAdminEntity(adminId);
         GasMaster gasMaster = validationService.validateGasMaster(productGasDto.getId());
         AdminGasMapping adminGasMapping = adminGasMappingRepo.getGasMappingByGasIdAndAdminId(gasMaster.getId(), adminEntity.getId());
