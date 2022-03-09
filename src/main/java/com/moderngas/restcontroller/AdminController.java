@@ -96,7 +96,7 @@ public class AdminController {
      * @param userDto
      * @return
      */
-    @Secured("ROLE_EMPLOYEE")
+    //@Secured("ROLE_EMPLOYEE")
     @PostMapping("/updateEmployee/{adminId}")
     public ResponseEntity<?> updateEmployee(@PathVariable("adminId") Long adminId,
                                             @RequestBody UserDto userDto) throws BadRequestException {

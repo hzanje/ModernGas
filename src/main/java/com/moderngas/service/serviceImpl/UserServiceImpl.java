@@ -223,7 +223,7 @@ public class UserServiceImpl implements UserService {
         UserEntity userEntity = validationService.validateUserEntity(userId);
         AddressEntity addressEntity = new AddressEntity();
         if (null != addressDto.getId()) {
-            addressEntity = validationService.validateAddressEntity(addressEntity.getId());
+            addressEntity = validationService.validateAddressEntity(addressDto.getId());
         }
         addressEntity = genericService.convertDtoToAddressEntity(addressDto, addressEntity);
         addressRepo.save(addressEntity);

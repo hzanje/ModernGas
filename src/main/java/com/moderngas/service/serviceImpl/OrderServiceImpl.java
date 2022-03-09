@@ -140,7 +140,7 @@ public class OrderServiceImpl implements OrderService {
         orderDto.setAddressDto(genericService.convertAddressEntityToDto(orderEntity.getAddressEntity()));
         orderDto.setUserName(userEntity.getName());
         if (null != orderEntity.getDeliveryVehicle()) {
-            orderDto.setDeliveryVehicle(orderEntity.getDeliveryVehicle() == null ? "" : orderEntity.getDeliveryVehicle().getName());
+            orderDto.setDeliveryVehicle(orderEntity.getDeliveryVehicle() == null ? "" : orderEntity.getDeliveryVehicle().getNumber());
         }
         return orderDto;
     }

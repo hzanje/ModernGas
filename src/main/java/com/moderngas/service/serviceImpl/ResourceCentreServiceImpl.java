@@ -178,7 +178,7 @@ public class ResourceCentreServiceImpl implements ResourceCentreService {
     @Override
     public String checkCylinderCode(String code) throws BadRequestException {
         CylinderEntity cylinderEntity = inventoryRepo.checkIfCylinderCodeExist(code).orElse(null);
-        if (ObjectUtils.isEmpty(cylinderEntity)) {
+        if (!ObjectUtils.isEmpty(cylinderEntity)) {
             return Constants.SUCCESS_STR;
         }
         return Constants.FAILURE_STR;

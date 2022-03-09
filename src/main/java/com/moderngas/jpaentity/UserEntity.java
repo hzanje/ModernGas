@@ -21,7 +21,7 @@ public class UserEntity extends BaseEntity {
     @Column(name = "name")
     private String name;
 
-    @Column(name = "mobile_number")
+    @Column(name = "mobile_number", updatable= false)
     private Long mobileNumber;
 
     @Column(name = "email")
