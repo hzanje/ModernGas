@@ -76,21 +76,21 @@ public class UserServiceImpl implements UserService {
     @Override
     public String addUser(Long adminId, UserDto userDto) throws BadRequestException, NoSuchAlgorithmException {
         log.info("UserService :: addUser >>> AdminId : {}", adminId);
-        String response = Constants.SUCCESS_STR;
         UserEntity adminEntity = validationService.validateAdminEntity(adminId);
         UserEntity userEntity = validationService.checkUserAlreadyExistInSystem(userDto.getMobileNumber(), adminEntity);
+        if (!userEntity.getAdminIdSet().contains(adminId)) {
+            userEntity.setAdminIdSet(genericService.addOrUpdateUserAdmin(userEntity, adminId));
+            return Constants.USER_ALREADY_REGISTER_ASSIGNED;
+        }
         if (!ObjectUtils.isEmpty(userDto.getId())) {
             userEntity = validationService.validateUserEntity(userDto.getId());
-        }
-        if (!userEntity.getAdminIdSet().contains(adminId)) {
-            response = Constants.USER_ALREADY_REGISTER_ASSIGNED;
         }
         userEntity = genericService.convertUserDtoToEntity(userEntity, userDto, adminEntity, UserRole.USER_ROLE_USER);
         userEntity.setAdminIdSet(genericService.addOrUpdateUserAdmin(userEntity, adminId));
         userEntity.setCompanyName(userDto.getCompanyName());
         userEntity.setPassword(genericService.encodeUserPassword(genericService.generateRandomPassword()));
         userRepo.save(userEntity);
-        return response;
+        return Constants.SUCCESS_STR;
     }
 
     @Override
@@ -259,21 +259,22 @@ public class UserServiceImpl implements UserService {
         if (null == userEntity) {
             throw new BadRequestException(ExceptionConstants.INVALID_USER_TOKEN);
         }
-        String token = JWT.create()
+        String token = AESUtil.encrypt(JWT.create()
                 .withSubject(userEntity.getMobileNumber().toString())
                 .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.EXPIRATION_TIME))
-                .sign(Algorithm.HMAC512(JwtProperties.SECRET.getBytes()));
-        String encryptedToken = AESUtil.encrypt(token);
-
-        Set<UserTokenEntity> updatedTokenSet = userEntity.getUserTokenSet().stream().filter(e -> !e.getToken()
-                .equals(existingToken.replace(JwtProperties.TOKEN_PREFIX, ""))).collect(Collectors.toSet());
-        UserTokenEntity tokenEntity = new UserTokenEntity();
-        tokenEntity.setToken(encryptedToken);
-        tokenEntity.setExpiredDate(new Date(System.currentTimeMillis() + JwtProperties.EXPIRATION_TIME));
-        updatedTokenSet.add(tokenEntity);
+                .sign(Algorithm.HMAC512(JwtProperties.SECRET.getBytes())));
+        Set<UserTokenEntity> updatedTokenSet = updateTokenSetForUser(token, userEntity.getUserTokenSet());
+        updatedTokenSet.add(generateTokenEntity(token));
         userEntity.setUserTokenSet(updatedTokenSet);
         userRepo.save(userEntity);
         return token;
+    }
+
+    private UserTokenEntity generateTokenEntity(String token) {
+        UserTokenEntity tokenEntity = new UserTokenEntity();
+        tokenEntity.setToken(token);
+        tokenEntity.setExpiredDate(new Date(System.currentTimeMillis() + JwtProperties.EXPIRATION_TIME));
+        return tokenEntity;
     }
 
     @Override
@@ -282,12 +283,14 @@ public class UserServiceImpl implements UserService {
         if (null == userEntity) {
             throw new BadRequestException(ExceptionConstants.INVALID_USER_TOKEN);
         }
-        Set<UserTokenEntity> userTokenSet = userEntity.getUserTokenSet();
-        Set<UserTokenEntity> updatedTokenSet = userTokenSet.stream().filter(e -> !e.getToken()
-                .equals(token.replace(JwtProperties.TOKEN_PREFIX, ""))).collect(Collectors.toSet());
-        userEntity.setUserTokenSet(updatedTokenSet);
+        userEntity.setUserTokenSet(updateTokenSetForUser(token, userEntity.getUserTokenSet()));
         userRepo.save(userEntity);
         return Constants.SUCCESS_STR;
+    }
+
+    private Set<UserTokenEntity> updateTokenSetForUser(String token, Set<UserTokenEntity> userTokenSet) {
+        return userTokenSet.stream().filter(e -> !e.getToken()
+                .equals(token.replace(JwtProperties.TOKEN_PREFIX, ""))).collect(Collectors.toSet());
     }
 
     @Override

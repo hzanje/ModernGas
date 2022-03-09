@@ -188,7 +188,7 @@ public class GenericServiceImpl implements GenericService {
                     .filter(e -> e.getRole().equals(UserRole.USER_ROLE_EMPLOYEE.getRole()))
                     .findFirst().orElse(null);
             userEntityResponseDto.setPrivilegeDtoList(ObjectUtils.isEmpty(employeeRole) ? null : convertToPrivilegeDto(employeeRole.getUserPrivilegeSet()));
-            setResourceCentreForOperatorUser(userEntityResponseDto);
+            setResourceCentreForOperatorUser(userEntityResponseDto, userEntity.getId());
             setAdminDtoForSingleAdminUser(userEntityResponseDto, userEntity);
             return userEntityResponseDto;
         }
@@ -206,9 +206,9 @@ public class GenericServiceImpl implements GenericService {
         return userEntityResponseDto;
     }
 
-    private UserEntityResponseDto setResourceCentreForOperatorUser(UserEntityResponseDto userEntityResponseDto) throws BadRequestException {
+    private UserEntityResponseDto setResourceCentreForOperatorUser(UserEntityResponseDto userEntityResponseDto, Long userId) throws BadRequestException {
         if (userEntityResponseDto.getRoles().contains(UserRole.USER_ROLE_EMPLOYEE.getRole())) {
-            userEntityResponseDto.setResourceCentreDtoList(resourceCentreService.getResourceCentre());
+            userEntityResponseDto.setResourceCentreDtoList(resourceCentreService.getResourceCentre(userId));
         }
         return userEntityResponseDto;
     }

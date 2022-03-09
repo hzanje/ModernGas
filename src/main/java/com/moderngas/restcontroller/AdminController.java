@@ -260,15 +260,15 @@ public class AdminController {
     /**
      * Get the resource centre by Admin
      *
-     * @param id
+     * @param adminId
      * @return
      * @throws BadRequestException
      */
     @Secured("ROLE_ADMIN")
     @GetMapping("/resourceCentre")
-    public ResponseEntity<?> getResourceCentre(@RequestParam(value = "id", required = false) Long id) throws BadRequestException {
-        log.info("AdminController :: getResourceCentre >>> Id : {}", id);
-        return new ResponseEntity<>(resourceCentreService.getResourceCentre(), HttpStatus.OK);
+    public ResponseEntity<?> getResourceCentre(@RequestParam(value = "id", required = false) Long adminId) throws BadRequestException {
+        log.info("AdminController :: getResourceCentre >>> AdminId : {}", adminId);
+        return new ResponseEntity<>(resourceCentreService.getResourceCentre(adminId), HttpStatus.OK);
     }
 
     /**

@@ -66,8 +66,8 @@ public class ResourceCentreServiceImpl implements ResourceCentreService {
     }
 
     @Override
-    public List<ResourceCentreDto> getResourceCentre() throws BadRequestException {
-        UserEntity userEntity = genericService.getUserAdminDetails();
+    public List<ResourceCentreDto> getResourceCentre(Long adminId) throws BadRequestException {
+        UserEntity userEntity = validationService.validateAdminEntity(adminId);
         return resourceCentreRepo.getResourceCentreByAdminId(userEntity.getId());
     }
 

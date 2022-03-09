@@ -12,7 +12,7 @@ public interface ResourceCentreService {
 
     String addOrUpdateResourceCentre(List<ResourceCentreDto> resourceCentreDtoList) throws BadRequestException;
 
-    List<ResourceCentreDto> getResourceCentre() throws BadRequestException;
+    List<ResourceCentreDto> getResourceCentre(Long adminId) throws BadRequestException;
 
     String deleteResourceCentre(Long id) throws BadRequestException;
 
