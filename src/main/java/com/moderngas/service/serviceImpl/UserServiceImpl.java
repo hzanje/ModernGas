@@ -14,6 +14,7 @@ import com.moderngas.pojo.admin.DeliveryVehicleDto;
 import com.moderngas.pojo.admin.UserDetails;
 import com.moderngas.pojo.user.*;
 import com.moderngas.repository.*;
+import com.moderngas.security.AESUtil;
 import com.moderngas.security.JwtProperties;
 import com.moderngas.service.EmailService;
 import com.moderngas.service.GenericService;
@@ -262,14 +263,15 @@ public class UserServiceImpl implements UserService {
                 .withSubject(userEntity.getMobileNumber().toString())
                 .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.EXPIRATION_TIME))
                 .sign(Algorithm.HMAC512(JwtProperties.SECRET.getBytes()));
+        String encryptedToken = AESUtil.encrypt(token);
 
-        Set<UserTokenEntity> userTokenSet = userEntity.getUserTokenSet()
-                .stream().filter(t -> t.getExpiredDate().after(new Date())).collect(Collectors.toSet());
+        Set<UserTokenEntity> updatedTokenSet = userEntity.getUserTokenSet().stream().filter(e -> !e.getToken()
+                .equals(existingToken.replace(JwtProperties.TOKEN_PREFIX, ""))).collect(Collectors.toSet());
         UserTokenEntity tokenEntity = new UserTokenEntity();
-        tokenEntity.setToken(token);
+        tokenEntity.setToken(encryptedToken);
         tokenEntity.setExpiredDate(new Date(System.currentTimeMillis() + JwtProperties.EXPIRATION_TIME));
-        userTokenSet.add(tokenEntity);
-        userEntity.setUserTokenSet(userTokenSet);
+        updatedTokenSet.add(tokenEntity);
+        userEntity.setUserTokenSet(updatedTokenSet);
         userRepo.save(userEntity);
         return token;
     }
@@ -280,9 +282,10 @@ public class UserServiceImpl implements UserService {
         if (null == userEntity) {
             throw new BadRequestException(ExceptionConstants.INVALID_USER_TOKEN);
         }
-        Set<UserTokenEntity> userTokenSet = userEntity.getUserTokenSet()
-                .stream().filter(t -> t.getExpiredDate().after(new Date())).collect(Collectors.toSet());
-        userEntity.setUserTokenSet(userTokenSet);
+        Set<UserTokenEntity> userTokenSet = userEntity.getUserTokenSet();
+        Set<UserTokenEntity> updatedTokenSet = userTokenSet.stream().filter(e -> !e.getToken()
+                .equals(token.replace(JwtProperties.TOKEN_PREFIX, ""))).collect(Collectors.toSet());
+        userEntity.setUserTokenSet(updatedTokenSet);
         userRepo.save(userEntity);
         return Constants.SUCCESS_STR;
     }

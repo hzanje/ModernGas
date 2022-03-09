@@ -196,15 +196,13 @@ public class GenericServiceImpl implements GenericService {
     }
 
     private UserEntityResponseDto setAdminDtoForSingleAdminUser(UserEntityResponseDto userEntityResponseDto, UserEntity userEntity) throws BadRequestException {
-        if (userEntity.getRoleEntitySet().stream().anyMatch(e -> e.getRole().equals(UserRole.USER_ROLE_ADMIN))) {
-            List<AdminDto> adminDtoList = new ArrayList<>();
-            for (Long adminId : userEntity.getAdminIdSet()) {
-                UserEntity adminEntity = validationService.validateAdminEntity(adminId);
-                adminDtoList.add(new AdminDto(adminEntity.getId(), adminEntity.getName(),
-                        adminEntity.getCompanyName()));
-            }
-            userEntityResponseDto.setAdminDtoList(adminDtoList);
+        List<AdminDto> adminDtoList = new ArrayList<>();
+        for (Long adminId : userEntity.getAdminIdSet()) {
+            UserEntity adminEntity = validationService.validateAdminEntity(adminId);
+            adminDtoList.add(new AdminDto(adminEntity.getId(), adminEntity.getName(),
+                    adminEntity.getCompanyName()));
         }
+        userEntityResponseDto.setAdminDtoList(adminDtoList);
         return userEntityResponseDto;
     }
 

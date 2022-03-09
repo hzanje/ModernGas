@@ -54,10 +54,8 @@ public class AESUtil {
     }
 
     /* Encryption Method */
-    public static String encrypt(String strToEncrypt)
-    {
-        try
-        {
+    public static String encrypt(String strToEncrypt) {
+        try {
             /* Declare a byte array. */
             byte[] iv = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
             IvParameterSpec parameterSpec = new IvParameterSpec(iv);
@@ -74,18 +72,15 @@ public class AESUtil {
             return Base64.getEncoder()
                     .encodeToString(cipher.doFinal(strToEncrypt.getBytes(StandardCharsets.UTF_8)));
         }
-        catch (InvalidAlgorithmParameterException | InvalidKeyException | NoSuchAlgorithmException | BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException | InvalidKeySpecException e)
-        {
+        catch (InvalidAlgorithmParameterException | InvalidKeyException | NoSuchAlgorithmException | BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException | InvalidKeySpecException e) {
             log.error("Error occurred during encryption: {}", e);
         }
         return null;
     }
 
     /* Decryption Method */
-    public static String decrypt(String strToDecrypt)
-    {
-        try
-        {
+    public static String decrypt(String strToDecrypt) {
+        try {
             /* Declare a byte array. */
             byte[] iv = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
             IvParameterSpec parameterSpec = new IvParameterSpec(iv);
@@ -101,8 +96,7 @@ public class AESUtil {
             /* Return decrypted value. */
             return new String(cipher.doFinal(Base64.getDecoder().decode(strToDecrypt)));
         }
-        catch (InvalidAlgorithmParameterException | InvalidKeyException | NoSuchAlgorithmException | InvalidKeySpecException | BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException e)
-        {
+        catch (InvalidAlgorithmParameterException | InvalidKeyException | NoSuchAlgorithmException | InvalidKeySpecException | BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException e) {
             log.info("Error occured during decryption: {}" + e);
         }
         return null;
