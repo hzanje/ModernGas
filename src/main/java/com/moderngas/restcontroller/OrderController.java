@@ -91,7 +91,7 @@ public class OrderController {
      * @throws JsonProcessingException
      * @throws BadRequestException
      */
-    @Secured("ROLE_ADMIN")
+    @Secured({"ROLE_ADMIN", "ROLE_EMPLOYEE"})
     @GetMapping("/adminOrderList")
     public HttpEntity<PagedModel<EntityModel<com.moderngas.pojo.admin.OrderDto>>> getAllOrderList(PagedResourcesAssembler<com.moderngas.pojo.admin.OrderDto> assembler,
                                                                                                   @RequestParam(value = "size", defaultValue = "10") Integer size,

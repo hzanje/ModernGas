@@ -86,6 +86,7 @@ public class UserController {
      * @param userName
      * @return
      */
+    @Secured("ROLE_ADMIN")
     @GetMapping(value = "/getUser")
     public ResponseEntity<?> getUser(@RequestParam("userName") Long userName) throws BadRequestException {
         log.info("UserController :: getUser >>> userName : {}", userName);
@@ -225,5 +226,12 @@ public class UserController {
                                                       @RequestBody List<CylinderDto> cylinderDtoList) throws BadRequestException {
         log.info("UserController :: addCylinder >>> UserId :{} ", userId);
         return new ResponseEntity<>(new ResponseStatus(inventoryService.addUserCylinder(userId, cylinderDtoList)), HttpStatus.OK);
+    }
+
+    @GetMapping("/frequentlyOrderProduct/{id}")
+    public ResponseEntity<?> getFrequentlyOrderProduct(@PathVariable("id") Long userId,
+                                                                    @RequestParam("adminId") Long adminId) throws BadRequestException {
+        log.info("UserController :: getFrequentlyOrderProduct >>> UserId : {} , AdminId : {}", userId, adminId);
+        return new ResponseEntity<>(userService.getFrequentlyOrderProduct(userId, adminId), HttpStatus.OK);
     }
 }

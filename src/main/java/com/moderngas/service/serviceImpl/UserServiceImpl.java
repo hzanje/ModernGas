@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -259,10 +260,7 @@ public class UserServiceImpl implements UserService {
         if (null == userEntity) {
             throw new BadRequestException(ExceptionConstants.INVALID_USER_TOKEN);
         }
-        String token = AESUtil.encrypt(JWT.create()
-                .withSubject(userEntity.getMobileNumber().toString())
-                .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.EXPIRATION_TIME))
-                .sign(Algorithm.HMAC512(JwtProperties.SECRET.getBytes())));
+        String token = AESUtil.createJWTToken(userEntity.getMobileNumber().toString());
         Set<UserTokenEntity> updatedTokenSet = updateTokenSetForUser(token, userEntity.getUserTokenSet());
         updatedTokenSet.add(generateTokenEntity(token));
         userEntity.setUserTokenSet(updatedTokenSet);
@@ -353,5 +351,11 @@ public class UserServiceImpl implements UserService {
         return orderRepo.getOrderCountByUserId(userId);
     }
 
-
+    @Override
+    public List<FrequentOrderProductDto> getFrequentlyOrderProduct(Long userId, Long adminId) throws BadRequestException {
+        UserEntity userEntity = validationService.validateUserEntity(userId);
+        UserEntity adminEntity = validationService.validateAdminEntity(adminId);
+        Pageable pageable = PageRequest.of(0, 5);
+        return orderRepo.getFrequentlyOrderProduct(pageable ,userEntity.getId(), adminEntity.getId()).getContent();
+    }
 }

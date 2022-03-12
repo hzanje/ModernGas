@@ -1,5 +1,7 @@
 package com.moderngas.security;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,6 +20,7 @@ import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 import java.util.Base64;
+import java.util.Date;
 
 @Slf4j
 @Component
@@ -100,6 +103,14 @@ public class AESUtil {
             log.info("Error occured during decryption: {}" + e);
         }
         return null;
+    }
+
+
+    public static String createJWTToken(String username) {
+        return encrypt(JWT.create()
+                .withSubject(username)
+                .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.EXPIRATION_TIME))
+                .sign(Algorithm.HMAC512(JwtProperties.SECRET.getBytes())));
     }
 
 

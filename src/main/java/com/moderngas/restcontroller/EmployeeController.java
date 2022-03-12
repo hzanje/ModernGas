@@ -40,7 +40,7 @@ public class EmployeeController {
      * @param adminId
      * @return
      */
-    @Secured("ROLE_EMPLOYEE")
+    @Secured({"ROLE_ADMIN", "ROLE_EMPLOYEE"})
     @GetMapping("/getAllEmployee")
     public HttpEntity<PagedModel<EntityModel<UserSearchDto>>> getAllEmployee(PagedResourcesAssembler<UserSearchDto> assembler,
                                                                                  @RequestParam(value = "size", defaultValue = "10") Integer size,
@@ -55,7 +55,8 @@ public class EmployeeController {
         PagedModel<EntityModel<UserSearchDto>> model = assembler.toModel(employeeSearchDtoList, link);
         return new ResponseEntity<>(model, HttpStatus.OK);
     }
-    @Secured("ROLE_EMPLOYEE")
+
+    @Secured({"ROLE_ADMIN", "ROLE_EMPLOYEE"})
     @GetMapping("/getEmployeeById/{id}")
     public ResponseEntity<?> getEmployeeById(@PathVariable("id") Long employeeId) throws BadRequestException {
         log.info("EmployeeController :: getEmployeeById >>> EmployeeId : {}", employeeId);

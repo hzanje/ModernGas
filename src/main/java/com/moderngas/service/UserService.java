@@ -59,4 +59,6 @@ public interface UserService {
     String addUser(Long adminId, UserDto userDto) throws BadRequestException, NoSuchAlgorithmException;
 
     String updateUser(Long adminId, UserDto userDto) throws BadRequestException;
+
+    List<FrequentOrderProductDto> getFrequentlyOrderProduct(Long userId, Long adminId) throws BadRequestException;
 }

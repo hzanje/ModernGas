@@ -67,16 +67,12 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         /* Create JWT Token */
         /* If token already exist return same else create new token */
         UserEntity userEntity = userRepo.findByMobileNumber(Long.parseLong(principal.getUsername())).orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_REGISTER_USER));
-        String token = JWT.create()
-                .withSubject(principal.getUsername())
-                .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.EXPIRATION_TIME))
-                .sign(Algorithm.HMAC512(JwtProperties.SECRET.getBytes()));
+        String token = AESUtil.createJWTToken(principal.getUsername());
         Date expiredDate = new Date(System.currentTimeMillis() + JwtProperties.EXPIRATION_TIME);
-        String encryptedToken = AESUtil.encrypt(token);
-        saveUserToken(encryptedToken, expiredDate, userEntity);
+        saveUserToken(token, expiredDate, userEntity);
 
         /* Add token in Response */
-        response.addHeader(JwtProperties.HEADER_STRING, JwtProperties.TOKEN_PREFIX + encryptedToken);
+        response.addHeader(JwtProperties.HEADER_STRING, JwtProperties.TOKEN_PREFIX + token);
     }
 
     private void saveUserToken(String token, Date expiredDate, UserEntity userEntity) {

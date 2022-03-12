@@ -65,7 +65,7 @@ public class AdminController {
      * @param userDto
      * @return
      */
-    @Secured("ROLE_USER")
+    @Secured({"ROLE_ADMIN", "ROLE_USER"})
     @PutMapping(value = "/updateUser/{adminId}")
     public ResponseEntity<ResponseStatus> updateUser(@PathVariable("adminId") Long adminId,
                                                      @RequestBody UserDto userDto) throws BadRequestException {
@@ -81,7 +81,7 @@ public class AdminController {
      * @param userDto
      * @return
      */
-    @Secured("ROLE_ADMIN")
+    @Secured({"ROLE_ADMIN", "ROLE_EMPLOYEE"})
     @PostMapping("/addEmployee/{adminId}")
     public ResponseEntity<?> addEmployee(@PathVariable("adminId") Long adminId,
                                          @RequestBody UserDto userDto) throws BadRequestException, NoSuchAlgorithmException {
@@ -96,7 +96,7 @@ public class AdminController {
      * @param userDto
      * @return
      */
-    //@Secured("ROLE_EMPLOYEE")
+    @Secured({"ROLE_ADMIN", "ROLE_EMPLOYEE"})
     @PostMapping("/updateEmployee/{adminId}")
     public ResponseEntity<?> updateEmployee(@PathVariable("adminId") Long adminId,
                                             @RequestBody UserDto userDto) throws BadRequestException {
@@ -112,7 +112,7 @@ public class AdminController {
      * @return
      * @throws BadRequestException
      */
-    @Secured("ROLE_ADMIN")
+    @Secured({"ROLE_ADMIN", "ROLE_EMPLOYEE"})
     @PostMapping("/addCylinder/{adminId}")
     public ResponseEntity<ResponseStatus> addCylinder(@PathVariable("adminId") Long adminId,
                                                       @RequestBody List<CylinderDto> cylinderDtoList) throws BadRequestException {
@@ -125,7 +125,7 @@ public class AdminController {
      *
      * @return
      */
-    @Secured("ROLE_EMPLOYEE")
+    @Secured({"ROLE_ADMIN", "ROLE_EMPLOYEE"})
     @GetMapping("/filter")
     public ResponseEntity<?> getFilters() {
         log.info("AdminController :: getFilters >>> ");
@@ -139,7 +139,7 @@ public class AdminController {
      * @return
      * @throws BadRequestException
      */
-    @Secured("ROLE_ADMIN")
+    @Secured({"ROLE_ADMIN", "ROLE_EMPLOYEE"})
     @PostMapping("/vehicle")
     public ResponseEntity<ResponseStatus> addVehicle(@RequestBody DeliveryVehicleDto deliveryVehicleDto) throws BadRequestException {
         log.info("AdminController :: addVehicle >>> ");
@@ -153,7 +153,7 @@ public class AdminController {
      * @param userId
      * @return
      */
-    @Secured("ROLE_ADMIN")
+    @Secured({"ROLE_ADMIN", "ROLE_EMPLOYEE"})
     @GetMapping("/vehicle/{id}")
     public ResponseEntity<?> getVehicle(@PathVariable("id") Long userId) {
         log.info("AdminController :: getVehicle >>> AdminId : {}", userId);
@@ -167,7 +167,7 @@ public class AdminController {
      * @return
      * @throws BadRequestException
      */
-    @Secured("ROLE_ADMIN")
+    @Secured({"ROLE_ADMIN", "ROLE_EMPLOYEE"})
     @DeleteMapping("/vehicle/{id}")
     public ResponseEntity<?> deleteVehicle(@PathVariable("id") Long vehicleId) throws BadRequestException {
         log.info("AdminController :: deleteVehicle >>> Id : {}", vehicleId);
@@ -180,7 +180,7 @@ public class AdminController {
      * @param adminId
      * @return
      */
-    @Secured("ROLE_ADMIN")
+    @Secured({"ROLE_ADMIN", "ROLE_EMPLOYEE"})
     @GetMapping("/inventory")
     public ResponseEntity<?> getInventoryCylinderForAdmin(@RequestParam("id") Long adminId) {
         log.info("AdminController :: getInventoryCylinderForAdmin >>> AdminId : {}", adminId);
@@ -195,7 +195,7 @@ public class AdminController {
      * @return
      * @throws BadRequestException
      */
-    @Secured("ROLE_ADMIN")
+    @Secured({"ROLE_ADMIN", "ROLE_EMPLOYEE"})
     @GetMapping("/userDetails")
     public ResponseEntity<?> getUserDetails(@RequestParam("id") Long id) throws BadRequestException {
         log.info("AdminController :: getUserDetails >>> AdminId :{}", id);
@@ -249,7 +249,7 @@ public class AdminController {
      * @return
      * @throws BadRequestException
      */
-    @Secured("ROLE_ADMIN")
+    @Secured({"ROLE_ADMIN", "ROLE_EMPLOYEE"})
     @PostMapping("/resourceCentre")
     public ResponseEntity<ResponseStatus> addOrUpdateResourceCentre(@RequestBody List<ResourceCentreDto> resourceCentreDtoList) throws BadRequestException {
         log.info("AdminController :: addOrUpdateResourceCentre >>> ");
@@ -264,7 +264,7 @@ public class AdminController {
      * @return
      * @throws BadRequestException
      */
-    @Secured("ROLE_ADMIN")
+    @Secured({"ROLE_ADMIN", "ROLE_EMPLOYEE"})
     @GetMapping("/resourceCentre")
     public ResponseEntity<?> getResourceCentre(@RequestParam(value = "id", required = false) Long adminId) throws BadRequestException {
         log.info("AdminController :: getResourceCentre >>> AdminId : {}", adminId);
@@ -278,7 +278,7 @@ public class AdminController {
      * @return
      * @throws BadRequestException
      */
-    @Secured("ROLE_ADMIN")
+    @Secured({"ROLE_ADMIN", "ROLE_EMPLOYEE"})
     @DeleteMapping("/resourceCentre/{id}")
     public ResponseEntity<ResponseStatus> deleteResourceCentre(@PathVariable("id") Long id) throws BadRequestException {
         log.info("AdminController :: deleteResourceCentre >>> Id :{}", id);
@@ -295,7 +295,7 @@ public class AdminController {
      * @throws BadRequestException
      * @throws NoSuchAlgorithmException
      */
-    @Secured("ROLE_EMPLOYEE")
+    @Secured({"ROLE_ADMIN", "ROLE_EMPLOYEE"})
     @PostMapping("/placeOrder/{adminId}")
     public ResponseEntity<?> placeOrder(@PathVariable("adminId") Long adminId,
                                         @RequestBody OpenOrderDto openOrderDto) throws BadRequestException, NoSuchAlgorithmException {
