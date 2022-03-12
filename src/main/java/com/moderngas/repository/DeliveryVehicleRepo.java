@@ -1,6 +1,6 @@
 package com.moderngas.repository;
 
-import com.moderngas.jpaentity.DeliveryVehicle;
+import com.moderngas.jpaentity.DeliveryVehicleEntity;
 import com.moderngas.pojo.NameIdDto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -12,8 +12,14 @@ import java.util.List;
 
 @Repository
 @Transactional
-public interface DeliveryVehicleRepo extends JpaRepository<DeliveryVehicle, Long> {
+public interface DeliveryVehicleRepo extends JpaRepository<DeliveryVehicleEntity, Long> {
 
-    @Query("SELECT new com.moderngas.pojo.NameIdDto(id, number) FROM DeliveryVehicle WHERE userId = :userId")
+    @Query("SELECT new com.moderngas.pojo.NameIdDto(id, number) FROM DeliveryVehicleEntity WHERE userId = :userId")
     List<NameIdDto> getVehicleNumberList(@Param("userId") Long userId);
+
+    @Query("FROM DeliveryVehicleEntity dv WHERE dv.number = :vehicleNumber")
+    DeliveryVehicleEntity getVehicleByNumber(@Param("vehicleNumber") String vehicleNumber);
+
+    @Query("FROM DeliveryVehicleEntity dv WHERE dv.id = :id")
+    DeliveryVehicleEntity getVehicleById(@Param("id") Long deliveryVehicleId);
 }

@@ -1,26 +1,77 @@
 package com.moderngas.jpaentity;
 
 import com.moderngas.enums.CylinderStatus;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import net.minidev.json.annotate.JsonIgnore;
+import org.hibernate.annotations.Where;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.util.Date;
+import java.util.Objects;
 
-@Data
+@Getter @Setter
 @Entity
+@Where(clause = "active_flag = 1")
 @Table(name = "cylinder")
 public class CylinderEntity extends BaseEntity {
 
     @Column(name = "cylinder_code")
     private String code;
 
-    @Column(name = "user_id")
-    private Long userId;
+    @Column(name = "assigned_user_id")
+    private Long assignedUserId;
+
+    @Column(name = "assigned_user_name")
+    private String assignedUserName;
+
+    @Column(name = "manufacturer")
+    private String manufacturer;
+
+    @JsonIgnore
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "manufacturing_date", updatable = false)
+    private Date manufacturingDate;
+
+    @JsonIgnore
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "expiry_date", updatable = false)
+    private Date expiryDate;
+
+    @JsonIgnore
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "last_service")
+    private Date lastService;
+
+    @JsonIgnore
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "next_service")
+    private Date nextService;
 
     @Column(name = "cylinder_status_id")
     @Enumerated(EnumType.ORDINAL)
     private CylinderStatus cylinderStatus;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
+    private UserEntity userEntity;
+
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "cylinder_detail_id", referencedColumnName = "id")
+    private CylinderInventoryDetailsEntity cylinderInventoryDetailsEntity;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        CylinderEntity that = (CylinderEntity) o;
+        return Objects.equals(code, that.code);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), code);
+    }
 }
+

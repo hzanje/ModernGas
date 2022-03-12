@@ -7,7 +7,7 @@ import lombok.Data;
 @Data
 public class CylinderTypeDto {
 
-    public String name;
+    public final String name;
 
-    public String description;
+    public final String description;
 }

@@ -3,17 +3,25 @@ package com.moderngas.service.serviceImpl;
 import com.moderngas.enums.CylinderStatus;
 import com.moderngas.enums.CylinderType;
 import com.moderngas.enums.OrderStatus;
+import com.moderngas.enums.UserPrivilege;
 import com.moderngas.pojo.NameIdDto;
+import com.moderngas.repository.GasRepo;
 import com.moderngas.service.MasterService;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Slf4j
 @Service
 public class MasterServiceImpl implements MasterService {
+
+    private static Logger log = LoggerFactory.getLogger(MasterServiceImpl.class.getName());
+
+    @Autowired
+    private GasRepo gasRepo;
 
     @Override
     public List<NameIdDto> getOrderStatus() {
@@ -40,5 +48,19 @@ public class MasterServiceImpl implements MasterService {
             cylinderTypeList.add(cylinderType.getName());
         }
         return cylinderTypeList;
+    }
+
+    @Override
+    public List<NameIdDto> getGasList() {
+        return gasRepo.getGasMasterNameIdList();
+    }
+
+    @Override
+    public List<String> getPrivilegeList() {
+        List<String> privilegeList = new ArrayList<>();
+        for (UserPrivilege userPrivilege : UserPrivilege.values()) {
+            privilegeList.add(userPrivilege.getName());
+        }
+        return privilegeList;
     }
 }

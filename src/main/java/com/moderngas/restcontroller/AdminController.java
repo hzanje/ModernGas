@@ -1,49 +1,26 @@
 package com.moderngas.restcontroller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.moderngas.exception.BadRequestException;
 import com.moderngas.pojo.ResponseStatus;
-import com.moderngas.pojo.NameIdDto;
-import com.moderngas.pojo.admin.CylinderCodeStatusDto;
-import com.moderngas.pojo.admin.DeliveryVehicleDto;
-import com.moderngas.pojo.admin.FilterDto;
-import com.moderngas.pojo.admin.InventoryCylinderDto;
-import com.moderngas.pojo.admin.OrderDto;
-import com.moderngas.pojo.admin.UserDetails;
-import com.moderngas.pojo.user.UserEntityDto;
-import com.moderngas.pojo.user.UserSearchDto;
-import com.moderngas.service.GenericService;
-import com.moderngas.service.OrderService;
-import com.moderngas.service.UserService;
-import com.moderngas.service.InventoryService;
+import com.moderngas.pojo.UserDto;
+import com.moderngas.pojo.admin.*;
+import com.moderngas.service.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PagedResourcesAssembler;
-import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.Link;
-import org.springframework.hateoas.PagedModel;
-import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
-
 
 @RestController
 @RequestMapping(value = "/admin", produces = "application/json")
 public class AdminController {
+
+    private static Logger log = LoggerFactory.getLogger(AdminController.class.getName());
 
     @Autowired
     private OrderService orderService;
@@ -55,89 +32,304 @@ public class AdminController {
     private UserService userService;
 
     @Autowired
+    private EmployeeService employeeService;
+
+    @Autowired
     private GenericService genericService;
 
-    @Secured("ROLE_ADMIN")
-    @GetMapping("/order")
-    public HttpEntity<PagedModel<EntityModel<OrderDto>>> getAllOrderList(PagedResourcesAssembler<OrderDto> assembler,
-               @RequestParam(value = "size",defaultValue = "0") Integer size,
-               @RequestParam(value = "page", defaultValue = "0") Integer page,
-               @RequestParam(value = "status", required = false) String status,
-               @RequestParam(value = "cylinderType", required = false) List<String> cylinderType,
-               @RequestParam(value = "search", required = false) String search,
-               @RequestParam(value = "quantityOrdering", required = false) String quantityOrder) throws JsonProcessingException {
-        Pageable pageable = PageRequest.of(page, size);
-        Page<OrderDto> orderDtoList = orderService.getAllOrderListForAdmin(pageable, status, cylinderType, search, quantityOrder);
-        Link link = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(AdminController.class)
-                .getAllOrderList(assembler, size, page, status, cylinderType, search, quantityOrder)).withSelfRel();
+    @Autowired
+    private ResourceCentreService resourceCentreService;
 
-        PagedModel<EntityModel<OrderDto>> model = assembler.toModel(orderDtoList, link);
-        return new ResponseEntity<>(model, HttpStatus.OK);
+    @Autowired
+    private AdminService adminService;
+
+
+    /**
+     * Add User To System
+     *
+     * @param userDto
+     * @return ResponseEntity
+     * @throws BadRequestException
+     */
+    @Secured("ROLE_ADMIN")
+    @PostMapping(value = "/addUser/{adminId}")
+    public ResponseEntity<ResponseStatus> addUser(@PathVariable("adminId") Long adminId,
+                                                  @RequestBody UserDto userDto) throws BadRequestException, NoSuchAlgorithmException {
+        log.info("AdminController :: userEntityDto >>> AdminId : {}", adminId);
+        return new ResponseEntity<>(new ResponseStatus(userService.addUser(adminId, userDto)), HttpStatus.OK);
     }
 
-    @PostMapping("/addCylinder/{id}")
-    public ResponseEntity<ResponseStatus> addCylinder(@PathVariable("id") Long userId,
-                                                      @RequestBody CylinderCodeStatusDto cylinderCodeStatusDto) throws BadRequestException {
-        String response = inventoryService.addCylinder(userId, cylinderCodeStatusDto);
-        return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
+    /**
+     * Update User To System.
+     *
+     * @param userDto
+     * @return
+     */
+    @Secured({"ROLE_ADMIN", "ROLE_USER"})
+    @PutMapping(value = "/updateUser/{adminId}")
+    public ResponseEntity<ResponseStatus> updateUser(@PathVariable("adminId") Long adminId,
+                                                     @RequestBody UserDto userDto) throws BadRequestException {
+        log.info("UserController :: updateUser >>> AdminId : {}", adminId);
+        return new ResponseEntity<>(new ResponseStatus(userService.updateUser(adminId, userDto)), HttpStatus.OK);
     }
 
-    @Secured("ROLE_ADMIN")
-    @PostMapping(value = "/addEmployee")
-    public ResponseEntity<ResponseStatus> addEmployee(@RequestBody UserEntityDto userEntityDto) {
-        String response = userService.addUser(userEntityDto);
-        return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
+
+    /**
+     * Add Employee To System
+     *
+     * @param adminId
+     * @param userDto
+     * @return
+     */
+    @Secured({"ROLE_ADMIN", "ROLE_EMPLOYEE"})
+    @PostMapping("/addEmployee/{adminId}")
+    public ResponseEntity<?> addEmployee(@PathVariable("adminId") Long adminId,
+                                         @RequestBody UserDto userDto) throws BadRequestException, NoSuchAlgorithmException {
+        log.info("EmployeeController :: addEmployee >>> AdminId : {}", adminId);
+        return new ResponseEntity<>(new ResponseStatus(employeeService.addEmployee(adminId, userDto)), HttpStatus.OK);
     }
 
-    @Secured("ROLE_ADMIN")
+    /**
+     * Update Employee To System
+     *
+     * @param adminId
+     * @param userDto
+     * @return
+     */
+    @Secured({"ROLE_ADMIN", "ROLE_EMPLOYEE"})
+    @PostMapping("/updateEmployee/{adminId}")
+    public ResponseEntity<?> updateEmployee(@PathVariable("adminId") Long adminId,
+                                            @RequestBody UserDto userDto) throws BadRequestException {
+        log.info("EmployeeController :: addEmployee >>> AdminId : {}", adminId);
+        return new ResponseEntity<>(new ResponseStatus(employeeService.updateEmployee(adminId, userDto)), HttpStatus.OK);
+    }
+
+    /**
+     * Add Cylinder for Specific Admin by Cylinder Code
+     *
+     * @param adminId
+     * @param cylinderDtoList
+     * @return
+     * @throws BadRequestException
+     */
+    @Secured({"ROLE_ADMIN", "ROLE_EMPLOYEE"})
+    @PostMapping("/addCylinder/{adminId}")
+    public ResponseEntity<ResponseStatus> addCylinder(@PathVariable("adminId") Long adminId,
+                                                      @RequestBody List<CylinderDto> cylinderDtoList) throws BadRequestException {
+        log.info("AdminController :: addCylinder >>> AdminId : {}", adminId);
+        return new ResponseEntity<>(new ResponseStatus(inventoryService.addAdminCylinder(adminId, cylinderDtoList)), HttpStatus.OK);
+    }
+
+    /**
+     * Get Filter for Admin in Order Tab
+     *
+     * @return
+     */
+    @Secured({"ROLE_ADMIN", "ROLE_EMPLOYEE"})
     @GetMapping("/filter")
-    public FilterDto getFilters() {
-        return genericService.getFilterList();
+    public ResponseEntity<?> getFilters() {
+        log.info("AdminController :: getFilters >>> ");
+        return new ResponseEntity<>(genericService.getFilterList(), HttpStatus.OK);
     }
 
-    @Secured("ROLE_ADMIN")
+    /**
+     * Add delivery vehicles by admin to assigned the particular order.
+     *
+     * @param deliveryVehicleDto
+     * @return
+     * @throws BadRequestException
+     */
+    @Secured({"ROLE_ADMIN", "ROLE_EMPLOYEE"})
     @PostMapping("/vehicle")
     public ResponseEntity<ResponseStatus> addVehicle(@RequestBody DeliveryVehicleDto deliveryVehicleDto) throws BadRequestException {
+        log.info("AdminController :: addVehicle >>> ");
         String response = userService.addVehicle(deliveryVehicleDto);
         return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
     }
 
-    @Secured("ROLE_ADMIN")
-    @GetMapping("/vehicle")
-    public List<NameIdDto> getVehicle(@RequestParam("id") Long userId) {
-        return userService.getVehicleNumberList(userId);
+    /**
+     * Get Vehicle ()
+     *
+     * @param userId
+     * @return
+     */
+    @Secured({"ROLE_ADMIN", "ROLE_EMPLOYEE"})
+    @GetMapping("/vehicle/{id}")
+    public ResponseEntity<?> getVehicle(@PathVariable("id") Long userId) {
+        log.info("AdminController :: getVehicle >>> AdminId : {}", userId);
+        return new ResponseEntity<>(userService.getVehicleNumberList(userId), HttpStatus.OK);
     }
 
-    @Secured("ROLE_ADMIN")
+    /**
+     * Delete Vehicle By Id
+     *
+     * @param vehicleId
+     * @return
+     * @throws BadRequestException
+     */
+    @Secured({"ROLE_ADMIN", "ROLE_EMPLOYEE"})
+    @DeleteMapping("/vehicle/{id}")
+    public ResponseEntity<?> deleteVehicle(@PathVariable("id") Long vehicleId) throws BadRequestException {
+        log.info("AdminController :: deleteVehicle >>> Id : {}", vehicleId);
+        return new ResponseEntity<>(new ResponseStatus(userService.deleteVehicle(vehicleId)), HttpStatus.OK);
+    }
+
+    /**
+     * Get Cylinder Inventory List.
+     *
+     * @param adminId
+     * @return
+     */
+    @Secured({"ROLE_ADMIN", "ROLE_EMPLOYEE"})
     @GetMapping("/inventory")
-    public List<InventoryCylinderDto> getInventoryCylinderForAdmin(@RequestParam("id") Long adminId) {
-        return inventoryService.getInventoryCylinderForAdmin(adminId);
+    public ResponseEntity<?> getInventoryCylinderForAdmin(@RequestParam("id") Long adminId) {
+        log.info("AdminController :: getInventoryCylinderForAdmin >>> AdminId : {}", adminId);
+        return new ResponseEntity<>(inventoryService.getInventoryCylinderForAdmin(adminId), HttpStatus.OK);
     }
 
-    @Secured("ROLE_ADMIN")
-    @GetMapping("/search")
-    public HttpEntity<PagedModel<EntityModel<UserSearchDto>>> searchUser(PagedResourcesAssembler<UserSearchDto> assembler,
-                                                                         @RequestParam(value = "size",defaultValue = "0") Integer size,
-                                                                         @RequestParam(value = "page", defaultValue = "0") Integer page,
-                                                                         @RequestParam(value = "name") String name) throws BadRequestException {
-        Pageable pageable = PageRequest.of(page, size);
-        Page<UserSearchDto> userSearchList = userService.searchUserByName(pageable, name);
-        Link link = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(AdminController.class)
-                .searchUser(assembler, size, page, name)).withSelfRel();
 
-        PagedModel<EntityModel<UserSearchDto>> model = assembler.toModel(userSearchList, link);
-        return new ResponseEntity<>(model, HttpStatus.OK);
-    }
-
-    @Secured("ROLE_ADMIN")
+    /**
+     * Get User details for Admin as per specific Admin
+     *
+     * @param id
+     * @return
+     * @throws BadRequestException
+     */
+    @Secured({"ROLE_ADMIN", "ROLE_EMPLOYEE"})
     @GetMapping("/userDetails")
-    public UserDetails getUserDetails(@RequestParam("id") Long id) throws BadRequestException {
-        return userService.getUserDetailsForAdmin(id);
+    public ResponseEntity<?> getUserDetails(@RequestParam("id") Long id) throws BadRequestException {
+        log.info("AdminController :: getUserDetails >>> AdminId :{}", id);
+        return new ResponseEntity<>(userService.getUserDetailsForAdmin(id), HttpStatus.OK);
     }
 
+    /**
+     * Get all the Orders as per Admin
+     *
+     * @param id
+     * @return
+     * @throws BadRequestException
+     */
     @GetMapping("/userOrder")
-    public List<OrderDto> getUserOrder(@RequestParam("id") Long id) throws BadRequestException {
-        return orderService.getUserOrderListForAdminInUserDetails(id);
+    public ResponseEntity<List<OrderDto>> getUserOrder(@RequestParam("id") Long id) throws BadRequestException {
+        log.info("AdminController :: getUserOrder >>> AdminId : {}", id);
+        return new ResponseEntity<>(orderService.getUserOrderListForAdminInUserDetails(id), HttpStatus.OK);
+    }
+
+    /**
+     * Get All Details for Admin Onboarding.
+     *
+     * @param id
+     * @return
+     * @throws BadRequestException
+     */
+    @GetMapping("/onboarding")
+    public ResponseEntity<?> getAdminOnBoardingDetails(@RequestParam("id") Long id) throws BadRequestException {
+        log.info("AdminController :: getAdminOnBoardingDetails >>> ");
+        return new ResponseEntity<>(adminService.getOnboardingDetails(id), HttpStatus.OK);
+    }
+
+    /**
+     * Save the details for Onboarding (Gas Description and Price)
+     *
+     * @param onboardingDtoList
+     * @return
+     * @throws BadRequestException
+     */
+    @PostMapping("/onboarding")
+    public ResponseEntity<ResponseStatus> saveAdminOnBoardingDetails(@RequestBody OnboardingDtoList onboardingDtoList) throws BadRequestException {
+        log.info("AdminController :: saveAdminOnBoardingDetails >>> ");
+        String response = adminService.saveOnBoardingDetails(onboardingDtoList);
+        return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
+    }
+
+    /**
+     * Add Or Update Resource Centre by Admin
+     *
+     * @param resourceCentreDtoList
+     * @return
+     * @throws BadRequestException
+     */
+    @Secured({"ROLE_ADMIN", "ROLE_EMPLOYEE"})
+    @PostMapping("/resourceCentre")
+    public ResponseEntity<ResponseStatus> addOrUpdateResourceCentre(@RequestBody List<ResourceCentreDto> resourceCentreDtoList) throws BadRequestException {
+        log.info("AdminController :: addOrUpdateResourceCentre >>> ");
+        String response = resourceCentreService.addOrUpdateResourceCentre(resourceCentreDtoList);
+        return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
+    }
+
+    /**
+     * Get the resource centre by Admin
+     *
+     * @param adminId
+     * @return
+     * @throws BadRequestException
+     */
+    @Secured({"ROLE_ADMIN", "ROLE_EMPLOYEE"})
+    @GetMapping("/resourceCentre")
+    public ResponseEntity<?> getResourceCentre(@RequestParam(value = "id", required = false) Long adminId) throws BadRequestException {
+        log.info("AdminController :: getResourceCentre >>> AdminId : {}", adminId);
+        return new ResponseEntity<>(resourceCentreService.getResourceCentre(adminId), HttpStatus.OK);
+    }
+
+    /**
+     * Delete the resource centre for specific admin
+     *
+     * @param id
+     * @return
+     * @throws BadRequestException
+     */
+    @Secured({"ROLE_ADMIN", "ROLE_EMPLOYEE"})
+    @DeleteMapping("/resourceCentre/{id}")
+    public ResponseEntity<ResponseStatus> deleteResourceCentre(@PathVariable("id") Long id) throws BadRequestException {
+        log.info("AdminController :: deleteResourceCentre >>> Id :{}", id);
+        String response = resourceCentreService.deleteResourceCentre(id);
+        return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);
+    }
+
+    /**
+     * Place Order
+     *
+     * @param adminId
+     * @param openOrderDto
+     * @return
+     * @throws BadRequestException
+     * @throws NoSuchAlgorithmException
+     */
+    @Secured({"ROLE_ADMIN", "ROLE_EMPLOYEE"})
+    @PostMapping("/placeOrder/{adminId}")
+    public ResponseEntity<?> placeOrder(@PathVariable("adminId") Long adminId,
+                                        @RequestBody OpenOrderDto openOrderDto) throws BadRequestException, NoSuchAlgorithmException {
+        log.info("AdminController :: placeOrder >>> AdminId > {} ", adminId);
+        return new ResponseEntity<>(new ResponseStatus(orderService.placeAdminInitiatedOrder(openOrderDto, adminId)), HttpStatus.OK);
+    }
+
+    /**
+     * Get All Gas/Product List as Respect to Admin
+     * API is used to fetch all Gas/Product List while creating order and View in Product Tab
+     *
+     * @param adminId
+     * @return
+     * @throws BadRequestException
+     */
+    @GetMapping("/getAllGasList/{adminId}")
+    public ResponseEntity<?> getAllGasList(@PathVariable("adminId") Long adminId) throws BadRequestException {
+        log.info("AdminController :: getAllGasList >>>  AdminId > {} ", adminId);
+        return new ResponseEntity<>(userService.getAllGasList(adminId), HttpStatus.OK);
+    }
+
+    /**
+     * Update Gas/Product Price and Description By Admin
+     *
+     * @param adminId
+     * @param productGasDto
+     * @return
+     * @throws BadRequestException
+     */
+    @PutMapping("/updateAdminGas/{adminId}")
+    public ResponseEntity<?> updateAdminGas(@PathVariable("adminId") Long adminId,
+                                            @RequestBody ProductGasDto productGasDto) throws BadRequestException {
+        log.info("AdminController :: updateAdminGas >>> AdminId : {}", adminId);
+        return new ResponseEntity<>(new ResponseStatus(adminService.updateAdminGas(adminId, productGasDto)), HttpStatus.OK);
     }
 
 }

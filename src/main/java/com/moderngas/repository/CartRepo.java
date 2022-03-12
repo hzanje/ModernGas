@@ -1,7 +1,6 @@
 package com.moderngas.repository;
 
 import com.moderngas.jpaentity.CartEntity;
-import com.moderngas.jpaentity.OrderEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -15,9 +14,9 @@ import java.util.List;
 @Transactional
 public interface CartRepo extends JpaRepository<CartEntity, Long> {
 
-    List<CartEntity> getCartEntitiesByUserIdOrderByUpdatedDate(Long userId);
+    List<CartEntity> getCartEntitiesByUserIdAndAdminIdOrderByUpdatedDate(Long userId, Long adminId);
 
     @Modifying
-    @Query("DELETE FROM CartEntity WHERE userId = :userId")
-    void deleteByUserId(@Param("userId") Long userId);
+    @Query("DELETE FROM CartEntity WHERE userId = :userId AND adminId = :adminId")
+    void deleteByUserId(@Param("userId") Long userId, @Param("adminId") Long adminId);
 }

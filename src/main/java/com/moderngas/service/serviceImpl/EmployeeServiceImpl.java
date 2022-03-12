@@ -3,85 +3,152 @@ package com.moderngas.service.serviceImpl;
 import com.moderngas.constants.Constants;
 import com.moderngas.constants.ExceptionConstants;
 import com.moderngas.enums.CylinderStatus;
+import com.moderngas.enums.UserRole;
 import com.moderngas.exception.BadRequestException;
-import com.moderngas.jpaentity.CylinderEntity;
-import com.moderngas.jpaentity.OrderEntity;
-import com.moderngas.jpaentity.UserEntity;
-import com.moderngas.pojo.admin.CylinderCodeListDto;
+import com.moderngas.jpaentity.*;
+import com.moderngas.pojo.UserDto;
+import com.moderngas.pojo.admin.CylinderInventoryDto;
+import com.moderngas.pojo.employee.EmployeeEntityResponseDto;
+import com.moderngas.pojo.user.UserSearchDto;
+import com.moderngas.repository.DeliveryVehicleRepo;
 import com.moderngas.repository.InventoryRepo;
-import com.moderngas.repository.OrderRepo;
 import com.moderngas.repository.UserRepo;
 import com.moderngas.service.EmployeeService;
-import lombok.extern.slf4j.Slf4j;
+import com.moderngas.service.GenericService;
+import com.moderngas.service.ValidationService;
+import org.apache.catalina.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 
-import java.util.Collections;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
-import java.util.stream.Collectors;
 
-@Slf4j
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
+
+    private static Logger log = LoggerFactory.getLogger(EmployeeServiceImpl.class.getName());
+
+    @Autowired
+    private DeliveryVehicleRepo deliveryVehicleRepo;
 
     @Autowired
     private InventoryRepo inventoryRepo;
 
     @Autowired
-    private OrderRepo orderRepo;
+    private ValidationService validationService;
+
+    @Autowired
+    private GenericService genericService;
 
     @Autowired
     private UserRepo userRepo;
 
     @Override
-    public String assignCylinderToUser(Long orderId, CylinderCodeListDto codeListDto) throws BadRequestException {
-        OrderEntity orderEntity = orderRepo.findById(orderId).orElse(null);
-        if (null == orderEntity) {
-            throw new BadRequestException(ExceptionConstants.INVALID_ORDER);
+    public String addEmployee(Long adminId, UserDto userDto) throws BadRequestException, NoSuchAlgorithmException {
+        log.info("EmployeeService :: addEmployee >>> AdminId : {}", adminId);
+        UserEntity adminEntity = validationService.validateAdminEntity(adminId);
+        UserEntity employeeEntity = validationService.checkUserAlreadyExistInSystem(userDto.getMobileNumber(), adminEntity);
+        if (!employeeEntity.getAdminIdSet().contains(adminId)) {
+            employeeEntity.setAdminIdSet(genericService.addOrUpdateUserAdmin(employeeEntity, adminId));
+            return Constants.USER_ALREADY_REGISTER_ASSIGNED;
         }
-        if (null == codeListDto || CollectionUtils.isEmpty(codeListDto.getCylinderCodes())) {
-            throw new BadRequestException(ExceptionConstants.INVALID_REQUEST_DATA);
+        if (!ObjectUtils.isEmpty(userDto.getId())) {
+            employeeEntity = validationService.validateAdminEntity(userDto.getId());
         }
-        inventoryRepo.updateCylinderToAssigned(orderEntity.getUserId(), codeListDto.getCylinderCodes(), CylinderStatus.CYLINDER_STATUS_ASSIGNED);
+
+        employeeEntity = genericService.convertUserDtoToEntity(employeeEntity, userDto, adminEntity, UserRole.USER_ROLE_EMPLOYEE);
+        employeeEntity.setAdminIdSet(genericService.addOrUpdateUserAdmin(employeeEntity, adminId));
+        employeeEntity.setPassword(genericService.encodeUserPassword(genericService.generateRandomPassword()));
+        userRepo.save(employeeEntity);
         return Constants.SUCCESS_STR;
     }
 
     @Override
-    public String receiveCylinderFromUser(Long orderId, CylinderCodeListDto codeListDto) throws BadRequestException {
-        OrderEntity orderEntity = orderRepo.findById(orderId).orElse(null);
-        if (null == orderEntity) {
-            throw new BadRequestException(ExceptionConstants.INVALID_ORDER);
+    public String updateEmployee(Long adminId, UserDto userDto) throws BadRequestException {
+        UserEntity adminEntity = validationService.validateAdminEntity(adminId);
+        UserEntity employeeEntity = validationService.validateAdminEntity(userDto.getId());
+        employeeEntity = genericService.convertUserDtoToEntity(employeeEntity, userDto, adminEntity, UserRole.USER_ROLE_EMPLOYEE);
+        employeeEntity.setCompanyName(userDto.getCompanyName());
+        if (null != userDto.getPassword() && !userDto.getPassword().isEmpty()) {
+            employeeEntity.setPassword(genericService.encodeUserPassword(userDto.getPassword()));
         }
-        if (null == codeListDto || CollectionUtils.isEmpty(codeListDto.getCylinderCodes())) {
+        userRepo.save(employeeEntity);
+        return Constants.SUCCESS_STR;
+    }
+
+    @Override
+    public Page<UserSearchDto> getAllEmployeeByAdmin(Pageable pageable, String search, Long adminId) throws BadRequestException {
+        UserEntity adminEntity = validationService.validateAdminEntity(adminId);
+        return userRepo.getAllUserByAdmin(pageable, search, adminEntity.getId(), UserRole.USER_ROLE_EMPLOYEE.getRole());
+    }
+
+    @Override
+    public EmployeeEntityResponseDto getEmployeeById(Long employeeId) throws BadRequestException {
+        UserEntity employeeEntity = validationService.validateAdminEntity(employeeId);
+        EmployeeEntityResponseDto employeeEntityResponseDto = new EmployeeEntityResponseDto();
+        employeeEntityResponseDto.setId(employeeEntity.getId());
+        employeeEntityResponseDto.setName(employeeEntity.getName());
+        employeeEntityResponseDto.setMobileNumber(employeeEntity.getMobileNumber());
+        employeeEntityResponseDto.setEmail(employeeEntity.getEmail());
+        employeeEntityResponseDto.setCompanyName(employeeEntity.getCompanyName());
+        if (!CollectionUtils.isEmpty(employeeEntity.getRoleEntitySet())) {
+            UserRoleEntity employeeRole = employeeEntity.getRoleEntitySet().stream()
+                    .filter(e -> e.getRole().equals(UserRole.USER_ROLE_EMPLOYEE.getRole()))
+                    .findFirst()
+                    .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_EMPLOYEE));
+            employeeEntityResponseDto.setPrivilegeDtoList(genericService.convertToPrivilegeDto(employeeRole.getUserPrivilegeSet()));
+        }
+        return employeeEntityResponseDto;
+    }
+
+    @Override
+    public String assignCylinderToUser(Long orderId, List<String> cylinderCodes) throws BadRequestException {
+        OrderEntity orderEntity = validationService.validateOrderEntity(orderId);
+        UserEntity userEntity = validationService.validateUserEntity(orderEntity.getUserId());
+        if (CollectionUtils.isEmpty(cylinderCodes)) {
             throw new BadRequestException(ExceptionConstants.INVALID_REQUEST_DATA);
         }
-        inventoryRepo.updateCylinderToEmpty(orderEntity.getUserId(), codeListDto.getCylinderCodes(), CylinderStatus.CYLINDER_STATUS_EMPTY);
+        inventoryRepo.updateCylinderToAssigned(userEntity.getId(), userEntity.getName(), cylinderCodes, CylinderStatus.CYLINDER_STATUS_ASSIGNED);
+        return Constants.SUCCESS_STR;
+    }
+
+    @Override
+    public String receiveCylinderFromUser(Long orderId, List<String> cylinderCodes) throws BadRequestException {
+        OrderEntity orderEntity = validationService.validateOrderEntity(orderId);
+        if (CollectionUtils.isEmpty(cylinderCodes)) {
+            throw new BadRequestException(ExceptionConstants.INVALID_REQUEST_DATA);
+        }
+        List<CylinderEntity> cylinderEntityList = inventoryRepo.getCylinderFromCodeList(cylinderCodes);
+        for (CylinderEntity cylinderEntity : cylinderEntityList) {
+            cylinderEntity.setCylinderStatus(CylinderStatus.CYLINDER_STATUS_EMPTY);
+            cylinderEntity.setAssignedUserId(null);
+            cylinderEntity.setAssignedUserName(null);
+            CylinderInventoryDetailsEntity cylinderDetailsEntity = new CylinderInventoryDetailsEntity();
+            if (cylinderEntity.getCylinderInventoryDetailsEntity() != null) {
+                cylinderDetailsEntity = cylinderEntity.getCylinderInventoryDetailsEntity();
+            }
+            cylinderDetailsEntity.setTransit(true);
+            cylinderDetailsEntity.setDeliveryVehicleEntity(orderEntity.getDeliveryVehicle());
+            cylinderEntity.setCylinderInventoryDetailsEntity(cylinderDetailsEntity);
+        }
+        inventoryRepo.saveAll(cylinderEntityList);
         return Constants.SUCCESS_STR;
     }
 
     @Override
     public List<String> getAvailableCylinder() {
-        return inventoryRepo.getAvailableCylinder(CylinderStatus.getByStatus("Filled"));
+        return inventoryRepo.getAvailableCylinder(CylinderStatus.CYLINDER_STATUS_FILLED);
     }
 
     @Override
-    public List<String> getAssignedCylinderByUserId(Long userId) throws BadRequestException {
-        UserEntity userEntity = userRepo.findById(userId).orElse(null);
-        if (null == userEntity) {
-            throw new BadRequestException(ExceptionConstants.INVALID_USER);
-        }
-        return inventoryRepo.getAssignedCylinderByUserId(userId);
-    }
-
-    @Override
-    public String fillCylinder(String cylinderCode) throws BadRequestException {
-        CylinderEntity cylinderEntity = inventoryRepo.checkIfCylinderCodeExist(cylinderCode);
-        if (null == cylinderEntity) {
-            throw new BadRequestException(ExceptionConstants.INVALID_CYLINDER_CODE);
-        }
-        cylinderEntity.setCylinderStatus(CylinderStatus.CYLINDER_STATUS_FILLED);
-        inventoryRepo.save(cylinderEntity);
-        return Constants.SUCCESS_STR;
+    public List<CylinderInventoryDto> getAssignedCylinderByUserId(Long userId) throws BadRequestException {
+        UserEntity userEntity = validationService.validateUserEntity(userId);
+        return inventoryRepo.getAssignedCylinderByUserId(userEntity.getId());
     }
 }

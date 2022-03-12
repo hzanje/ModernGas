@@ -24,7 +24,7 @@ public class BaseEntity implements Serializable {
     protected Long id;
 
     @JsonIgnore
-    @Column(name = "active_flag", columnDefinition = "tinyint(1) DEFAULT 1" )
+    @Column(name = "active_flag", columnDefinition = "tinyint(1) DEFAULT 1")
     protected boolean activeFlag = true;
 
     @JsonIgnore

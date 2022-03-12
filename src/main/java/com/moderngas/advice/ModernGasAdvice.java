@@ -3,7 +3,6 @@ package com.moderngas.advice;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.moderngas.exception.BadRequestException;
 import com.moderngas.pojo.ResponseStatus;
-import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -27,6 +26,7 @@ public class ModernGasAdvice {
     @ExceptionHandler({MissingServletRequestParameterException.class})
     public ResponseEntity<ResponseStatus> handleMissingServletRequestParameterException(MissingServletRequestParameterException exception) {
         ResponseStatus status = new ResponseStatus();
+
         status.setStatus(String.format("Required parameter %s is not present", exception.getParameterName()));
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(status);
     }
@@ -63,6 +63,13 @@ public class ModernGasAdvice {
     public ResponseEntity<ResponseStatus> handleTokenExpiredException(TokenExpiredException tokenExpiredException) {
         ResponseStatus status = new ResponseStatus();
         status.setStatus("Request Token Has Expired");
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(status);
+    }
+
+    @ExceptionHandler({IllegalArgumentException.class})
+    public ResponseEntity<ResponseStatus> illegalArgumentException(IllegalArgumentException illegalArgumentException) {
+        ResponseStatus status = new ResponseStatus();
+        status.setStatus("Please Enter Valid Argument");
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(status);
     }
 

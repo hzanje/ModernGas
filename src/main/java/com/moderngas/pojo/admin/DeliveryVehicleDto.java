@@ -3,15 +3,13 @@ package com.moderngas.pojo.admin;
 import lombok.Data;
 import lombok.NonNull;
 
+import java.util.List;
+
 @Data
 public class DeliveryVehicleDto {
 
-    private String name;
-
-    private String color;
-
     @NonNull
-    private String number;
+    private List<String> numbers;
 
     @NonNull
     private Long userId;

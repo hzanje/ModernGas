@@ -1,63 +1,64 @@
 package com.moderngas.service;
 
 import com.moderngas.exception.BadRequestException;
-import com.moderngas.jpaentity.AddressEntity;
 import com.moderngas.jpaentity.UserEntity;
-import com.moderngas.pojo.admin.DeliveryVehicleDto;
-import com.moderngas.pojo.admin.OrderDto;
-import com.moderngas.pojo.admin.UserDetails;
-import com.moderngas.pojo.user.GasDto;
 import com.moderngas.pojo.NameIdDto;
-import com.moderngas.pojo.user.UserDashboardDto;
-import com.moderngas.pojo.user.UserEntityDto;
-
-import com.moderngas.pojo.user.UserSearchDto;
+import com.moderngas.pojo.UserDto;
+import com.moderngas.pojo.admin.DeliveryVehicleDto;
+import com.moderngas.pojo.admin.UserDetails;
+import com.moderngas.pojo.user.*;
 import net.minidev.json.JSONObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
-import java.util.Optional;
+import java.util.Set;
 
 public interface UserService {
 
-    String addUser(UserEntityDto userEntityDto);
 
-    String updateUser(UserEntity userEntity);
+    UserEntityResponseDto getUserById(Long userId) throws BadRequestException;
 
-    List<UserEntityDto> getAllUser();
+    UserEntity getUserByLoginId(Long username) throws BadRequestException;
 
-    UserEntityDto getUserById(Long userId) throws BadRequestException;
-
-    String checkUserExist(Long mobileNumber);
-
-    UserEntity getUserByLoginId(Long username);
-
-    String changePassword(Long username, String oldPassword, String newPassword);
+    String changePassword(Long username, String newPassword) throws BadRequestException;
 
     String forgetPassword(Long userName) throws BadRequestException;
 
-    List<UserDashboardDto> getUserDashboard(Long userId);
+    Set<UserDashboardDto> getUserDashboard(Long userId, Long adminId) throws BadRequestException;
 
-    String updateAddress(AddressEntity addressEntity, Long userId);
-    
-    JSONObject getAddress(Long userId);
+    String addOrUpdateAddress(AddressDto addressDto, Long userId) throws BadRequestException;
+
+    JSONObject getAddress(Long userId) throws BadRequestException;
+
+    String deleteUserAddress(Long id);
 
     String refreshToken(String existingToken) throws BadRequestException;
 
-    List<NameIdDto> getListByCategoryId(Long categoryId);
+    List<GasNameIdDto> getGasListByCategoryId(Long categoryId, Long adminId);
 
-    GasDto getGasDetailsById(Long id) throws BadRequestException;
+    List<GasDto> getAllGasList(Long adminId) throws BadRequestException;
+
+    GasDto getGasDetailsById(Long id, Long adminId) throws BadRequestException;
 
     void checkIfRoleIsNotUser(UserEntity userEntity) throws BadRequestException;
 
     String addVehicle(DeliveryVehicleDto deliveryVehicleDto) throws BadRequestException;
 
+    String deleteVehicle(Long vehicleId) throws BadRequestException;
+
     List<NameIdDto> getVehicleNumberList(Long userId);
 
-    Page<UserSearchDto> searchUserByName(Pageable pageable, String name) throws BadRequestException;
+    Page<UserSearchDto> getAllUserByAdmin(Pageable pageable, String search, Long adminId) throws BadRequestException;
 
     UserDetails getUserDetailsForAdmin(Long id) throws BadRequestException;
 
     String logout(String token) throws BadRequestException;
+
+    String addUser(Long adminId, UserDto userDto) throws BadRequestException, NoSuchAlgorithmException;
+
+    String updateUser(Long adminId, UserDto userDto) throws BadRequestException;
+
+    List<FrequentOrderProductDto> getFrequentlyOrderProduct(Long userId, Long adminId) throws BadRequestException;
 }

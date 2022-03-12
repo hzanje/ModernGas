@@ -2,27 +2,35 @@ package com.moderngas.service.serviceImpl;
 
 import com.moderngas.constants.Constants;
 import com.moderngas.constants.ExceptionConstants;
-import com.moderngas.enums.CylinderStatus;
+import com.moderngas.enums.UserRole;
 import com.moderngas.exception.BadRequestException;
 import com.moderngas.jpaentity.CylinderEntity;
 import com.moderngas.jpaentity.UserEntity;
-import com.moderngas.pojo.admin.CylinderCodeStatusDto;
-import com.moderngas.pojo.admin.InventoryCylinderDto;
+import com.moderngas.pojo.admin.CylinderDto;
+import com.moderngas.pojo.admin.CylinderInventoryDto;
+import com.moderngas.pojo.user.InventoryDetailsDto;
 import com.moderngas.repository.InventoryRepo;
 import com.moderngas.repository.UserRepo;
+import com.moderngas.service.GenericService;
 import com.moderngas.service.InventoryService;
-import lombok.extern.slf4j.Slf4j;
+import com.moderngas.service.UserService;
+import com.moderngas.service.ValidationService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import com.moderngas.service.UserService;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
-@Slf4j
 @Service
 public class InventoryServiceImpl implements InventoryService {
+
+    private static Logger log = LoggerFactory.getLogger(InventoryServiceImpl.class.getName());
 
     @Autowired
     private UserService userService;
@@ -33,35 +41,59 @@ public class InventoryServiceImpl implements InventoryService {
     @Autowired
     private InventoryRepo inventoryRepo;
 
+    @Autowired
+    private ValidationService validationService;
+
+    @Autowired
+    private GenericService genericService;
+
     @Override
-    public String addCylinder(Long userId, CylinderCodeStatusDto cylinderCodeStatusDto) throws BadRequestException {
-        if (null == cylinderCodeStatusDto) {
+    public String addAdminCylinder(Long adminId, List<CylinderDto> cylinderDtoList) throws BadRequestException {
+        if (CollectionUtils.isEmpty(cylinderDtoList)) {
             throw new BadRequestException(ExceptionConstants.INVALID_REQUEST_DATA);
         }
-        UserEntity userEntity = userRepo.findById(userId).orElse(null);
-        //userService.checkIfRoleIsNotUser(userEntity);
-        if (!CylinderStatus.isExist(cylinderCodeStatusDto.getStatus())) {
-            throw new BadRequestException(ExceptionConstants.INVALID_STATUS);
+        UserEntity adminEntity = validationService.validateAdminEntity(adminId);
+        return addCylinders(adminEntity, cylinderDtoList, UserRole.USER_ROLE_ADMIN.getRole());
+    }
+
+    @Override
+    public String addUserCylinder(Long userId, List<CylinderDto> cylinderDtoList) throws BadRequestException {
+        if (CollectionUtils.isEmpty(cylinderDtoList)) {
+            throw new BadRequestException(ExceptionConstants.INVALID_REQUEST_DATA);
         }
-        CylinderStatus cylinderStatus = CylinderStatus.getByStatus(cylinderCodeStatusDto.getStatus());
-        List<CylinderEntity> cylinderEntityList = new ArrayList<>();
-        for (String code : cylinderCodeStatusDto.getCylinderCodes()) {
-            if (null == inventoryRepo.checkIfCylinderCodeExist(code)) {
-                CylinderEntity cylinderEntity = new CylinderEntity();
-                cylinderEntity.setCode(code);
-                if (cylinderStatus.equals(CylinderStatus.CYLINDER_STATUS_ASSIGNED)) {
-                    cylinderEntity.setUserId(userEntity.getId());
-                }
-                cylinderEntity.setCylinderStatus(cylinderStatus);
-                cylinderEntityList.add(cylinderEntity);
+        UserEntity userEntity = validationService.validateUserEntity(userId);
+        return addCylinders(userEntity, cylinderDtoList, UserRole.USER_ROLE_USER.getRole());
+    }
+
+    private String addCylinders(UserEntity entity, List<CylinderDto> cylinderDtoList, String requestedRole) throws BadRequestException {
+        Set<CylinderEntity> cylinderEntitySet = CollectionUtils.isEmpty(entity.getCylinderEntitySet()) ? new HashSet<>()  : entity.getCylinderEntitySet() ;
+        for (CylinderDto cylinderDto : cylinderDtoList) {
+            CylinderEntity cylinderEntity = genericService.convertDtoToCylinderEntity(entity, cylinderDto, requestedRole);
+            if (!ObjectUtils.isEmpty(cylinderEntity)) {
+                cylinderEntitySet.add(cylinderEntity);
             }
         }
-        inventoryRepo.saveAll(cylinderEntityList);
+        entity.setCylinderEntitySet(cylinderEntitySet);
+        userRepo.save(entity);
         return Constants.SUCCESS_STR;
     }
 
     @Override
-    public List<InventoryCylinderDto> getInventoryCylinderForAdmin(Long adminId) {
+    public List<CylinderInventoryDto> getInventoryCylinderForAdmin(Long adminId) {
         return inventoryRepo.getInventoryCylinderForAdmin();
+    }
+
+    @Override
+    public Set<InventoryDetailsDto> getUserInventory(Long id, Long adminId) throws BadRequestException {
+        UserEntity userEntity = validationService.validateUserEntity(id);
+        if (!userEntity.getAdminIdSet().contains(adminId)) {
+            throw new BadRequestException(ExceptionConstants.INVALID_USER_ADMIN);
+        }
+
+        Set<InventoryDetailsDto> inventoryDetailsDtoSet = new HashSet<>();
+        inventoryDetailsDtoSet.addAll(inventoryRepo.getInventoryCylinderAssignedToUser(id));
+        inventoryDetailsDtoSet.addAll(inventoryRepo.getInventoryCylinderOwnedByUser(id));
+
+        return inventoryDetailsDtoSet;
     }
 }

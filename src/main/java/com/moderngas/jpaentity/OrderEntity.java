@@ -5,13 +5,7 @@ import com.moderngas.enums.OrderStatus;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.Date;
 
 @Entity
@@ -20,10 +14,13 @@ import java.util.Date;
 @Table(name = "orders")
 public class OrderEntity extends BaseEntity {
 
+    @Column(name = "order_number")
+    private String orderNumber;
+
     @Column(name = "quantity")
     private int quantity;
 
-    @Column(name = "is_refill", columnDefinition = "tinyint(1) DEFAULT 0" )
+    @Column(name = "is_refill", columnDefinition = "tinyint(1) DEFAULT 0")
     private boolean isRefill;
 
     @Column(name = "refill_count")
@@ -31,6 +28,9 @@ public class OrderEntity extends BaseEntity {
 
     @Column(name = "user_id")
     private Long userId;
+
+    @Column(name = "admin_id")
+    private Long adminId;
 
     @Column(name = "status_id")
     @Enumerated(EnumType.ORDINAL)
@@ -44,8 +44,9 @@ public class OrderEntity extends BaseEntity {
     @JoinColumn(name = "gas_id", referencedColumnName = "id")
     private GasMaster gasMaster;
 
-    @Column(name = "delivery_vehicle")
-    private Long deliveryVehicleNumber;
+    @OneToOne
+    @JoinColumn(name = "delivery_vehicle", referencedColumnName = "id")
+    private DeliveryVehicleEntity deliveryVehicle;
 
     @Column(name = "loaded_date")
     private Date loadedDate;
@@ -57,6 +58,10 @@ public class OrderEntity extends BaseEntity {
     private Date cancellationDate;
 
     @Column(name = "price")
-    private int price;
+    private float price;
+
+    @OneToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
+    @JoinColumn(name = "address_id", referencedColumnName = "id")
+    private AddressEntity addressEntity;
 
 }

@@ -1,9 +1,13 @@
 package com.moderngas.pojo.user;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.springframework.util.StringUtils;
+import lombok.NoArgsConstructor;
+import org.springframework.util.ObjectUtils;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserSearchDto {
 
     private Long id;
@@ -12,9 +16,11 @@ public class UserSearchDto {
 
     private String companyName;
 
+    private Long mobileNumber;
+
     public UserSearchDto(Long id, String name, String companyName) {
         this.id = id;
         this.name = name;
-        this.companyName = StringUtils.isEmpty(companyName) ? "NA" : companyName;
+        this.companyName = ObjectUtils.isEmpty(companyName) ? "NA" : companyName;
     }
 }

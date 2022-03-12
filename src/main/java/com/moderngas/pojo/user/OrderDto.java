@@ -1,9 +1,8 @@
 package com.moderngas.pojo.user;
 
-import com.moderngas.pojo.DateStatusDto;
+import com.moderngas.pojo.OrderDateStatusDto;
 import lombok.Data;
 
-import java.util.Date;
 import java.util.List;
 
 @Data
@@ -17,6 +16,8 @@ public class OrderDto {
 
     private Long userId;
 
+    private Long adminId;
+
     private Long gasId;
 
     private String gasName;
@@ -27,7 +28,7 @@ public class OrderDto {
 
     private int refillCount;
 
-    private int price;
+    private float price;
 
     private String status;
 
@@ -35,15 +36,11 @@ public class OrderDto {
 
     private String deliveryVehicle;
 
-    private List<DateStatusDto> dateStatusDto;
-
-    private Date orderedOnDate;
-
-    private Date loadedOnDate;
-
-    private Date deliveredOnDate;
+    private List<OrderDateStatusDto> orderDateStatusDto;
 
     private AddressDto addressDto;
+
+    private Long addressId;
 
 
 }

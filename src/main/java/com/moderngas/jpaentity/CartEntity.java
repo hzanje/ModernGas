@@ -4,13 +4,7 @@ import com.moderngas.enums.CylinderType;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Data
 @NoArgsConstructor
@@ -31,6 +25,9 @@ public class CartEntity extends BaseEntity {
     @Column(name = "userId")
     private Long userId;
 
+    @Column(name = "admin_id")
+    private Long adminId;
+
     @OneToOne
     @JoinColumn(name = "gas_id", referencedColumnName = "id")
     private GasMaster gasMaster;
@@ -39,5 +36,5 @@ public class CartEntity extends BaseEntity {
     private int quantity;
 
     @Column(name = "price")
-    private int price;
+    private float price;
 }

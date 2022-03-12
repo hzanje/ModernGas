@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.util.Set;
 
 @Entity
 @Getter
@@ -28,11 +27,6 @@ public class GasMaster extends BaseEntity {
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "type_id", referencedColumnName = "id")
     private CategoryMaster categoryMaster;
-
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinTable(name = "gas_image_mapping", joinColumns = {@JoinColumn(name = "gas_id")}
-    , inverseJoinColumns = {@JoinColumn(name = "image_id")})
-    private Set<GasImageEntity> gasImageEntityList;
 
 
 }

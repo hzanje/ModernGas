@@ -4,8 +4,7 @@ import javax.mail.MessagingException;
 
 public interface EmailService {
 
-    public void sendMail(String to, String subject, String body) throws MessagingException;
-
+    void sendMail(String to, String subject, String body) throws MessagingException;
 
 
 }

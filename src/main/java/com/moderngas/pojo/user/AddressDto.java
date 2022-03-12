@@ -7,6 +7,10 @@ public class AddressDto {
 
     private Long id;
 
+    private String name;
+
+    private Long mobileNumber;
+
     private int pincode;
 
     private String landmark;
@@ -18,4 +22,6 @@ public class AddressDto {
     private String city;
 
     private String state;
+
+    private boolean isPrimary;
 }

@@ -1,20 +1,27 @@
 package com.moderngas.jpaentity;
 
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Data
-@NoArgsConstructor
+@Getter
+@Setter
+@Where(clause = "active_flag = 1")
 @Table(name = "user")
 public class UserEntity extends BaseEntity {
+
+    @Column(name = "is_onboarding", columnDefinition = "tinyint(1) DEFAULT 1")
+    protected boolean isOnboarding = true;
 
     @Column(name = "name")
     private String name;
 
-    @Column(name = "mobile_number")
+    @Column(name = "mobile_number", updatable= false)
     private Long mobileNumber;
 
     @Column(name = "email")
@@ -27,22 +34,41 @@ public class UserEntity extends BaseEntity {
     @Column(name = "company_name")
     private String companyName;
 
-    @Column(name = "contact_person")
-    private String contactPerson;
+    @Column(name = "is_forget_password", columnDefinition = "tinyint(1) DEFAULT 0")
+    private boolean isForgetPassword = false;
 
-    @Column(name = "employer_id")
-    private Long employerId;
+    @ElementCollection
+    @CollectionTable(name = "user_admin_mapping", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "admin_id")
+    private Set<Long> adminIdSet = new HashSet<>();
+
+    @OneToMany(cascade = {CascadeType.DETACH, CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.REMOVE}, fetch = FetchType.EAGER, orphanRemoval = true)
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    private Set<AddressEntity> addressEntitySet;
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    private Set<ContactPersonEntity> contactPersonSet;
 
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     private Set<UserRoleEntity> roleEntitySet;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "admin_id", referencedColumnName = "id", nullable = false)
+    private Set<AdminGasMapping> adminGasMappings;
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "userEntity",  orphanRemoval = true)
+    //@JoinColumn(name = "user_id", nullable = false)
+    private Set<CylinderEntity> cylinderEntitySet;
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "userEntity", orphanRemoval = true)
+    //@JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
+    private Set<ResourceCentreEntity> resourceCentreEntitySet;
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     private Set<UserTokenEntity> userTokenSet;
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinColumn(name = "addressId", referencedColumnName = "id")
-    private AddressEntity addressEntity;
 
 }

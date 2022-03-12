@@ -1,26 +1,24 @@
 package com.moderngas.enums;
 
-import org.springframework.util.StringUtils;
+import org.springframework.util.ObjectUtils;
 
 public enum UserRole {
 
+    USER_ROLE_SUPER_ADMIN("ROLE_SUPER_ADMIN"),
+    USER_ROLE_ADMIN("ROLE_ADMIN"),
     USER_ROLE_USER("ROLE_USER"),
-    USER_ROLE_ADMIN("ROLE_ADMIN");
+    USER_ROLE_EMPLOYEE("ROLE_EMPLOYEE");
 
     private final String role;
-
-    public String getRole() {
-        return role;
-    }
 
     UserRole(String role) {
         this.role = role;
     }
 
     public static UserRole getByRole(String role) {
-        if (!StringUtils.isEmpty(role)) {
+        if (!ObjectUtils.isEmpty(role)) {
             for (UserRole userRole : UserRole.values()) {
-                if (userRole.getRole().equals("ROLE_" + role)) {
+                if (userRole.getRole().equals(role)) {
                     return userRole;
                 }
             }
@@ -29,7 +27,7 @@ public enum UserRole {
     }
 
     public static boolean isExist(String role) {
-        if (!StringUtils.isEmpty(role)) {
+        if (!ObjectUtils.isEmpty(role)) {
             for (UserRole userRole : UserRole.values()) {
                 if (userRole.getRole().equals("ROLE_" + role)) {
                     return true;
@@ -37,5 +35,9 @@ public enum UserRole {
             }
         }
         return false;
+    }
+
+    public String getRole() {
+        return role;
     }
 }

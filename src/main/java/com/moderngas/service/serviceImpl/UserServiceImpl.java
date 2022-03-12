@@ -2,63 +2,50 @@ package com.moderngas.service.serviceImpl;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.moderngas.Security.JwtProperties;
 import com.moderngas.constants.Constants;
 import com.moderngas.constants.ExceptionConstants;
-import com.moderngas.enums.CylinderType;
+import com.moderngas.enums.UserRole;
 import com.moderngas.exception.BadRequestException;
-import com.moderngas.exception.UnauthorizedException;
-import com.moderngas.jpaentity.AddressEntity;
-import com.moderngas.jpaentity.CategoryMaster;
-import com.moderngas.jpaentity.DeliveryVehicle;
-import com.moderngas.jpaentity.GasImageEntity;
-import com.moderngas.jpaentity.GasMaster;
-import com.moderngas.jpaentity.OrderEntity;
-import com.moderngas.jpaentity.UserEntity;
-import com.moderngas.jpaentity.UserRoleEntity;
-import com.moderngas.jpaentity.UserTokenEntity;
+import com.moderngas.jpaentity.*;
+import com.moderngas.pojo.CylinderTypeDto;
+import com.moderngas.pojo.NameIdDto;
+import com.moderngas.pojo.UserDto;
 import com.moderngas.pojo.admin.DeliveryVehicleDto;
 import com.moderngas.pojo.admin.UserDetails;
-import com.moderngas.pojo.user.GasDto;
-import com.moderngas.pojo.NameIdDto;
-import com.moderngas.pojo.user.UserDashboardDto;
-import com.moderngas.pojo.user.UserEntityDto;
-import com.moderngas.pojo.user.UserSearchDto;
-import com.moderngas.repository.DeliveryVehicleRepo;
-import com.moderngas.repository.GasRepo;
-import com.moderngas.repository.InventoryRepo;
-import com.moderngas.repository.OrderRepo;
-import com.moderngas.repository.UserRepo;
+import com.moderngas.pojo.user.*;
+import com.moderngas.repository.*;
+import com.moderngas.security.AESUtil;
+import com.moderngas.security.JwtProperties;
 import com.moderngas.service.EmailService;
 import com.moderngas.service.GenericService;
 import com.moderngas.service.UserService;
-
-import lombok.extern.slf4j.Slf4j;
+import com.moderngas.service.ValidationService;
 import net.minidev.json.JSONObject;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
+import org.springframework.util.ObjectUtils;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.security.NoSuchAlgorithmException;
+import java.util.*;
 import java.util.stream.Collectors;
 
-@Slf4j
 @Service
 public class UserServiceImpl implements UserService {
 
+    private static Logger log = LoggerFactory.getLogger(UserServiceImpl.class.getName());
+
     @Autowired
     private UserRepo userRepo;
+
+    @Autowired
+    private AddressRepo addressRepo;
 
     @Autowired
     private GenericService genericService;
@@ -73,6 +60,9 @@ public class UserServiceImpl implements UserService {
     private GasRepo gasRepo;
 
     @Autowired
+    private AdminGasMappingRepo adminGasMappingRepo;
+
+    @Autowired
     private DeliveryVehicleRepo deliveryVehicleRepo;
 
     @Autowired
@@ -81,89 +71,73 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private OrderRepo orderRepo;
 
+    @Autowired
+    private ValidationService validationService;
 
     @Override
-    public String addUser(UserEntityDto userEntityDto) {
-        log.info("UserService >> Create New User");
-        /* Add new Client to DataBase */
-        String response = Constants.FAILURE_STR;
-
-        UserEntity userEntity = genericService.convertDtoToUserData(userEntityDto);
-        userEntity = userRepo.save(userEntity);
-        if (userEntity.getId() != null) {
-            response = Constants.SUCCESS_STR;
+    public String addUser(Long adminId, UserDto userDto) throws BadRequestException, NoSuchAlgorithmException {
+        log.info("UserService :: addUser >>> AdminId : {}", adminId);
+        UserEntity adminEntity = validationService.validateAdminEntity(adminId);
+        UserEntity userEntity = validationService.checkUserAlreadyExistInSystem(userDto.getMobileNumber(), adminEntity);
+        if (!userEntity.getAdminIdSet().contains(adminId)) {
+            userEntity.setAdminIdSet(genericService.addOrUpdateUserAdmin(userEntity, adminId));
+            return Constants.USER_ALREADY_REGISTER_ASSIGNED;
         }
-        return response;
-    }
-
-    public String updateUser(UserEntity userEntity) {
-        log.info("UserService >> Update User");
-        String response = Constants.FAILURE_STR;
-        Optional<UserEntity> user=userRepo.findByMobileNumber(userEntity.getMobileNumber());
-        if(user.isPresent()) {
-        	UserEntity tempUser=user.get();
-        	tempUser.setName(userEntity.getName());
-        	tempUser.setEmail(userEntity.getEmail());
-        	tempUser.setCompanyName(userEntity.getCompanyName());
-            userRepo.save(tempUser);
-            response = Constants.SUCCESS_STR;
+        if (!ObjectUtils.isEmpty(userDto.getId())) {
+            userEntity = validationService.validateUserEntity(userDto.getId());
         }
-        return response;
+        userEntity = genericService.convertUserDtoToEntity(userEntity, userDto, adminEntity, UserRole.USER_ROLE_USER);
+        userEntity.setAdminIdSet(genericService.addOrUpdateUserAdmin(userEntity, adminId));
+        userEntity.setCompanyName(userDto.getCompanyName());
+        userEntity.setPassword(genericService.encodeUserPassword(genericService.generateRandomPassword()));
+        userRepo.save(userEntity);
+        return Constants.SUCCESS_STR;
     }
 
     @Override
-    public List<UserEntityDto> getAllUser() {
-        List<UserEntity> userEntityList = userRepo.findAll();
-        List<UserEntityDto> userEntityDtoList = new ArrayList<>();
-        for (UserEntity userEntity : userEntityList) {
-            UserEntityDto userEntityDto = genericService.convertUserDataToDto(userEntity);
-            userEntityDtoList.add(userEntityDto);
+    public String updateUser(Long adminId, UserDto userDto) throws BadRequestException {
+        UserEntity adminEntity = validationService.validateAdminEntity(adminId);
+        UserEntity userEntity = validationService.validateUserEntity(userDto.getId());
+        userEntity = genericService.convertUserDtoToEntity(userEntity, userDto, adminEntity, UserRole.USER_ROLE_USER);
+        userEntity.setCompanyName(userDto.getCompanyName());
+        if (null != userDto.getPassword() && !userDto.getPassword().isEmpty()) {
+            userEntity.setPassword(genericService.encodeUserPassword(userDto.getPassword()));
         }
-        return userEntityDtoList;
+        userRepo.save(userEntity);
+        return Constants.SUCCESS_STR;
     }
 
     @Override
-    public UserEntityDto getUserById(Long userId) throws BadRequestException {
-        UserEntity userEntity = userRepo.findById(userId).orElse(null);
-        if (null == userEntity) {
-            throw new BadRequestException(ExceptionConstants.INVALID_USER);
-        }
+    public Page<UserSearchDto> getAllUserByAdmin(Pageable pageable, String search, Long adminId) throws BadRequestException {
+        UserEntity adminEntity = validationService.validateAdminEntity(adminId);
+        return userRepo.getAllUserByAdmin(pageable, search, adminEntity.getId(), UserRole.USER_ROLE_USER.getRole());
+    }
+
+    @Override
+    public UserEntityResponseDto getUserById(Long userId) throws BadRequestException {
+        UserEntity userEntity = validationService.validateUserEntity(userId);
         return genericService.convertUserDataToDto(userEntity);
     }
 
     @Override
-    public String checkUserExist(Long mobileNumber) {
-        String result = Constants.FAILURE_STR;
-        Optional<UserEntity> userEntity = userRepo.findByMobileNumber(mobileNumber);
-        if (userEntity.isPresent()) {
-            result = Constants.SUCCESS_STR;
-        }
-        return result;
+    public UserEntity getUserByLoginId(Long username) throws BadRequestException {
+        return userRepo.findByMobileNumber(username).orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER_NAME));
     }
 
     @Override
-    public UserEntity getUserByLoginId(Long username) {
-        Optional<UserEntity> userEntity = userRepo.findByMobileNumber(username);
-        if (userEntity.isPresent()) {
-            return userEntity.get();
-        }
-        return null;
-    }
-
-    @Override
-    public String changePassword(Long username, String oldPassword, String newPassword) {
+    public String changePassword(Long username, String newPassword) throws BadRequestException {
         log.info("UserService >> Changes password for User: {}", username);
-        String result = Constants.FAILURE_STR;
-        UserEntity userEntity;
-        Optional<UserEntity> optionalUserEntity = userRepo.findByMobileNumber(username);
-        if (optionalUserEntity.isPresent()) {
-            userEntity = optionalUserEntity.get();
-            if (passwordEncoder.matches(oldPassword, userEntity.getPassword())) {
-                userEntity.setPassword(passwordEncoder.encode(newPassword));
-                result = updateUser(userEntity);
-            }
+        UserEntity userEntity = userRepo.findByMobileNumber(username)
+                .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER));
+        userEntity.setPassword(passwordEncoder.encode(newPassword));
+        if (userEntity.isOnboarding()) {
+            userEntity.setOnboarding(false);
         }
-        return result;
+        if (userEntity.isForgetPassword()) {
+            userEntity.setForgetPassword(false);
+        }
+        userRepo.save(userEntity);
+        return Constants.SUCCESS_STR;
     }
 
     @Override
@@ -171,11 +145,8 @@ public class UserServiceImpl implements UserService {
         log.info("UserService >> Forget Password by User: {}", userName);
         String result = Constants.FAILURE_STR;
         /* Check if User Exits */
-        Optional<UserEntity> entity=userRepo.findByMobileNumber(userName);
-        if(!entity.isPresent()) {
-            throw new BadRequestException(ExceptionConstants.INVALID_USER);
-        }
-        UserEntity userEntity = entity.get();
+        UserEntity userEntity = userRepo.findByMobileNumber(userName)
+                .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER));
         try {
             if (null != userEntity && null != userEntity.getEmail()) {
                 String tempPassword = genericService.generateRandomPassword();
@@ -186,8 +157,9 @@ public class UserServiceImpl implements UserService {
 
                 /* Update user with random password */
                 userEntity.setPassword(passwordEncoder.encode(tempPassword));
-                result = updateUser(userEntity);
-
+                userEntity.setForgetPassword(true);
+                userRepo.save(userEntity);
+                result = Constants.SUCCESS_STR;
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -196,121 +168,144 @@ public class UserServiceImpl implements UserService {
     }
 
     private String createEmailBody(String name, String tempPassword) {
-        StringBuilder stringBuilder = new StringBuilder("Hi " + name + ", <Br>");
-        stringBuilder.append("Have you forget your password to Modern Gas App, Don't worry we have provided a temporary password below, ");
-        stringBuilder.append("<Br><Br>Password : <Strong>" + tempPassword + "</Strong>");
-        stringBuilder.append("<Br>Now you may directly login to Modern Gas Account with temporary password. ");
-        stringBuilder.append("<Br><Br>Thanks & Regards, <Br> A.B. Chaudhary");
-        return stringBuilder.toString();
+        return "Hi " + name + ", <Br>" + "Have you forget your password to Modern Gas App, Don't worry we have provided a temporary password below, " +
+                "<Br><Br>Password : <Strong>" + tempPassword + "</Strong>" +
+                "<Br>Now you may directly login to Modern Gas Account with temporary password. " +
+                "<Br><Br>Thanks & Regards, <Br> A.B. Chaudhary";
     }
 
     @Override
-    public List<UserDashboardDto> getUserDashboard(Long userId) {
-        List<UserDashboardDto> userDashboardDtoList = new ArrayList<>();
+    public Set<UserDashboardDto> getUserDashboard(Long userId, Long adminId) throws BadRequestException {
+        UserEntity userEntity = validationService.validateUserEntity(userId);
+        if (!userEntity.getAdminIdSet().contains(adminId)) {
+            throw new BadRequestException(ExceptionConstants.INVALID_USER_ADMIN);
+        }
+        Set<UserDashboardDto> userDashboardSet = new LinkedHashSet();
 
         /* Get all Category*/
         List<CategoryMaster> categoryMasterList = gasRepo.getAllCategory();
-        userDashboardDtoList.addAll(genericService.convertCategoryToDto(categoryMasterList));
+        /* Get Order Category by Admin's selection  */
+        List<AdminGasMapping> adminGasMappingList = adminGasMappingRepo.getAllGasMappingByAdminId(adminId);
 
-        /* Get Dashboard Gas  */
-        GasMaster gasMaster = gasRepo.getGasMasterByNameEquals("Medical Oxygen");
-        if(gasMaster!=null) {
-        UserDashboardDto userDashboardDto = new UserDashboardDto();
-        userDashboardDto.setId(gasMaster.getId());
-        userDashboardDto.setName(gasMaster.getName());
-        userDashboardDto.setCategory(false);
-        userDashboardDtoList.add(userDashboardDto);
-        }
-        return userDashboardDtoList;
+        userDashboardSet.addAll(genericService.convertGasMappingToDashboardDto(adminGasMappingList));
+        userDashboardSet.addAll(genericService.convertCategoryToDto(categoryMasterList, userDashboardSet));
+        return userDashboardSet;
     }
 
     @Override
-    public List<NameIdDto> getListByCategoryId(Long categoryId) {
-        return gasRepo.getGasMasterByCategoryId(categoryId);
+    public List<GasNameIdDto> getGasListByCategoryId(Long categoryId, Long adminId) {
+        List<AdminGasMapping> adminGasMappingList = adminGasMappingRepo.getGasMappingListByCategoryId(categoryId, adminId);
+        return adminGasMappingList.stream()
+                .map(e -> new GasNameIdDto(e.getGasId(), e.getGasName(), ""))
+                .toList();
     }
 
     @Override
-    public String updateAddress(AddressEntity addressEntity, Long userId) {
-        String response = Constants.FAILURE_STR;
-        Optional<UserEntity> optionalUser = userRepo.findById(userId);
-        if (optionalUser.isPresent()) {
-            UserEntity userEntity = optionalUser.get();
-            userEntity.setAddressEntity(addressEntity);
-            userRepo.save(userEntity);
-            response = Constants.SUCCESS_STR;
+    public List<GasDto> getAllGasList(Long adminId) throws BadRequestException{
+        UserEntity adminEntity = validationService.validateAdminEntity(adminId);
+        List<AdminGasMapping> adminGasMappingList = adminGasMappingRepo.getGasMappingList(adminEntity.getId());
+        List<GasDto> gasDtoList = new ArrayList<>();
+        for (AdminGasMapping adminGasMapping : adminGasMappingList) {
+            GasDto gasDto = new GasDto();
+            gasDto.setId(adminGasMapping.getGasId());
+            gasDto.setName(adminGasMapping.getGasName());
+            gasDto.setCategory(adminGasMapping.getCategoryName());
+            gasDto.setAvailable(adminGasMapping.isActiveFlag());
+            gasDto.setPrice(adminGasMapping.getPrice());
+            gasDto.setAvailableCylinderType(adminGasMapping.getAdminGasCylinderTypeMapping()
+                    .stream().map(e -> new CylinderTypeDto(e.getCylinderType().getName(), e.getCylinderType().getDescription())).toList());
+            gasDtoList.add(gasDto);
         }
-        return response;
-    }
-
-	@Override
-	public JSONObject getAddress(Long userId) {
-		Optional<UserEntity> optional=userRepo.findById(userId);
-		JSONObject obj=new JSONObject();
-		if (optional.isPresent()) {
-			AddressEntity address=optional.get().getAddressEntity();
-			if (address==null) {
-				obj.put("message", "Address does not exist");
-			} else {
-				obj.put("address", genericService.convertAddressEntityToDto(address));
-			}
-		} else {
-			obj.put("message", "User does not exists");
-		}
-		return obj;
-	}
-
-    @Override
-    public String refreshToken(String existingToken) throws BadRequestException {
-        UserEntity userEntity = userRepo.getUserDetailsByToken(existingToken.replace(JwtProperties.TOKEN_PREFIX,""));
-        if (null == userEntity) {
-            throw new BadRequestException(ExceptionConstants.INVALID_USER_TOKEN);
-        }
-        String token = JWT.create()
-                .withSubject(userEntity.getMobileNumber().toString())
-                .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.EXPIRATION_TIME))
-                .sign(Algorithm.HMAC512(JwtProperties.SECRET.getBytes()));
-
-        Set<UserTokenEntity> userTokenSet = userEntity.getUserTokenSet()
-                .stream().filter(t -> t.getExpiredDate().after(new Date())).collect(Collectors.toSet());
-        UserTokenEntity tokenEntity = new UserTokenEntity();
-        tokenEntity.setToken(token);
-        tokenEntity.setExpiredDate(new Date(System.currentTimeMillis() + JwtProperties.EXPIRATION_TIME));
-        userTokenSet.add(tokenEntity);
-        userEntity.setUserTokenSet(userTokenSet);
-        userRepo.save(userEntity);
-        return token;
+        return gasDtoList;
     }
 
     @Override
-    public String logout(String token) throws BadRequestException {
-        UserEntity userEntity = userRepo.getUserDetailsByToken(token.replace(JwtProperties.TOKEN_PREFIX,""));
-        if (null == userEntity) {
-            throw new BadRequestException(ExceptionConstants.INVALID_USER_TOKEN);
+    public String addOrUpdateAddress(AddressDto addressDto, Long userId) throws BadRequestException {
+        UserEntity userEntity = validationService.validateUserEntity(userId);
+        AddressEntity addressEntity = new AddressEntity();
+        if (null != addressDto.getId()) {
+            addressEntity = validationService.validateAddressEntity(addressDto.getId());
         }
-        Set<UserTokenEntity> userTokenSet = userEntity.getUserTokenSet()
-                .stream().filter(t -> t.getExpiredDate().after(new Date())).collect(Collectors.toSet());
-        userEntity.setUserTokenSet(userTokenSet);
+        addressEntity = genericService.convertDtoToAddressEntity(addressDto, addressEntity);
+        addressRepo.save(addressEntity);
+        Set<AddressEntity> addressEntitySet = userEntity.getAddressEntitySet();
+        addressEntitySet.add(addressEntity);
+        userEntity.setAddressEntitySet(addressEntitySet);
         userRepo.save(userEntity);
         return Constants.SUCCESS_STR;
     }
 
     @Override
-    public GasDto getGasDetailsById(Long id) throws BadRequestException {
-        GasMaster gasMaster = gasRepo.findById(id).orElse(null);
-        if (null == gasMaster) {
-            throw new BadRequestException(ExceptionConstants.INVALID_GAS);
+    public JSONObject getAddress(Long userId) throws BadRequestException {
+        UserEntity userEntity = validationService.validateUserEntity(userId);
+        JSONObject obj = new JSONObject();
+        Set<AddressEntity> addressSet = userEntity.getAddressEntitySet();
+        if (addressSet == null) {
+            obj.put("message", "Address does not exist");
+        } else {
+            obj.put("address", genericService.convertAddressEntitySetToDto(addressSet));
         }
+        return obj;
+    }
+
+    @Override
+    public String deleteUserAddress(Long id) {
+        addressRepo.deleteById(id);
+        return Constants.SUCCESS_STR;
+    }
+
+    @Override
+    public String refreshToken(String existingToken) throws BadRequestException {
+        UserEntity userEntity = userRepo.getUserDetailsByToken(existingToken.replace(JwtProperties.TOKEN_PREFIX, ""));
+        if (null == userEntity) {
+            throw new BadRequestException(ExceptionConstants.INVALID_USER_TOKEN);
+        }
+        String token = AESUtil.createJWTToken(userEntity.getMobileNumber().toString());
+        Set<UserTokenEntity> updatedTokenSet = updateTokenSetForUser(token, userEntity.getUserTokenSet());
+        updatedTokenSet.add(generateTokenEntity(token));
+        userEntity.setUserTokenSet(updatedTokenSet);
+        userRepo.save(userEntity);
+        return token;
+    }
+
+    private UserTokenEntity generateTokenEntity(String token) {
+        UserTokenEntity tokenEntity = new UserTokenEntity();
+        tokenEntity.setToken(token);
+        tokenEntity.setExpiredDate(new Date(System.currentTimeMillis() + JwtProperties.EXPIRATION_TIME));
+        return tokenEntity;
+    }
+
+    @Override
+    public String logout(String token) throws BadRequestException {
+        UserEntity userEntity = userRepo.getUserDetailsByToken(token.replace(JwtProperties.TOKEN_PREFIX, ""));
+        if (null == userEntity) {
+            throw new BadRequestException(ExceptionConstants.INVALID_USER_TOKEN);
+        }
+        userEntity.setUserTokenSet(updateTokenSetForUser(token, userEntity.getUserTokenSet()));
+        userRepo.save(userEntity);
+        return Constants.SUCCESS_STR;
+    }
+
+    private Set<UserTokenEntity> updateTokenSetForUser(String token, Set<UserTokenEntity> userTokenSet) {
+        return userTokenSet.stream().filter(e -> !e.getToken()
+                .equals(token.replace(JwtProperties.TOKEN_PREFIX, ""))).collect(Collectors.toSet());
+    }
+
+    @Override
+    public GasDto getGasDetailsById(Long id, Long adminId) throws BadRequestException {
+        AdminGasMapping adminGasMapping = adminGasMappingRepo.getGasMappingByAdminId(id, adminId)
+                .orElseThrow(() -> new BadRequestException(ExceptionConstants.ADMIN_GAS_IS_EMPTY));
+        GasMaster gasMaster = validationService.validateGasMaster(id);
         GasDto gasDto = new GasDto();
-        gasDto.setId(gasMaster.getId());
-        gasDto.setName(gasMaster.getName());
-        gasDto.setAvailableCylinderType(CylinderType.getCylinderTypeDtoList());
-        gasDto.setDescription(gasMaster.getDescription());
-        gasDto.setPrice(gasMaster.getPrice());
-        gasDto.setAvailable(gasMaster.isAvaliable());
-        if (!CollectionUtils.isEmpty(gasMaster.getGasImageEntityList())) {
-            gasDto.setImageList(gasMaster.getGasImageEntityList().stream()
-                    .map(GasImageEntity::getImageUrl).collect(Collectors.toList()));
-        }
+        gasDto.setCategory(gasMaster.getCategoryMaster().getName());
+        gasDto.setId(adminGasMapping.getGasId());
+        gasDto.setName(adminGasMapping.getGasName());
+        gasDto.setAvailableCylinderType(adminGasMapping.getAdminGasCylinderTypeMapping()
+                .stream().map(e -> new CylinderTypeDto(e.getCylinderType().getName(), e.getCylinderType().getDescription()))
+                .toList());
+        gasDto.setDescription(adminGasMapping.getDescription());
+        gasDto.setPrice(adminGasMapping.getPrice());
+        gasDto.setAvailable(adminGasMapping.isActiveFlag());
         return gasDto;
     }
 
@@ -323,12 +318,19 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String addVehicle(DeliveryVehicleDto deliveryVehicleDto) throws BadRequestException {
-        if (null == deliveryVehicleDto) {
+        if (CollectionUtils.isEmpty(deliveryVehicleDto.getNumbers())) {
             throw new BadRequestException(ExceptionConstants.INVALID_REQUEST_DATA);
         }
-        UserEntity userEntity = userRepo.findById(deliveryVehicleDto.getUserId()).orElse(null);
-        DeliveryVehicle deliveryVehicle = genericService.convertDtoToDeliveryVehicle(deliveryVehicleDto);
-        deliveryVehicleRepo.save(deliveryVehicle);
+        validationService.validateUserEntity(deliveryVehicleDto.getUserId());
+        List<DeliveryVehicleEntity> deliveryVehicleEntityList = genericService.convertDtoToDeliveryVehicle(deliveryVehicleDto);
+        deliveryVehicleRepo.saveAll(deliveryVehicleEntityList);
+        return Constants.SUCCESS_STR;
+    }
+
+    @Override
+    public String deleteVehicle(Long vehicleId) throws BadRequestException {
+        validationService.validateDeliveryVehicleEntity(vehicleId);
+        deliveryVehicleRepo.deleteById(vehicleId);
         return Constants.SUCCESS_STR;
     }
 
@@ -338,35 +340,22 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Page<UserSearchDto> searchUserByName(Pageable pageable, String name) throws BadRequestException {
-        if (StringUtils.isEmpty(name)) {
-            throw new BadRequestException(ExceptionConstants.INVALID_REQUEST_DATA);
-        }
-        return userRepo.searchUserByName(pageable, name);
-    }
-
-    @Override
     public UserDetails getUserDetailsForAdmin(Long id) throws BadRequestException {
-        UserEntity userEntity = userRepo.findById(id).orElse(null);
-        if (null == userEntity) {
-            throw new BadRequestException(ExceptionConstants.INVALID_USER);
-        }
-        UserDetails userDetails = userRepo.getUserDetailsForAdmin(id);
-        userDetails.setAssignedCylinder(getUserInventory(id));
-        userDetails.setTotalOrders(getUserOrdersCount(id));
+        UserEntity userEntity = validationService.validateUserEntity(id);
+        UserDetails userDetails = userRepo.getUserDetailsForAdmin(userEntity.getId());
+        userDetails.setTotalOrders(getUserOrdersCount(userEntity.getId()));
         return userDetails;
     }
 
     private int getUserOrdersCount(Long userId) {
-        List<OrderEntity> orderEntityList = orderRepo.getOrderEntitiesByUserId(userId);
-        if (CollectionUtils.isEmpty(orderEntityList)) {
-            return 0;
-        }
-        return orderEntityList.size();
+        return orderRepo.getOrderCountByUserId(userId);
     }
 
-    private List<String> getUserInventory(Long userId) {
-        return inventoryRepo.getAssignedCylinderByUserId(userId);
+    @Override
+    public List<FrequentOrderProductDto> getFrequentlyOrderProduct(Long userId, Long adminId) throws BadRequestException {
+        UserEntity userEntity = validationService.validateUserEntity(userId);
+        UserEntity adminEntity = validationService.validateAdminEntity(adminId);
+        Pageable pageable = PageRequest.of(0, 5);
+        return orderRepo.getFrequentlyOrderProduct(pageable ,userEntity.getId(), adminEntity.getId()).getContent();
     }
-
 }

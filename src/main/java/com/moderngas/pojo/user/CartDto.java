@@ -11,6 +11,8 @@ public class CartDto {
 
     private Long userId;
 
+    private Long adminId;
+
     private Long gasId;
 
     private String gasName;
@@ -19,10 +21,6 @@ public class CartDto {
 
     private int quantity;
 
-    private int price;
-
-    private boolean isRefill;
-
-    private int refillCount;
+    private float price;
 
 }

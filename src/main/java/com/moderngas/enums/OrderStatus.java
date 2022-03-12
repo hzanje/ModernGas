@@ -1,8 +1,10 @@
 package com.moderngas.enums;
 
-import org.springframework.util.StringUtils;
+import com.moderngas.exception.BadRequestException;
+import org.springframework.util.ObjectUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public enum OrderStatus {
@@ -14,16 +16,12 @@ public enum OrderStatus {
 
     private final String name;
 
-    public String getName() {
-        return name;
-    }
-
     OrderStatus(String name) {
         this.name = name;
     }
 
     public static OrderStatus getByStatus(String status) {
-        if (!StringUtils.isEmpty(status)) {
+        if (!ObjectUtils.isEmpty(status)) {
             for (OrderStatus orderStatus : OrderStatus.values()) {
                 if (orderStatus.getName().equals(status)) {
                     return orderStatus;
@@ -34,7 +32,7 @@ public enum OrderStatus {
     }
 
     public static boolean isExist(String status) {
-        if (!StringUtils.isEmpty(status)) {
+        if (!ObjectUtils.isEmpty(status)) {
             for (OrderStatus orderStatus : OrderStatus.values()) {
                 if (orderStatus.getName().equals(status)) {
                     return true;
@@ -44,18 +42,20 @@ public enum OrderStatus {
         return false;
     }
 
-    public static OrderStatus getByOrdinal(Integer ord) throws Exception {
-        if((ord < 0 ) || (ord > OrderStatus.values().length-1)) {
-            throw new Exception(String.format("%d is not a valid User Type", ord));
+    public static OrderStatus getByOrdinal(Integer ord) throws BadRequestException {
+        if ((ord < 0) || (ord > OrderStatus.values().length - 1)) {
+            throw new BadRequestException(String.format("%d is not a valid User Type", ord));
         }
         return OrderStatus.values()[ord];
     }
 
     public static List<OrderStatus> getOrderStatusList() {
         List<OrderStatus> orderStatusList = new ArrayList<>();
-        for (OrderStatus orderStatus : OrderStatus.values()) {
-            orderStatusList.add(orderStatus);
-        }
+        orderStatusList.addAll(Arrays.asList(OrderStatus.values()));
         return orderStatusList;
+    }
+
+    public String getName() {
+        return name;
     }
 }
