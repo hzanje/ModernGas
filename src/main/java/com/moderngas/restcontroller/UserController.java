@@ -90,6 +90,7 @@ public class UserController {
     @GetMapping(value = "/getUser")
     public ResponseEntity<?> getUser(@RequestParam("userName") Long userName) throws BadRequestException {
         log.info("UserController :: getUser >>> userName : {}", userName);
+        genericService.checkUserNameAndToken(userName);
         return new ResponseEntity<>(genericService.convertUserDataToDto(userService.getUserByLoginId(userName)), HttpStatus.OK);
     }
 

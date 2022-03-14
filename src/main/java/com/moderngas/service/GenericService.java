@@ -69,6 +69,8 @@ public interface GenericService {
 
     UserEntity getUserAdminDetails() throws BadRequestException;
 
+    UserEntity checkUserNameAndToken(Long userName) throws BadRequestException;
+
     UserEntity getUserAndCheckUserAdmin(Long userId, Long adminId) throws BadRequestException;
 
     Set<UserDashboardDto> convertGasMappingToDashboardDto(List<AdminGasMapping> adminGasMappingList);
