@@ -477,7 +477,6 @@ public class GenericServiceImpl implements GenericService {
 
 
             case ORDER_STATUS_CANCELLED -> {
-                orderEntity.setActiveFlag(false);
                 orderEntity.setCancellationDate(new Date());
             }
         }

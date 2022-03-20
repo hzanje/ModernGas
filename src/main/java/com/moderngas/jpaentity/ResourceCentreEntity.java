@@ -12,7 +12,6 @@ import javax.persistence.*;
 @Getter @Setter
 @Entity
 @SQLDelete(sql = "UPDATE resource_centre a SET active_flag = 0 WHERE id = ? ")
-@Where(clause = "active_flag = 1")
 @Table(name = "resource_centre")
 public class ResourceCentreEntity extends BaseEntity {
 
