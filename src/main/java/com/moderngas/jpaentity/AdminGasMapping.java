@@ -10,7 +10,6 @@ import java.util.Set;
 @Entity
 @Data
 @NoArgsConstructor
-@Where(clause = "active_flag = 1")
 @Table(name = "admin_gas_mapping")
 public class AdminGasMapping extends BaseEntity {
 

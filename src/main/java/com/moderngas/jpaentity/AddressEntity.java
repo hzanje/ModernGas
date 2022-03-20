@@ -14,7 +14,6 @@ import java.io.Serializable;
 @Data
 @NoArgsConstructor
 @SQLDelete(sql = "UPDATE address a SET active_flag = 0 WHERE id = ?")
-@Where(clause = "active_flag = 1")
 @Table(name = "address")
 public class AddressEntity extends BaseEntity implements Serializable {
 

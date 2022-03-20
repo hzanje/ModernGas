@@ -42,6 +42,7 @@ public class UserEntity extends BaseEntity {
     @Column(name = "admin_id")
     private Set<Long> adminIdSet = new HashSet<>();
 
+    @Where(clause = "active_flag = 1")
     @OneToMany(cascade = {CascadeType.DETACH, CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.REMOVE}, fetch = FetchType.EAGER, orphanRemoval = true)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private Set<AddressEntity> addressEntitySet;
@@ -59,11 +60,10 @@ public class UserEntity extends BaseEntity {
     private Set<AdminGasMapping> adminGasMappings;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "userEntity",  orphanRemoval = true)
-    //@JoinColumn(name = "user_id", nullable = false)
     private Set<CylinderEntity> cylinderEntitySet;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "userEntity", orphanRemoval = true)
-    //@JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
+    @Where(clause = "active_flag = 1")
     private Set<ResourceCentreEntity> resourceCentreEntitySet;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
