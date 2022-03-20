@@ -127,6 +127,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public String changePassword(Long username, String newPassword) throws BadRequestException {
         log.info("UserService >> Changes password for User: {}", username);
+        genericService.checkUserNameAndToken(username);
         UserEntity userEntity = userRepo.findByMobileNumber(username)
                 .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER));
         userEntity.setPassword(passwordEncoder.encode(newPassword));
@@ -145,8 +146,10 @@ public class UserServiceImpl implements UserService {
         log.info("UserService >> Forget Password by User: {}", userName);
         String result = Constants.FAILURE_STR;
         /* Check if User Exits */
+        genericService.checkUserNameAndToken(userName);
         UserEntity userEntity = userRepo.findByMobileNumber(userName)
                 .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER));
+        genericService.checkUserNameAndToken(userName);
         try {
             if (null != userEntity && null != userEntity.getEmail()) {
                 String tempPassword = genericService.generateRandomPassword();
