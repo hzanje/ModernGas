@@ -28,6 +28,17 @@ public class BaseController {
     @Autowired
     private UserService userService;
 
+    /**
+     * Test Connection
+     *
+     * @return String
+     */
+    @GetMapping("/test")
+    public ResponseEntity<ResponseStatus> testConnection() {
+        log.info("BaseController :: testConnection >>>");
+        return new ResponseEntity<>(new ResponseStatus("Connected To Reek Application"), HttpStatus.OK);
+    }
+
 
     /**
      * API for Forget Password.
