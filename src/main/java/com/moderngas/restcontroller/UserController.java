@@ -86,7 +86,7 @@ public class UserController {
      * @param userName
      * @return
      */
-    @Secured("ROLE_ADMIN")
+    @Secured({"ROLE_ADMIN", "ROLE_EMPLOYEE", "ROLE_USER"})
     @GetMapping(value = "/getUser")
     public ResponseEntity<?> getUser(@RequestParam("userName") Long userName) throws BadRequestException {
         log.info("UserController :: getUser >>> userName : {}", userName);
