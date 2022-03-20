@@ -73,29 +73,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .anyRequest().authenticated();
     }
 
-
-
-    /*@Bean
-    public RoleHierarchyVoter roleHierarchyVoter(RoleHierarchy roleHierarchy) {
-        return new RoleHierarchyVoter(roleHierarchy);
-    }*/
-
-    /*@Bean
-    public AffirmativeBased defaultAccessDecisionManager(RoleHierarchy roleHierarchy){
-        List<AccessDecisionVoter<? extends Object>> decisionVoters = new ArrayList<>();
-
-        // webExpressionVoter
-        WebExpressionVoter webExpressionVoter = new WebExpressionVoter();
-        DefaultWebSecurityExpressionHandler
-                expressionHandler = new DefaultWebSecurityExpressionHandler();
-        expressionHandler.setRoleHierarchy(roleHierarchy);
-        webExpressionVoter.setExpressionHandler(expressionHandler);
-
-        decisionVoters.add(webExpressionVoter);
-        decisionVoters.add(roleHierarchyVoter(roleHierarchy));
-        return new AffirmativeBased(decisionVoters);
-    }*/
-
     @Bean
     DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();

@@ -95,7 +95,7 @@ public class ValidationServiceImpl implements ValidationService {
     @Override
     public UserEntity validateSuperAdminEntity(Long superId) throws BadRequestException {
         UserEntity userEntity = validateUser(superId);
-        if (userEntity.getRoleEntitySet().stream().noneMatch(e -> e.getRole().equals(UserRole.USER_ROLE_SUPER_ADMIN))) {
+        if (userEntity.getRoleEntitySet().stream().noneMatch(e -> e.getRole().equals(UserRole.USER_ROLE_SUPER_ADMIN.getRole()))) {
             throw new BadRequestException(ExceptionConstants.INVALID_SUPER_ADMIN);
         }
         return userEntity;
