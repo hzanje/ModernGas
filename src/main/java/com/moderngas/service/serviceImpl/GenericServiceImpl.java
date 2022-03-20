@@ -547,7 +547,7 @@ public class GenericServiceImpl implements GenericService {
     @Override
     public UserEntity checkUserNameAndToken(Long userName) throws BadRequestException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (!userName.equals(auth.getPrincipal())) {
+        if (!String.valueOf(userName).equals(auth.getPrincipal())) {
             throw new BadRequestException(ExceptionConstants.INVALID_USER_TOKEN);
         }
         return null;
