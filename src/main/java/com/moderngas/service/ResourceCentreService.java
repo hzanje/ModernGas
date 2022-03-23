@@ -22,10 +22,12 @@ public interface ResourceCentreService {
 
     String addPublicCylinderToResourceCentre(Long resourceCentreId, Long userId, List<String> cylinderCodes) throws BadRequestException;
 
+    String removePublicCylinderToResourceCentre(Long resourceCentreId, Long userId, List<String> cylinderCodes) throws BadRequestException;
+
     Page<CylinderInventoryDto> fetchCylinderFromResourceCentre(Pageable pageable, String search, Long resourceCentreId, String cylinderStatus, Long adminId) throws BadRequestException;
 
     String fillCylinder(List<String> cylinderCodes) throws BadRequestException;
 
-    String checkCylinderCode(String code) throws BadRequestException;
+    String checkCylinderCode(String code, Long userId) throws BadRequestException;
 
 }

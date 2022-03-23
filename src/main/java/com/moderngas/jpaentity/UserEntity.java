@@ -62,7 +62,7 @@ public class UserEntity extends BaseEntity {
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "userEntity",  orphanRemoval = true)
     private Set<CylinderEntity> cylinderEntitySet;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "userEntity", orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "userEntity")
     @Where(clause = "active_flag = 1")
     private Set<ResourceCentreEntity> resourceCentreEntitySet;
 

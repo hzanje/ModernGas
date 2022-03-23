@@ -54,8 +54,11 @@ public class EmployeeServiceImpl implements EmployeeService {
         log.info("EmployeeService :: addEmployee >>> AdminId : {}", adminId);
         UserEntity adminEntity = validationService.validateAdminEntity(adminId);
         UserEntity employeeEntity = validationService.checkUserAlreadyExistInSystem(userDto.getMobileNumber(), adminEntity);
-        if (!employeeEntity.getAdminIdSet().contains(adminId)) {
+        if (ObjectUtils.isEmpty(employeeEntity)) {
+            employeeEntity = new UserEntity();
+        } else if (!employeeEntity.getAdminIdSet().contains(adminId)) {
             employeeEntity.setAdminIdSet(genericService.addOrUpdateUserAdmin(employeeEntity, adminId));
+            userRepo.save(employeeEntity);
             return Constants.USER_ALREADY_REGISTER_ASSIGNED;
         }
         if (!ObjectUtils.isEmpty(userDto.getId())) {
