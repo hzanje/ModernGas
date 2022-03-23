@@ -93,7 +93,6 @@ public class InventoryServiceImpl implements InventoryService {
         Set<InventoryDetailsDto> inventoryDetailsDtoSet = new HashSet<>();
         inventoryDetailsDtoSet.addAll(inventoryRepo.getInventoryCylinderAssignedToUser(id));
         inventoryDetailsDtoSet.addAll(inventoryRepo.getInventoryCylinderOwnedByUser(id));
-
         return inventoryDetailsDtoSet;
     }
 }

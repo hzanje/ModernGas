@@ -79,15 +79,18 @@ public class UserServiceImpl implements UserService {
         log.info("UserService :: addUser >>> AdminId : {}", adminId);
         UserEntity adminEntity = validationService.validateAdminEntity(adminId);
         UserEntity userEntity = validationService.checkUserAlreadyExistInSystem(userDto.getMobileNumber(), adminEntity);
-        if (!userEntity.getAdminIdSet().contains(adminId)) {
-            userEntity.setAdminIdSet(genericService.addOrUpdateUserAdmin(userEntity, adminId));
+        if (ObjectUtils.isEmpty(userEntity)) {
+            userEntity = new UserEntity();
+        } else if (!userEntity.getAdminIdSet().contains(adminEntity.getId())) {
+            userEntity.setAdminIdSet(genericService.addOrUpdateUserAdmin(userEntity, adminEntity.getId()));
+            userRepo.save(userEntity);
             return Constants.USER_ALREADY_REGISTER_ASSIGNED;
         }
         if (!ObjectUtils.isEmpty(userDto.getId())) {
             userEntity = validationService.validateUserEntity(userDto.getId());
         }
         userEntity = genericService.convertUserDtoToEntity(userEntity, userDto, adminEntity, UserRole.USER_ROLE_USER);
-        userEntity.setAdminIdSet(genericService.addOrUpdateUserAdmin(userEntity, adminId));
+        userEntity.setAdminIdSet(genericService.addOrUpdateUserAdmin(userEntity, adminEntity.getId()));
         userEntity.setCompanyName(userDto.getCompanyName());
         userEntity.setPassword(genericService.encodeUserPassword(genericService.generateRandomPassword()));
         userRepo.save(userEntity);
@@ -324,7 +327,7 @@ public class UserServiceImpl implements UserService {
         if (CollectionUtils.isEmpty(deliveryVehicleDto.getNumbers())) {
             throw new BadRequestException(ExceptionConstants.INVALID_REQUEST_DATA);
         }
-        validationService.validateUserEntity(deliveryVehicleDto.getUserId());
+        validationService.validateAdminEntity(deliveryVehicleDto.getUserId());
         List<DeliveryVehicleEntity> deliveryVehicleEntityList = genericService.convertDtoToDeliveryVehicle(deliveryVehicleDto);
         deliveryVehicleRepo.saveAll(deliveryVehicleEntityList);
         return Constants.SUCCESS_STR;

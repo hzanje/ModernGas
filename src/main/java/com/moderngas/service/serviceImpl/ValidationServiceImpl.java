@@ -67,7 +67,7 @@ public class ValidationServiceImpl implements ValidationService {
                 return userEntity.get();
             }
         }
-        return new UserEntity();
+        return null;
     }
 
     @Override

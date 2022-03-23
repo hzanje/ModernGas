@@ -415,7 +415,7 @@ public class GenericServiceImpl implements GenericService {
             resourceCentreEntity = validationService.validateResourceCentreEntity(cylinderDto.getResourceCentreId());
         }
         CylinderEntity cylinderEntity = null;
-        if (!inventoryRepo.checkIfCylinderCodeExist(cylinderDto.getCylinderCode()).isPresent()) {
+        if (!inventoryRepo.checkIfCylinderCodeExist(cylinderDto.getCylinderCode(), entity.getId()).isPresent()) {
             cylinderEntity = new CylinderEntity();
             CylinderStatus cylinderStatus = CylinderStatus.getByStatus(cylinderDto.getStatus());
             cylinderEntity.setCode(cylinderDto.getCylinderCode());

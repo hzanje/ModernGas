@@ -38,8 +38,8 @@ public interface InventoryRepo extends JpaRepository<CylinderEntity, Long> {
                                @Param("codeList") List<String> codeList,
                                @Param("status") CylinderStatus status);
 
-    @Query(" FROM CylinderEntity WHERE code = :code")
-    Optional<CylinderEntity> checkIfCylinderCodeExist(@Param("code") String code);
+    @Query(" FROM CylinderEntity WHERE code = :code AND userEntity.id = :id")
+    Optional<CylinderEntity> checkIfCylinderCodeExist(@Param("code") String code, @Param("id") Long userId);
 
     @Query("SELECT ce FROM CylinderEntity ce INNER JOIN ce.cylinderInventoryDetailsEntity WHERE ce.code IN :codeList")
     List<CylinderEntity> getCylinderFromCodeList(@Param("codeList") List<String> codeList);
@@ -59,10 +59,10 @@ public interface InventoryRepo extends JpaRepository<CylinderEntity, Long> {
                                                                             @Param("cylinderStatus") CylinderStatus cylinderStatus,
                                                                             @Param("adminId") Long adminId);
 
-    @Query("SELECT new com.moderngas.pojo.user.InventoryDetailsDto(ce.id, ce.code, ue.id, ue.name, ue.name) FROM UserEntity ue INNER JOIN ue.cylinderEntitySet ce WHERE ce.assignedUserId = :id ")
+    @Query(QUERIES.CYLINDER_INVENTORY_DTO + " WHERE ce.assignedUserId = :id ")
     Set<InventoryDetailsDto> getInventoryCylinderAssignedToUser(@Param("id") Long id);
 
-    @Query("SELECT new com.moderngas.pojo.user.InventoryDetailsDto(ce.id, ce.code, ue.id, ue.name, ue.name) FROM UserEntity ue INNER JOIN ue.cylinderEntitySet ce WHERE ue.id = :id ")
+    @Query(QUERIES.CYLINDER_INVENTORY_DTO + " WHERE ue.id = :id ")
     Set<InventoryDetailsDto> getInventoryCylinderOwnedByUser(@Param("id") Long id);
 
     class QUERIES {
@@ -70,14 +70,14 @@ public interface InventoryRepo extends JpaRepository<CylinderEntity, Long> {
         private static final String CYLINDER_INVENTORY_DTO = "SELECT new com.moderngas.pojo.admin.CylinderInventoryDto(ce.id, ce.code, ce.cylinderStatus, ue.id, ue.name, ce.assignedUserId , ce.assignedUserName , ce.cylinderInventoryDetailsEntity.isTransit, ce.cylinderInventoryDetailsEntity.resourceCentreEntity.id, ce.cylinderInventoryDetailsEntity.resourceCentreEntity.name) FROM UserEntity ue " +
                 " INNER JOIN ue.cylinderEntitySet ce ";
 
-        private static final String FETCH_CYLINDER_BY_RESOURCE_CENTRE = CYLINDER_INVENTORY_DTO + "WHERE ue.id = :adminId OR ce.assignedUserId = :adminId ";
+        private static final String FETCH_CYLINDER_BY_RESOURCE_CENTRE = CYLINDER_INVENTORY_DTO + "WHERE (ue.id = :adminId OR ce.assignedUserId = :adminId) ";
 
         private static final String FETCH_CYLINDER_BY_RESOURCE_CENTRE_COUNT = "SELECT COUNT(*) FROM UserEntity ue " +
                 "INNER JOIN ue.cylinderEntitySet ce " +
                 "WHERE ue.id = :adminId " +
                 "OR ce.assignedUserId = :adminId ";
 
-        private static final String FETCH_CYLINDER_BY_RESOURCE_CENTRE_AND_SEARCH = "AND (:search IS NULL OR ce.code LIKE :search%) " +
+        private static final String FETCH_CYLINDER_BY_RESOURCE_CENTRE_AND_SEARCH = " AND (:search IS NULL OR ce.code LIKE %:search% ) " +
                 " AND ce.cylinderInventoryDetailsEntity.resourceCentreEntity.id IN :resourceCentreIds " +
                 " AND (:cylinderStatus IS NULL OR ce.cylinderStatus = :cylinderStatus) ";
 
