@@ -4,7 +4,6 @@ package com.moderngas.repository;
 import com.moderngas.enums.CylinderStatus;
 import com.moderngas.jpaentity.CylinderEntity;
 import com.moderngas.pojo.admin.CylinderInventoryDto;
-import com.moderngas.pojo.user.InventoryDetailsDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -38,7 +37,7 @@ public interface InventoryRepo extends JpaRepository<CylinderEntity, Long> {
                                @Param("codeList") List<String> codeList,
                                @Param("status") CylinderStatus status);
 
-    @Query(" FROM CylinderEntity WHERE code = :code AND userEntity.id = :id")
+    @Query(" FROM CylinderEntity WHERE code = :code AND (:id IS NULL OR  userEntity.id = :id)")
     Optional<CylinderEntity> checkIfCylinderCodeExist(@Param("code") String code, @Param("id") Long userId);
 
     @Query("SELECT ce FROM CylinderEntity ce INNER JOIN ce.cylinderInventoryDetailsEntity WHERE ce.code IN :codeList")
@@ -60,10 +59,10 @@ public interface InventoryRepo extends JpaRepository<CylinderEntity, Long> {
                                                                             @Param("adminId") Long adminId);
 
     @Query(QUERIES.CYLINDER_INVENTORY_DTO + " WHERE ce.assignedUserId = :id ")
-    Set<InventoryDetailsDto> getInventoryCylinderAssignedToUser(@Param("id") Long id);
+    Set<CylinderInventoryDto> getInventoryCylinderAssignedToUser(@Param("id") Long id);
 
     @Query(QUERIES.CYLINDER_INVENTORY_DTO + " WHERE ue.id = :id ")
-    Set<InventoryDetailsDto> getInventoryCylinderOwnedByUser(@Param("id") Long id);
+    Set<CylinderInventoryDto> getInventoryCylinderOwnedByUser(@Param("id") Long id);
 
     class QUERIES {
 
@@ -74,8 +73,7 @@ public interface InventoryRepo extends JpaRepository<CylinderEntity, Long> {
 
         private static final String FETCH_CYLINDER_BY_RESOURCE_CENTRE_COUNT = "SELECT COUNT(*) FROM UserEntity ue " +
                 "INNER JOIN ue.cylinderEntitySet ce " +
-                "WHERE ue.id = :adminId " +
-                "OR ce.assignedUserId = :adminId ";
+                "WHERE (ue.id = :adminId OR ce.assignedUserId = :adminId) ";
 
         private static final String FETCH_CYLINDER_BY_RESOURCE_CENTRE_AND_SEARCH = " AND (:search IS NULL OR ce.code LIKE %:search% ) " +
                 " AND ce.cylinderInventoryDetailsEntity.resourceCentreEntity.id IN :resourceCentreIds " +
@@ -85,7 +83,7 @@ public interface InventoryRepo extends JpaRepository<CylinderEntity, Long> {
 
         private static final String FETCH_CYLINDER_BY_RESOURCE_CENTRE_AND_STATUS = FETCH_CYLINDER_BY_RESOURCE_CENTRE + FETCH_CYLINDER_BY_RESOURCE_CENTRE_AND_SEARCH;
 
-        private static final String FETCH_CYLINDER_BY_RESOURCE_CENTRE_AND_STATUS_COUNT = FETCH_CYLINDER_BY_RESOURCE_CENTRE_COUNT + FETCH_CYLINDER_BY_RESOURCE_CENTRE_AND_SEARCH;
+        private static final String FETCH_CYLINDER_BY_RESOURCE_CENTRE_AND_STATUS_COUNT = FETCH_CYLINDER_BY_RESOURCE_CENTRE_COUNT  + FETCH_CYLINDER_BY_RESOURCE_CENTRE_AND_SEARCH;
 
     }
 
