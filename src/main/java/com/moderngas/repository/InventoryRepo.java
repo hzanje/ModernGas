@@ -61,13 +61,15 @@ public interface InventoryRepo extends JpaRepository<CylinderEntity, Long> {
     @Query(QUERIES.CYLINDER_INVENTORY_DTO + " WHERE ce.assignedUserId = :id ")
     Set<CylinderInventoryDto> getInventoryCylinderAssignedToUser(@Param("id") Long id);
 
-    @Query(QUERIES.CYLINDER_INVENTORY_DTO + " WHERE ue.id = :id ")
+    @Query(QUERIES.CYLINDER_INVENTORY_DTO + " WHERE ce.userEntity.id = :id ")
     Set<CylinderInventoryDto> getInventoryCylinderOwnedByUser(@Param("id") Long id);
 
     class QUERIES {
 
-        private static final String CYLINDER_INVENTORY_DTO = "SELECT new com.moderngas.pojo.admin.CylinderInventoryDto(ce.id, ce.code, ce.cylinderStatus, ue.id, ue.name, ce.assignedUserId , ce.assignedUserName , ce.cylinderInventoryDetailsEntity.isTransit, ce.cylinderInventoryDetailsEntity.resourceCentreEntity.id, ce.cylinderInventoryDetailsEntity.resourceCentreEntity.name) FROM UserEntity ue " +
-                " INNER JOIN ue.cylinderEntitySet ce ";
+        private static final String CYLINDER_INVENTORY_DTO = "SELECT new com.moderngas.pojo.admin.CylinderInventoryDto(ce.id, ce.code, ce.cylinderStatus, ue.id, ue.name, ce.assignedUserId , ce.assignedUserName , cid.isTransit, rc.id, rc.name) FROM UserEntity ue " +
+                " JOIN ue.cylinderEntitySet ce ON ue.id = ce.userEntity.id " +
+                " LEFT JOIN ce.cylinderInventoryDetailsEntity cid" +
+                " LEFT JOIN cid.resourceCentreEntity rc  ";
 
         private static final String FETCH_CYLINDER_BY_RESOURCE_CENTRE = CYLINDER_INVENTORY_DTO + "WHERE (ue.id = :adminId OR ce.assignedUserId = :adminId) ";
 
@@ -76,7 +78,7 @@ public interface InventoryRepo extends JpaRepository<CylinderEntity, Long> {
                 "WHERE (ue.id = :adminId OR ce.assignedUserId = :adminId) ";
 
         private static final String FETCH_CYLINDER_BY_RESOURCE_CENTRE_AND_SEARCH = " AND (:search IS NULL OR ce.code LIKE %:search% ) " +
-                " AND ce.cylinderInventoryDetailsEntity.resourceCentreEntity.id IN :resourceCentreIds " +
+                " AND rc.id IN :resourceCentreIds " +
                 " AND (:cylinderStatus IS NULL OR ce.cylinderStatus = :cylinderStatus) ";
 
 
