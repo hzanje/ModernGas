@@ -14,7 +14,7 @@ import java.util.List;
 @Transactional
 public interface DeliveryVehicleRepo extends JpaRepository<DeliveryVehicleEntity, Long> {
 
-    @Query("SELECT new com.moderngas.pojo.NameIdDto(id, number) FROM DeliveryVehicleEntity WHERE userId = :userId")
+    @Query("SELECT new com.moderngas.pojo.NameIdDto(id, number) FROM DeliveryVehicleEntity WHERE userId = :userId AND activeFlag = 1")
     List<NameIdDto> getVehicleNumberList(@Param("userId") Long userId);
 
     @Query("FROM DeliveryVehicleEntity dv WHERE dv.number = :vehicleNumber")

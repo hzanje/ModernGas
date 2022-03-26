@@ -8,7 +8,6 @@ import com.moderngas.jpaentity.CylinderEntity;
 import com.moderngas.jpaentity.UserEntity;
 import com.moderngas.pojo.admin.CylinderDto;
 import com.moderngas.pojo.admin.CylinderInventoryDto;
-import com.moderngas.pojo.user.InventoryDetailsDto;
 import com.moderngas.repository.InventoryRepo;
 import com.moderngas.repository.UserRepo;
 import com.moderngas.service.GenericService;
@@ -22,7 +21,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -84,15 +82,15 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
-    public Set<InventoryDetailsDto> getUserInventory(Long id, Long adminId) throws BadRequestException {
+    public Set<CylinderInventoryDto> getUserInventory(Long id, Long adminId) throws BadRequestException {
         UserEntity userEntity = validationService.validateUserEntity(id);
         if (!userEntity.getAdminIdSet().contains(adminId)) {
             throw new BadRequestException(ExceptionConstants.INVALID_USER_ADMIN);
         }
 
-        Set<InventoryDetailsDto> inventoryDetailsDtoSet = new HashSet<>();
-        inventoryDetailsDtoSet.addAll(inventoryRepo.getInventoryCylinderAssignedToUser(id));
-        inventoryDetailsDtoSet.addAll(inventoryRepo.getInventoryCylinderOwnedByUser(id));
-        return inventoryDetailsDtoSet;
+        Set<CylinderInventoryDto> cylinderInventoryDtoSet = new HashSet<>();
+        cylinderInventoryDtoSet.addAll(inventoryRepo.getInventoryCylinderAssignedToUser(id));
+        cylinderInventoryDtoSet.addAll(inventoryRepo.getInventoryCylinderOwnedByUser(id));
+        return cylinderInventoryDtoSet;
     }
 }
