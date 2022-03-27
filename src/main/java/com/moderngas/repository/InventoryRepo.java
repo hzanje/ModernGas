@@ -74,7 +74,9 @@ public interface InventoryRepo extends JpaRepository<CylinderEntity, Long> {
         private static final String FETCH_CYLINDER_BY_RESOURCE_CENTRE = CYLINDER_INVENTORY_DTO + "WHERE (ue.id = :adminId OR ce.assignedUserId = :adminId) ";
 
         private static final String FETCH_CYLINDER_BY_RESOURCE_CENTRE_COUNT = "SELECT COUNT(*) FROM UserEntity ue " +
-                "INNER JOIN ue.cylinderEntitySet ce " +
+                " JOIN ue.cylinderEntitySet ce ON ue.id = ce.userEntity.id " +
+                " LEFT JOIN ce.cylinderInventoryDetailsEntity cid" +
+                " LEFT JOIN cid.resourceCentreEntity rc  " +
                 "WHERE (ue.id = :adminId OR ce.assignedUserId = :adminId) ";
 
         private static final String FETCH_CYLINDER_BY_RESOURCE_CENTRE_AND_SEARCH = " AND (:search IS NULL OR ce.code LIKE %:search% ) " +
