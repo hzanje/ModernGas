@@ -150,6 +150,7 @@ public class GenericServiceImpl implements GenericService {
             adminGasMapping.setCategoryId(gasMaster.getCategoryMaster().getId());
             adminGasMapping.setCategoryName(gasMaster.getCategoryMaster().getName());
             adminGasMapping.setDescription(gasMaster.getDescription());
+            adminGasMapping.setPrice((float) gasMaster.getPrice());
             if (!CollectionUtils.isEmpty(nameType.getTypes())) {
                 adminGasMapping.setAdminGasCylinderTypeMapping(getCylinderTypeSet(nameType.getTypes()));
             }
