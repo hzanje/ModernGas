@@ -37,7 +37,7 @@ public class SuperAdminServiceImpl implements SuperAdminService {
         if (!ObjectUtils.isEmpty(adminEntityDto.getUserDto()) && !ObjectUtils.isEmpty(adminEntityDto.getUserDto().getId())) {
             adminEntity = validationService.validateAdminEntity(adminEntityDto.getUserDto().getId());
         }
-        adminEntity = genericService.convertUserDtoToEntity(adminEntity, adminEntityDto.getUserDto(), superEntity, UserRole.USER_ROLE_SUPER_ADMIN);
+        adminEntity = genericService.convertUserDtoToEntity(adminEntity, adminEntityDto.getUserDto(), superEntity, UserRole.USER_ROLE_ADMIN);
         adminEntity.setContactPersonSet(adminEntityDto.getContactPersonSet());
         adminEntity.setAdminGasMappings(genericService.gasMappingByNameAndType(adminEntityDto.getGasNameCylinderTypes()));
         userRepo.save(adminEntity);
