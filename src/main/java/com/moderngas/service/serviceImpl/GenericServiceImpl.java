@@ -110,7 +110,7 @@ public class GenericServiceImpl implements GenericService {
         return roleEntitySet;
     }
 
-    @Secured("ROLE_EMPLOYEE")
+    @Secured({"ROLE_ADMIN","ROLE_EMPLOYEE"})
     @Override
     public Set<UserPrivilegeEntity> addOrUpdateUserPrivilege(Set<UserPrivilegeEntity> existingPrivilege, List<UserPrivilege> privilegeList) throws BadRequestException {
         Set<UserPrivilegeEntity> userPrivilegeEntitySet = new HashSet<>();
