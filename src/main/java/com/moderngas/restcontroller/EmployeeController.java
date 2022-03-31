@@ -113,8 +113,8 @@ public class EmployeeController {
      * @throws BadRequestException
      */
     @GetMapping("/getAssignedCylinder")
-    public ResponseEntity<?> getAssignedCylinder(@RequestParam(value = "id") Long userId) throws BadRequestException {
-        log.info("EmployeeController :: getAssignedCylinder >>> UserId :{} ", userId);
-        return new ResponseEntity<>(employeeService.getAssignedCylinderByUserId(userId), HttpStatus.OK);
+    public ResponseEntity<?> getAssignedCylinder(@RequestParam(value = "id") Long userId, @RequestParam(value = "adminId") Long adminId) throws BadRequestException {
+        log.info("EmployeeController :: getAssignedCylinder >>> UserId :{}, adminId :{} ", userId, adminId);
+        return new ResponseEntity<>(employeeService.getAssignedCylinderByUserId(userId, adminId), HttpStatus.OK);
     }
 }

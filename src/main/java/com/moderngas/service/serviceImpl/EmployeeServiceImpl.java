@@ -150,8 +150,9 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public List<CylinderInventoryDto> getAssignedCylinderByUserId(Long userId) throws BadRequestException {
+    public List<CylinderInventoryDto> getAssignedCylinderByUserId(Long userId, Long adminId) throws BadRequestException {
         UserEntity userEntity = validationService.validateUserEntity(userId);
-        return inventoryRepo.getAssignedCylinderByUserId(userEntity.getId());
+        UserEntity adminEntity = validationService.validateAdminEntity(adminId);
+        return inventoryRepo.getAssignedCylinderByUserId(userEntity.getId(), adminEntity.getId());
     }
 }

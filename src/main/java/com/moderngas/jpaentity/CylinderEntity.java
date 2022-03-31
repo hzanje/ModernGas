@@ -52,6 +52,9 @@ public class CylinderEntity extends BaseEntity {
     @Enumerated(EnumType.ORDINAL)
     private CylinderStatus cylinderStatus;
 
+    @Column(name = "gas_id")
+    private Long gasId;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     private UserEntity userEntity;
