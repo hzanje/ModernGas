@@ -21,7 +21,7 @@ public interface EmployeeService {
 
     String receiveCylinderFromUser(Long orderId, List<String> cylinderCodes) throws BadRequestException;
 
-    List<CylinderInventoryDto> getAssignedCylinderByUserId(Long userId) throws BadRequestException;
+    List<CylinderInventoryDto> getAssignedCylinderByUserId(Long userId, Long adminId) throws BadRequestException;
 
     String addEmployee(Long adminId, UserDto userDto) throws BadRequestException, NoSuchAlgorithmException;
 

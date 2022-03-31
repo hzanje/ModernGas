@@ -48,8 +48,9 @@ public interface InventoryRepo extends JpaRepository<CylinderEntity, Long> {
             "LEFT JOIN UserEntity ue ON ce.assignedUserId = ue.id ")
     List<CylinderInventoryDto> getInventoryCylinderForAdmin();
 
-    @Query(value = QUERIES.CYLINDER_INVENTORY_DTO + "WHERE ce.assignedUserId=:assignedUserId")
-    List<CylinderInventoryDto> getAssignedCylinderByUserId(@Param("assignedUserId") Long assignedUserId);
+    @Query(value = QUERIES.CYLINDER_INVENTORY_DTO + "WHERE ce.assignedUserId=:assignedUserId AND ce.userEntity.id = :adminId")
+    List<CylinderInventoryDto> getAssignedCylinderByUserId(@Param("assignedUserId") Long assignedUserId,
+                                                           @Param("adminId") Long adminId);
 
     @Query(value = QUERIES.FETCH_CYLINDER_BY_RESOURCE_CENTRE_AND_STATUS, countQuery = QUERIES.FETCH_CYLINDER_BY_RESOURCE_CENTRE_AND_STATUS_COUNT)
     Page<CylinderInventoryDto> fetchCylinderFromResourceCentreByIdAndStatus(Pageable pageable,

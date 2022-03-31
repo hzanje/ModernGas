@@ -1,0 +1,1 @@
+ALTER TABLE cylinder ADD gas_id BIGINT NULL;
