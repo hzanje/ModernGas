@@ -378,19 +378,26 @@ public class GenericServiceImpl implements GenericService {
 
     @Override
     public CartEntity convertDtoToCartEntity(@NonNull CartDto cartDto) throws BadRequestException {
+        log.info("GenericService :: convertDtoToCartEntity >>> adminId : {}, userId : {}, gasId :{}", cartDto.getAdminId(), cartDto.getUserId(), cartDto.getGasId());
         GasMaster gasMaster = validationService.validateGasMaster(cartDto.getGasId());
+        UserEntity adminEntity = validationService.validateAdminEntity(cartDto.getAdminId());
+        AdminGasMapping adminGasMapping = adminEntity.getAdminGasMappings().stream().filter(e -> e.getGasId().equals(gasMaster.getId())).findFirst().orElse(null);
         CartEntity cartEntity = new CartEntity();
         cartEntity.setId(cartDto.getId());
         cartEntity.setCylinderType(CylinderType.getByStatus(cartDto.getCylinderType()));
         cartEntity.setQuantity(cartDto.getQuantity());
         cartEntity.setUserId(cartDto.getUserId());
-        cartEntity.setAdminId(cartDto.getAdminId());
+        cartEntity.setAdminId(adminEntity.getId());
         cartEntity.setGasMaster(gasMaster);
+        if (!ObjectUtils.isEmpty(adminGasMapping)) {
+            cartEntity.setPrice(adminGasMapping.getPrice());
+        }
         return cartEntity;
     }
 
     @Override
     public CartDto convertCartEntityToDto(CartEntity cartEntity) {
+        log.info("GenericService :: convertCartEntityToDto >>> Cart : {} ", cartEntity.getId());
         CartDto cartDto = null;
         if (null != cartEntity) {
             cartDto = new CartDto();
