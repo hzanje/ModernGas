@@ -116,7 +116,7 @@ public class OperatorController {
      * @return
      * @throws BadRequestException
      */
-    @PutMapping("/public/removeFromResourceCentre/{resourceCentreId}")
+    @PutMapping("/public/removeFromResourceCentre/{resourceCentreId}/{userId}")
     public ResponseEntity<ResponseStatus> removePublicCylinderToResourceCentre(@PathVariable("resourceCentreId") Long resourceCentreId,
                                                                                @PathVariable("userId") Long userId,
                                                                                @RequestBody List<String> cylinderCodes) throws BadRequestException {

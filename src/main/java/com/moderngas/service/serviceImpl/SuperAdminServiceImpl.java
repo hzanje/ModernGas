@@ -1,6 +1,7 @@
 package com.moderngas.service.serviceImpl;
 
 import com.moderngas.constants.Constants;
+import com.moderngas.enums.MailSubject;
 import com.moderngas.enums.UserRole;
 import com.moderngas.exception.BadRequestException;
 import com.moderngas.jpaentity.UserEntity;
@@ -12,13 +13,21 @@ import com.moderngas.service.ValidationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
+
+import javax.mail.MessagingException;
+import java.security.NoSuchAlgorithmException;
 
 @Service
 public class SuperAdminServiceImpl implements SuperAdminService {
 
     private static Logger log = LoggerFactory.getLogger(SuperAdminServiceImpl.class.getName());
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
     private GenericService genericService;
@@ -30,7 +39,7 @@ public class SuperAdminServiceImpl implements SuperAdminService {
     private ValidationService validationService;
 
     @Override
-    public String createAdmin(Long superId, AdminEntityDto adminEntityDto) throws BadRequestException {
+    public String createAdmin(Long superId, AdminEntityDto adminEntityDto) throws BadRequestException, MessagingException, NoSuchAlgorithmException {
         /* Add new Client to DataBase */
         UserEntity superEntity = validationService.validateSuperAdminEntity(superId);
         UserEntity adminEntity = new UserEntity();
@@ -40,8 +49,8 @@ public class SuperAdminServiceImpl implements SuperAdminService {
         adminEntity = genericService.convertUserDtoToEntity(adminEntity, adminEntityDto.getUserDto(), superEntity, UserRole.USER_ROLE_ADMIN);
         adminEntity.setContactPersonSet(adminEntityDto.getContactPersonSet());
         adminEntity.setAdminGasMappings(genericService.gasMappingByNameAndType(adminEntityDto.getGasNameCylinderTypes()));
+        adminEntity.setPassword(genericService.generatePasswordAndSendMail(adminEntity, MailSubject.MAIL_SUBJECT_NEW_PASSWORD));
         userRepo.save(adminEntity);
         return Constants.SUCCESS_STR;
     }
-
 }

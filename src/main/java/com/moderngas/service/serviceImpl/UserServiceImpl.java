@@ -4,6 +4,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.moderngas.constants.Constants;
 import com.moderngas.constants.ExceptionConstants;
+import com.moderngas.enums.MailSubject;
 import com.moderngas.enums.UserRole;
 import com.moderngas.exception.BadRequestException;
 import com.moderngas.jpaentity.*;
@@ -32,6 +33,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
+import javax.mail.MessagingException;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -75,7 +77,7 @@ public class UserServiceImpl implements UserService {
     private ValidationService validationService;
 
     @Override
-    public String addUser(Long adminId, UserDto userDto) throws BadRequestException, NoSuchAlgorithmException {
+    public String addUser(Long adminId, UserDto userDto) throws BadRequestException, NoSuchAlgorithmException, MessagingException {
         log.info("UserService :: addUser >>> AdminId : {}", adminId);
         UserEntity adminEntity = validationService.validateAdminEntity(adminId);
         UserEntity userEntity = validationService.checkUserAlreadyExistInSystem(userDto.getMobileNumber(), adminEntity);
@@ -92,7 +94,7 @@ public class UserServiceImpl implements UserService {
         userEntity = genericService.convertUserDtoToEntity(userEntity, userDto, adminEntity, UserRole.USER_ROLE_USER);
         userEntity.setAdminIdSet(genericService.addOrUpdateUserAdmin(userEntity, adminEntity.getId()));
         userEntity.setCompanyName(userDto.getCompanyName());
-        userEntity.setPassword(genericService.encodeUserPassword(genericService.generateRandomPassword()));
+        userEntity.setPassword(genericService.generatePasswordAndSendMail(userEntity, MailSubject.MAIL_SUBJECT_NEW_PASSWORD));
         userRepo.save(userEntity);
         return Constants.SUCCESS_STR;
     }
@@ -149,20 +151,13 @@ public class UserServiceImpl implements UserService {
         log.info("UserService >> Forget Password by User: {}", userName);
         String result = Constants.FAILURE_STR;
         /* Check if User Exits */
-        genericService.checkUserNameAndToken(userName);
         UserEntity userEntity = userRepo.findByMobileNumber(userName)
                 .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_USER));
-        genericService.checkUserNameAndToken(userName);
         try {
             if (null != userEntity && null != userEntity.getEmail()) {
-                String tempPassword = genericService.generateRandomPassword();
-
-                /* Send forget password mail */
-                String subject = "Forget Password..?";
-                emailService.sendMail(userEntity.getEmail(), subject, createEmailBody(userEntity.getName(), tempPassword));
-
+                String password = genericService.generatePasswordAndSendMail(userEntity, MailSubject.MAIL_SUBJECT_FORGET_PASSWORD);
                 /* Update user with random password */
-                userEntity.setPassword(passwordEncoder.encode(tempPassword));
+                userEntity.setPassword(password);
                 userEntity.setForgetPassword(true);
                 userRepo.save(userEntity);
                 result = Constants.SUCCESS_STR;
@@ -171,13 +166,6 @@ public class UserServiceImpl implements UserService {
             e.printStackTrace();
         }
         return result;
-    }
-
-    private String createEmailBody(String name, String tempPassword) {
-        return "Hi " + name + ", <Br>" + "Have you forget your password to Modern Gas App, Don't worry we have provided a temporary password below, " +
-                "<Br><Br>Password : <Strong>" + tempPassword + "</Strong>" +
-                "<Br>Now you may directly login to Modern Gas Account with temporary password. " +
-                "<Br><Br>Thanks & Regards, <Br> A.B. Chaudhary";
     }
 
     @Override
