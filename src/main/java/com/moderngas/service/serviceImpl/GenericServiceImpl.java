@@ -441,7 +441,7 @@ public class GenericServiceImpl implements GenericService {
             cylinderEntity.setCode(cylinderDto.getCylinderCode());
             cylinderEntity.setCylinderStatus(cylinderStatus);
             cylinderEntity.setManufacturer(cylinderDto.getManufacturer());
-            cylinderEntity.setGasId(cylinderEntity.getGasId());
+            cylinderEntity.setGasId(cylinderDto.getGasId());
             if (!ObjectUtils.isEmpty(cylinderDto.getManufacturingDate())) {
                 cylinderEntity.setManufacturingDate(new Date(Long.parseLong(cylinderDto.getManufacturingDate())));
             }
