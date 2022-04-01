@@ -20,4 +20,6 @@ public class CylinderDto {
     private String lastService;
 
     private String nextService;
+
+    private Long gasId;
 }
