@@ -16,6 +16,7 @@ import com.moderngas.pojo.employee.PrivilegeDto;
 import com.moderngas.pojo.superadmin.GasNameCylinderTypeDto;
 import com.moderngas.pojo.user.*;
 import com.moderngas.repository.*;
+import com.moderngas.service.EmailService;
 import com.moderngas.service.GenericService;
 import com.moderngas.service.ResourceCentreService;
 import com.moderngas.service.ValidationService;
@@ -31,6 +32,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
+import javax.mail.MessagingException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.*;
@@ -64,6 +66,9 @@ public class GenericServiceImpl implements GenericService {
 
     @Autowired
     private InventoryRepo inventoryRepo;
+
+    @Autowired
+    private EmailService emailService;
 
     @Override
     public UserEntity convertUserDtoToEntity(UserEntity entity, @NonNull UserDto userDto, UserEntity adminEntity, UserRole userRole) throws BadRequestException {
@@ -212,6 +217,13 @@ public class GenericServiceImpl implements GenericService {
             userEntityResponseDto.setResourceCentreDtoList(resourceCentreService.getResourceCentre(userId));
         }
         return userEntityResponseDto;
+    }
+
+    @Override
+    public String generatePasswordAndSendMail(UserEntity userEntity, MailSubject mailSubject) throws NoSuchAlgorithmException, MessagingException, BadRequestException {
+        String password = generateRandomPassword();
+        emailService.sendMail(userEntity, password, mailSubject);
+        return encodeUserPassword(password);
     }
 
     @Override

@@ -5,6 +5,7 @@ import com.moderngas.exception.BadRequestException;
 import com.moderngas.pojo.ResponseStatus;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.MailException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -12,6 +13,8 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import org.springframework.web.servlet.NoHandlerFoundException;
+
+import javax.mail.internet.AddressException;
 
 @ControllerAdvice
 public class ModernGasAdvice {
@@ -70,6 +73,20 @@ public class ModernGasAdvice {
     public ResponseEntity<ResponseStatus> illegalArgumentException(IllegalArgumentException illegalArgumentException) {
         ResponseStatus status = new ResponseStatus();
         status.setStatus("Please Enter Valid Argument");
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(status);
+    }
+
+    @ExceptionHandler({MailException.class})
+    public ResponseEntity<ResponseStatus> mailException(MailException mailException) {
+        ResponseStatus status = new ResponseStatus();
+        status.setStatus("Sending Mail Is Failed");
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(status);
+    }
+
+    @ExceptionHandler({AddressException.class})
+    public ResponseEntity<ResponseStatus> addressException(AddressException addressException) {
+        ResponseStatus status = new ResponseStatus();
+        status.setStatus("Sending Mail Is Failed");
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(status);
     }
 

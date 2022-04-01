@@ -12,6 +12,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
+import javax.mail.MessagingException;
+import java.security.NoSuchAlgorithmException;
+
 @RestController
 @RequestMapping(value = "/super", produces = "application/json")
 public class SuperAdminController {
@@ -24,7 +27,7 @@ public class SuperAdminController {
     @Secured("ROLE_SUPER_ADMIN")
     @PostMapping("/createAdmin/{superId}")
     public ResponseEntity<ResponseStatus> createAdmin(@PathVariable("superId") Long superId,
-                                                      @RequestBody AdminEntityDto adminEntityDto) throws BadRequestException {
+                                                      @RequestBody AdminEntityDto adminEntityDto) throws BadRequestException, MessagingException, NoSuchAlgorithmException {
         log.info("SuperAdminController :: createAdmin >>> SuperAdminId : {}", superId);
         String response = superAdminService.createAdmin(superId, adminEntityDto);
         return new ResponseEntity<>(new ResponseStatus(response), HttpStatus.OK);

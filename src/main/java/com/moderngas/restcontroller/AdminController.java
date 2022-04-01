@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
+import javax.mail.MessagingException;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
@@ -54,7 +55,7 @@ public class AdminController {
     @Secured("ROLE_ADMIN")
     @PostMapping(value = "/addUser/{adminId}")
     public ResponseEntity<ResponseStatus> addUser(@PathVariable("adminId") Long adminId,
-                                                  @RequestBody UserDto userDto) throws BadRequestException, NoSuchAlgorithmException {
+                                                  @RequestBody UserDto userDto) throws BadRequestException, NoSuchAlgorithmException, MessagingException {
         log.info("AdminController :: userEntityDto >>> AdminId : {}", adminId);
         return new ResponseEntity<>(new ResponseStatus(userService.addUser(adminId, userDto)), HttpStatus.OK);
     }
@@ -84,7 +85,7 @@ public class AdminController {
     @Secured({"ROLE_ADMIN", "ROLE_EMPLOYEE"})
     @PostMapping("/addEmployee/{adminId}")
     public ResponseEntity<?> addEmployee(@PathVariable("adminId") Long adminId,
-                                         @RequestBody UserDto userDto) throws BadRequestException, NoSuchAlgorithmException {
+                                         @RequestBody UserDto userDto) throws BadRequestException, NoSuchAlgorithmException, MessagingException {
         log.info("EmployeeController :: addEmployee >>> AdminId : {}", adminId);
         return new ResponseEntity<>(new ResponseStatus(employeeService.addEmployee(adminId, userDto)), HttpStatus.OK);
     }

@@ -3,6 +3,7 @@ package com.moderngas.service.serviceImpl;
 import com.moderngas.constants.Constants;
 import com.moderngas.constants.ExceptionConstants;
 import com.moderngas.enums.CylinderStatus;
+import com.moderngas.enums.MailSubject;
 import com.moderngas.enums.UserRole;
 import com.moderngas.exception.BadRequestException;
 import com.moderngas.jpaentity.*;
@@ -26,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
+import javax.mail.MessagingException;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
@@ -50,7 +52,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     private UserRepo userRepo;
 
     @Override
-    public String addEmployee(Long adminId, UserDto userDto) throws BadRequestException, NoSuchAlgorithmException {
+    public String addEmployee(Long adminId, UserDto userDto) throws BadRequestException, NoSuchAlgorithmException, MessagingException {
         log.info("EmployeeService :: addEmployee >>> AdminId : {}", adminId);
         UserEntity adminEntity = validationService.validateAdminEntity(adminId);
         UserEntity employeeEntity = validationService.checkUserAlreadyExistInSystem(userDto.getMobileNumber(), adminEntity);
@@ -67,7 +69,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         employeeEntity = genericService.convertUserDtoToEntity(employeeEntity, userDto, adminEntity, UserRole.USER_ROLE_EMPLOYEE);
         employeeEntity.setAdminIdSet(genericService.addOrUpdateUserAdmin(employeeEntity, adminId));
-        employeeEntity.setPassword(genericService.encodeUserPassword(genericService.generateRandomPassword()));
+        employeeEntity.setPassword(genericService.generatePasswordAndSendMail(employeeEntity, MailSubject.MAIL_SUBJECT_NEW_PASSWORD));
         userRepo.save(employeeEntity);
         return Constants.SUCCESS_STR;
     }

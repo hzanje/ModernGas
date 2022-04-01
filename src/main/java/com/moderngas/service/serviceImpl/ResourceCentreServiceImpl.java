@@ -3,6 +3,7 @@ package com.moderngas.service.serviceImpl;
 import com.moderngas.constants.Constants;
 import com.moderngas.constants.ExceptionConstants;
 import com.moderngas.enums.CylinderStatus;
+import com.moderngas.enums.InventoryStatus;
 import com.moderngas.exception.BadRequestException;
 import com.moderngas.jpaentity.*;
 import com.moderngas.pojo.admin.CylinderInventoryDto;
@@ -117,6 +118,7 @@ public class ResourceCentreServiceImpl implements ResourceCentreService {
                 cylinderInventoryEntity = cylinderEntity.getCylinderInventoryDetailsEntity();
             }
             cylinderInventoryEntity.setTransit(true);
+            cylinderInventoryEntity.setInventoryStatus(InventoryStatus.INVENTORY_STATUS_OUT);
             cylinderEntity.setCylinderInventoryDetailsEntity(cylinderInventoryEntity);
             if (resourceCentreEntity.getUserEntity().getId().equals(cylinderEntity.getAssignedUserId())) {
                 cylinderInventoryEntity.setResourceCentreEntity(null);
@@ -159,20 +161,16 @@ public class ResourceCentreServiceImpl implements ResourceCentreService {
         ResourceCentreEntity resourceCentreEntity = validationService.validateResourceCentreEntity(resourceCentreId);
         UserEntity userEntity = validationService.validateUserEntity(userId);
         List<String> existingAnonymousCylinderCode = new ArrayList<>();
+        List<String> existingUserCylinder = new ArrayList<>();
         for (String code : cylinderCodes) {
             CylinderEntity cylinderEntity = inventoryRepo.checkIfCylinderCodeExist(code, userEntity.getId()).orElse(null);
             if (null != cylinderEntity) {
-                CylinderInventoryDetailsEntity cylinderInventoryEntity = new CylinderInventoryDetailsEntity();
-                if (null != cylinderEntity.getCylinderInventoryDetailsEntity()) {
-                    cylinderInventoryEntity = cylinderEntity.getCylinderInventoryDetailsEntity();
-                }
-                cylinderInventoryEntity.setTransit(true);
-                cylinderEntity.setCylinderInventoryDetailsEntity(cylinderInventoryEntity);
-                inventoryRepo.save(cylinderEntity);
+                existingUserCylinder.add(cylinderEntity.getCode());
             } else {
                 existingAnonymousCylinderCode.add(code);
             }
         }
+        removeCylinderFromResourceCentre(resourceCentreEntity.getId(), existingUserCylinder);
         anonymousCylinderRepo.deleteAll(anonymousCylinderRepo.getAllAnonymousCylinderById(existingAnonymousCylinderCode));
         return Constants.SUCCESS_STR;
     }

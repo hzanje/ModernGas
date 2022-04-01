@@ -8,6 +8,7 @@ import com.moderngas.pojo.user.UserSearchDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import javax.mail.MessagingException;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
@@ -23,7 +24,7 @@ public interface EmployeeService {
 
     List<CylinderInventoryDto> getAssignedCylinderByUserId(Long userId, Long adminId) throws BadRequestException;
 
-    String addEmployee(Long adminId, UserDto userDto) throws BadRequestException, NoSuchAlgorithmException;
+    String addEmployee(Long adminId, UserDto userDto) throws BadRequestException, NoSuchAlgorithmException, MessagingException;
 
     String updateEmployee(Long adminId, UserDto userDto) throws BadRequestException;
 

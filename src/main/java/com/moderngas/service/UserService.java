@@ -11,6 +11,7 @@ import net.minidev.json.JSONObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import javax.mail.MessagingException;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Set;
@@ -56,7 +57,7 @@ public interface UserService {
 
     String logout(String token) throws BadRequestException;
 
-    String addUser(Long adminId, UserDto userDto) throws BadRequestException, NoSuchAlgorithmException;
+    String addUser(Long adminId, UserDto userDto) throws BadRequestException, NoSuchAlgorithmException, MessagingException;
 
     String updateUser(Long adminId, UserDto userDto) throws BadRequestException;
 
