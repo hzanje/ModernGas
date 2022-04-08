@@ -70,7 +70,7 @@ public class AdminController {
     @PutMapping(value = "/updateUser/{adminId}")
     public ResponseEntity<ResponseStatus> updateUser(@PathVariable("adminId") Long adminId,
                                                      @RequestBody UserDto userDto) throws BadRequestException {
-        log.info("UserController :: updateUser >>> AdminId : {}", adminId);
+        log.info("AdminController :: updateUser >>> AdminId : {}", adminId);
         return new ResponseEntity<>(new ResponseStatus(userService.updateUser(adminId, userDto)), HttpStatus.OK);
     }
 
@@ -86,7 +86,7 @@ public class AdminController {
     @PostMapping("/addEmployee/{adminId}")
     public ResponseEntity<?> addEmployee(@PathVariable("adminId") Long adminId,
                                          @RequestBody UserDto userDto) throws BadRequestException, NoSuchAlgorithmException, MessagingException {
-        log.info("EmployeeController :: addEmployee >>> AdminId : {}", adminId);
+        log.info("AdminController :: addEmployee >>> AdminId : {}", adminId);
         return new ResponseEntity<>(new ResponseStatus(employeeService.addEmployee(adminId, userDto)), HttpStatus.OK);
     }
 
@@ -101,7 +101,7 @@ public class AdminController {
     @PostMapping("/updateEmployee/{adminId}")
     public ResponseEntity<?> updateEmployee(@PathVariable("adminId") Long adminId,
                                             @RequestBody UserDto userDto) throws BadRequestException {
-        log.info("EmployeeController :: addEmployee >>> AdminId : {}", adminId);
+        log.info("AdminController :: addEmployee >>> AdminId : {}", adminId);
         return new ResponseEntity<>(new ResponseStatus(employeeService.updateEmployee(adminId, userDto)), HttpStatus.OK);
     }
 

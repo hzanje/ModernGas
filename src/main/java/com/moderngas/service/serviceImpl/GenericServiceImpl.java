@@ -442,17 +442,18 @@ public class GenericServiceImpl implements GenericService {
             cylinderEntity.setCylinderStatus(cylinderStatus);
             cylinderEntity.setManufacturer(cylinderDto.getManufacturer());
             cylinderEntity.setGasId(cylinderDto.getGasId());
+            cylinderEntity.setIdentifier(cylinderDto.getIdentifier());
             if (!ObjectUtils.isEmpty(cylinderDto.getManufacturingDate())) {
                 cylinderEntity.setManufacturingDate(new Date(Long.parseLong(cylinderDto.getManufacturingDate())));
             }
             if (!ObjectUtils.isEmpty(cylinderDto.getExpiryDate())) {
                 cylinderEntity.setExpiryDate(new Date(Long.parseLong(cylinderDto.getExpiryDate())));
             }
-            if (!ObjectUtils.isEmpty(cylinderDto.getLastService())) {
-                cylinderEntity.setLastService(new Date(Long.parseLong(cylinderDto.getLastService())));
+            if (!ObjectUtils.isEmpty(cylinderDto.getHydroTestingDate())) {
+                cylinderEntity.setHydroTestingDate(new Date(Long.parseLong(cylinderDto.getHydroTestingDate())));
             }
-            if (!ObjectUtils.isEmpty(cylinderDto.getNextService())) {
-                cylinderEntity.setNextService(new Date(Long.parseLong(cylinderDto.getNextService())));
+            if (!ObjectUtils.isEmpty(cylinderDto.getNextHydroTestDueDate())) {
+                cylinderEntity.setNextHydroTestDueDate(new Date(Long.parseLong(cylinderDto.getNextHydroTestDueDate())));
             }
             CylinderInventoryDetailsEntity cylinderInventoryDetailsEntity = new CylinderInventoryDetailsEntity();
             cylinderInventoryDetailsEntity.setInventoryStatus(InventoryStatus.INVENTORY_STATUS_IN);

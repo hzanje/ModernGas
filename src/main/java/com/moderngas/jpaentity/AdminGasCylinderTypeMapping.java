@@ -24,4 +24,6 @@ public class AdminGasCylinderTypeMapping {
     @Column(name = "cylinder_type")
     @Enumerated(EnumType.ORDINAL)
     private CylinderType cylinderType;
+
+    //add price as per type in next release
 }

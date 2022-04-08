@@ -10,8 +10,14 @@ import java.util.List;
 
 public enum CylinderType {
 
-    CYLINDER_TYPE_B("B", "10 Litre Cylinder"),
-    CYLINDER_TYPE_D("D", "21 Litre Cylinder");
+    CYLINDER_TYPE_B("B Type", "10 Litre Cylinder in Cubic Meter (cu.m)"),
+    CYLINDER_TYPE_D("D Type", "21 Litre Cylinder in Cubic Meter (cu.m)"),
+    CYLINDER_TYPE_9_KG("9 Kg", "9 Kg Cylinder in Kilogram"),
+    CYLINDER_TYPE_30_KG("30 Kg", "30 Kg Cylinder in Kilogram"),
+    CYLINDER_TYPE_4_KG_500_GRM("4.5 Kg", "4.5 Kg Cylinder in Kilogram"),
+    CYLINDER_TYPE_7_KG_500_GRM("7.5 Kg", "7.5 Kg Cylinder in Kilogram"),
+    CYLINDER_TYPE_208_LITRE("208 litre", "208 Kg Cylinder in Litre Water Capacity"),
+    CYLINDER_TYPE_250_LITRE("250 litre", "250 Kg Cylinder in Litre Water Capacity");
 
     private final String name;
 
