@@ -25,5 +25,6 @@ public class AdminGasCylinderTypeMapping {
     @Enumerated(EnumType.ORDINAL)
     private CylinderType cylinderType;
 
-    //add price as per type in next release
+    @Transient
+    private Integer price;
 }

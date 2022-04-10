@@ -26,7 +26,12 @@ public class CylinderInventoryDto {
 
     private String resourceCenterName;
 
-    public CylinderInventoryDto(Long id, String code, CylinderStatus cylinderStatus, Long ownerId, String ownerName, Long assignedId, String assignedName, boolean isTransit, Long resourceCenterId, String resourceCenterName) {
+    private String identifier;
+
+    public CylinderInventoryDto(Long id, String code, CylinderStatus cylinderStatus,
+                                Long ownerId, String ownerName, Long assignedId,
+                                String assignedName, boolean isTransit, Long resourceCenterId,
+                                String resourceCenterName, String identifier) {
         this.id = id;
         this.code = code;
         this.status = CylinderStatus.isExist(cylinderStatus.getName()) ? cylinderStatus.getName() : "";
@@ -37,6 +42,6 @@ public class CylinderInventoryDto {
         this.isTransit = isTransit;
         this.resourceCenterId = resourceCenterId;
         this.resourceCenterName = resourceCenterName;
-
+        this.identifier = identifier;
     }
 }

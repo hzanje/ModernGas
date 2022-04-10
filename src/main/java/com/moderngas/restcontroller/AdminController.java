@@ -105,6 +105,13 @@ public class AdminController {
         return new ResponseEntity<>(new ResponseStatus(employeeService.updateEmployee(adminId, userDto)), HttpStatus.OK);
     }
 
+    @DeleteMapping("/deleteUser/{adminId}/{userId}")
+    public ResponseEntity<?> deleteUser(@PathVariable("adminId") Long adminId,
+                                        @PathVariable("userId") Long userId) throws BadRequestException {
+        log.info("AdminController :: deleteUser >>> AdminId : {}, UserId : {}", adminId, userId);
+        return new ResponseEntity<>(userService.deleteUser(adminId, userId), HttpStatus.OK);
+    }
+
     /**
      * Add Cylinder for Specific Admin by Cylinder Code
      *
