@@ -148,7 +148,7 @@ public class OperatorController {
      */
     @PutMapping("/fillCylinder")
     public ResponseEntity<?> fillCylinder(@RequestBody List<String> cylinderCodes) throws BadRequestException {
-        log.info("EmployeeController :: fillCylinder >>> ");
+        log.info("OperatorController :: fillCylinder >>> ");
         return new ResponseEntity<>(new ResponseStatus(resourceCentreService.fillCylinder(cylinderCodes)), HttpStatus.OK);
     }
 

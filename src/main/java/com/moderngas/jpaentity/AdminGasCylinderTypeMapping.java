@@ -24,4 +24,7 @@ public class AdminGasCylinderTypeMapping {
     @Column(name = "cylinder_type")
     @Enumerated(EnumType.ORDINAL)
     private CylinderType cylinderType;
+
+    @Transient
+    private Integer price;
 }

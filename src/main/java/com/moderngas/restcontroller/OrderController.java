@@ -102,7 +102,7 @@ public class OrderController {
                                                                                                   @RequestParam(value = "id") Long id,
                                                                                                   @RequestParam(value = "quantityOrdering", required = false) String quantityOrder) throws JsonProcessingException, BadRequestException {
 
-        log.info("AdminController :: getAllOrderList >>> OrderId : {}", id);
+        log.info("OrderController :: adminOrderList >>> AdminId : {} and Search : {}", id, search);
         Sort sortOrdering = getSortingOrder(quantityOrder);
         Pageable pageable = PageRequest.of(page, size, sortOrdering);
         Page<com.moderngas.pojo.admin.OrderDto> orderDtoList = orderService.getAllOrderListForAdmin(pageable, status, cylinderType, search, id, quantityOrder);

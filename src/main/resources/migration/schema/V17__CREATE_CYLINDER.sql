@@ -8,6 +8,8 @@ CREATE TABLE `cylinder`(
   `assigned_user_id` BIGINT(20),
   `assigned_user_name` TEXT(255),
   `user_id` BIGINT(20),
+  `gas_id` BIGINT(20),
+  `identifier` TEXT(255) NOT NULL,
   `cylinder_detail_id` BIGINT(20),
   `manufacturer` TEXT(255),
   `manufacturing_date` DATETIME,
@@ -15,5 +17,6 @@ CREATE TABLE `cylinder`(
   `last_service` DATETIME,
   `next_service` DATETIME,
   PRIMARY KEY (`id`),
-  CONSTRAINT `FK_USER_ID` FOREIGN KEY (`user_id`) REFERENCES `user`(`id`)
+  CONSTRAINT `FK_USER_ID` FOREIGN KEY (`user_id`) REFERENCES `user`(`id`),
+  CONSTRAINT `FK_CYLINDER_DETAILS_ID` FOREIGN KEY (cylinder_detail_id) REFERENCES `cylinder_inventory_details`(id)
 );

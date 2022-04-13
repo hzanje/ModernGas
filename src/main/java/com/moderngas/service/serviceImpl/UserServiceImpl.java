@@ -113,6 +113,18 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public String deleteUser(Long adminId, Long userId) throws BadRequestException {
+        UserEntity userEntity = validationService.validateUserEntity(userId);
+        UserEntity adminEntity = validationService.validateAdminEntity(adminId);
+        Set<Long> userEntityAdminIdSet = userEntity.getAdminIdSet();
+        if (userEntityAdminIdSet.remove(adminEntity.getId())) {
+            userEntity.setAdminIdSet(userEntityAdminIdSet);
+            userRepo.save(userEntity);
+        }
+        return Constants.SUCCESS_STR;
+    }
+
+    @Override
     public Page<UserSearchDto> getAllUserByAdmin(Pageable pageable, String search, Long adminId) throws BadRequestException {
         UserEntity adminEntity = validationService.validateAdminEntity(adminId);
         return userRepo.getAllUserByAdmin(pageable, search, adminEntity.getId(), UserRole.USER_ROLE_USER.getRole());
