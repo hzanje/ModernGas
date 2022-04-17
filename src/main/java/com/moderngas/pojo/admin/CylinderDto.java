@@ -17,7 +17,11 @@ public class CylinderDto {
 
     private String expiryDate;
 
-    private String lastService;
+    private String hydroTestingDate;
 
-    private String nextService;
+    private String nextHydroTestDueDate;
+
+    private Long gasId;
+
+    private String identifier;
 }

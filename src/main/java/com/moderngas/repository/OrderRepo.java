@@ -57,7 +57,7 @@ public interface OrderRepo extends JpaRepository<OrderEntity, Long> {
                 " AND (COALESCE(:cylinderType) IS NULL OR ord.cylinderType IN :cylinderType)" +
                 " AND (:search IS NULL OR u.name LIKE :search%)" +
                 " AND (:quantityOrder IS NULL)" +
-                " ORDER BY ord.orderStatus ASC ";
+                " ORDER BY function('date_format', ord.createdDate, '%Y, %m, %d') DESC, ord.orderStatus ASC ";
 
         private static final String ALL_ORDER_LIST_HEADER_FOR_ADMIN = "SELECT new com.moderngas.pojo.admin.OrderDto(" +
                 "ord.id, ord.cylinderType, ord.isRefill, u.id, u.name, ord.gasMaster.name, ord.gasMaster.categoryMaster.name," +
@@ -68,7 +68,7 @@ public interface OrderRepo extends JpaRepository<OrderEntity, Long> {
         private static final String ORDER_LIST_FOR_ADMIN_IN_USER_DETAILS = "SELECT new com.moderngas.pojo.admin.OrderDto(" +
                 "ord.id, ord.cylinderType, ord.isRefill, u.id, u.name, ord.gasMaster.name, ord.gasMaster.categoryMaster.name," +
                 " ord.orderStatus, ord.quantity, ord.createdDate) FROM OrderEntity ord LEFT JOIN UserEntity u ON u.id = ord.userId " +
-                " WHERE ord.userId =:userId ORDER BY ord.createdDate DESC";
+                " WHERE ord.userId =:userId ORDER BY function('date_format', ord.createdDate, '%Y, %m, %d') DESC, ord.orderStatus ASC ";
 
         private static final String FREQUENTLY_ORDER_PRODUCT_LIST = "SELECT new com.moderngas.pojo.user.FrequentOrderProductDto(ord.activeFlag, ord.gasMaster.id, ord.gasMaster.name, ord.gasMaster.categoryMaster.name, agm.price) " +
                 "FROM OrderEntity ord " +

@@ -1,5 +1,6 @@
 package com.moderngas.service;
 
+import com.moderngas.enums.MailSubject;
 import com.moderngas.enums.OrderStatus;
 import com.moderngas.enums.UserPrivilege;
 import com.moderngas.enums.UserRole;
@@ -14,6 +15,7 @@ import com.moderngas.pojo.employee.PrivilegeDto;
 import com.moderngas.pojo.superadmin.GasNameCylinderTypeDto;
 import com.moderngas.pojo.user.*;
 
+import javax.mail.MessagingException;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Set;
@@ -32,6 +34,8 @@ public interface GenericService {
     UserEntityResponseDto convertUserDataToDto(UserEntity clientEntity) throws BadRequestException;
 
     Set<AdminGasMapping> gasMappingByNameAndType(List<GasNameCylinderTypeDto> gasNameCylinderTypes) throws BadRequestException;
+
+    String generatePasswordAndSendMail(UserEntity userEntity, MailSubject mailSubject) throws NoSuchAlgorithmException, MessagingException, BadRequestException;
 
     String encodeUserPassword(String password);
 

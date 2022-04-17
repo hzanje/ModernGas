@@ -10,13 +10,20 @@ import com.moderngas.pojo.user.*;
 import net.minidev.json.JSONObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 
+import javax.mail.MessagingException;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Set;
 
 public interface UserService {
 
+    String addUser(Long adminId, UserDto userDto) throws BadRequestException, NoSuchAlgorithmException, MessagingException;
+
+    String updateUser(Long adminId, UserDto userDto) throws BadRequestException;
+
+    String deleteUser(Long adminId, Long userId) throws BadRequestException;
 
     UserEntityResponseDto getUserById(Long userId) throws BadRequestException;
 
@@ -56,9 +63,7 @@ public interface UserService {
 
     String logout(String token) throws BadRequestException;
 
-    String addUser(Long adminId, UserDto userDto) throws BadRequestException, NoSuchAlgorithmException;
-
-    String updateUser(Long adminId, UserDto userDto) throws BadRequestException;
-
     List<FrequentOrderProductDto> getFrequentlyOrderProduct(Long userId, Long adminId) throws BadRequestException;
+
+
 }

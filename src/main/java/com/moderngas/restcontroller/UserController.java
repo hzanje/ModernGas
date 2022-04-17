@@ -51,7 +51,7 @@ public class UserController {
      * @param adminId
      * @return
      */
-    @Secured("ROLE_EMPLOYEE")
+    @Secured({"ROLE_ADMIN","ROLE_EMPLOYEE"})
     @GetMapping("/getAllUser")
     public HttpEntity<PagedModel<EntityModel<UserSearchDto>>> getAllClient(PagedResourcesAssembler<UserSearchDto> assembler,
                                                                            @RequestParam(value = "size", defaultValue = "10") Integer size,
@@ -86,7 +86,7 @@ public class UserController {
      * @param userName
      * @return
      */
-    @Secured("ROLE_ADMIN")
+    @Secured({"ROLE_ADMIN", "ROLE_EMPLOYEE", "ROLE_USER"})
     @GetMapping(value = "/getUser")
     public ResponseEntity<?> getUser(@RequestParam("userName") Long userName) throws BadRequestException {
         log.info("UserController :: getUser >>> userName : {}", userName);

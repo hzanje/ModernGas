@@ -40,17 +40,23 @@ public class CylinderEntity extends BaseEntity {
 
     @JsonIgnore
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "last_service")
-    private Date lastService;
+    @Column(name = "hydro_test_date")
+    private Date hydroTestingDate;
 
     @JsonIgnore
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "next_service")
-    private Date nextService;
+    @Column(name = "next_hydro_test_due_date")
+    private Date nextHydroTestDueDate;
 
     @Column(name = "cylinder_status_id")
     @Enumerated(EnumType.ORDINAL)
     private CylinderStatus cylinderStatus;
+
+    @Column(name = "gas_id")
+    private Long gasId;
+
+    @Column(name = "identifier")
+    private String identifier;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)

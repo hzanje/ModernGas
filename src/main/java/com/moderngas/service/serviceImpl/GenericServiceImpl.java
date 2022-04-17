@@ -16,6 +16,7 @@ import com.moderngas.pojo.employee.PrivilegeDto;
 import com.moderngas.pojo.superadmin.GasNameCylinderTypeDto;
 import com.moderngas.pojo.user.*;
 import com.moderngas.repository.*;
+import com.moderngas.service.EmailService;
 import com.moderngas.service.GenericService;
 import com.moderngas.service.ResourceCentreService;
 import com.moderngas.service.ValidationService;
@@ -31,6 +32,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
+import javax.mail.MessagingException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.*;
@@ -64,6 +66,9 @@ public class GenericServiceImpl implements GenericService {
 
     @Autowired
     private InventoryRepo inventoryRepo;
+
+    @Autowired
+    private EmailService emailService;
 
     @Override
     public UserEntity convertUserDtoToEntity(UserEntity entity, @NonNull UserDto userDto, UserEntity adminEntity, UserRole userRole) throws BadRequestException {
@@ -110,7 +115,7 @@ public class GenericServiceImpl implements GenericService {
         return roleEntitySet;
     }
 
-    @Secured("ROLE_EMPLOYEE")
+    @Secured({"ROLE_ADMIN","ROLE_EMPLOYEE"})
     @Override
     public Set<UserPrivilegeEntity> addOrUpdateUserPrivilege(Set<UserPrivilegeEntity> existingPrivilege, List<UserPrivilege> privilegeList) throws BadRequestException {
         Set<UserPrivilegeEntity> userPrivilegeEntitySet = new HashSet<>();
@@ -150,6 +155,7 @@ public class GenericServiceImpl implements GenericService {
             adminGasMapping.setCategoryId(gasMaster.getCategoryMaster().getId());
             adminGasMapping.setCategoryName(gasMaster.getCategoryMaster().getName());
             adminGasMapping.setDescription(gasMaster.getDescription());
+            adminGasMapping.setPrice((float) gasMaster.getPrice());
             if (!CollectionUtils.isEmpty(nameType.getTypes())) {
                 adminGasMapping.setAdminGasCylinderTypeMapping(getCylinderTypeSet(nameType.getTypes()));
             }
@@ -211,6 +217,13 @@ public class GenericServiceImpl implements GenericService {
             userEntityResponseDto.setResourceCentreDtoList(resourceCentreService.getResourceCentre(userId));
         }
         return userEntityResponseDto;
+    }
+
+    @Override
+    public String generatePasswordAndSendMail(UserEntity userEntity, MailSubject mailSubject) throws NoSuchAlgorithmException, MessagingException, BadRequestException {
+        String password = generateRandomPassword();
+        emailService.sendMail(userEntity, password, mailSubject);
+        return encodeUserPassword(password);
     }
 
     @Override
@@ -377,19 +390,26 @@ public class GenericServiceImpl implements GenericService {
 
     @Override
     public CartEntity convertDtoToCartEntity(@NonNull CartDto cartDto) throws BadRequestException {
+        log.info("GenericService :: convertDtoToCartEntity >>> adminId : {}, userId : {}, gasId :{}", cartDto.getAdminId(), cartDto.getUserId(), cartDto.getGasId());
         GasMaster gasMaster = validationService.validateGasMaster(cartDto.getGasId());
+        UserEntity adminEntity = validationService.validateAdminEntity(cartDto.getAdminId());
+        AdminGasMapping adminGasMapping = adminEntity.getAdminGasMappings().stream().filter(e -> e.getGasId().equals(gasMaster.getId())).findFirst().orElse(null);
         CartEntity cartEntity = new CartEntity();
         cartEntity.setId(cartDto.getId());
         cartEntity.setCylinderType(CylinderType.getByStatus(cartDto.getCylinderType()));
         cartEntity.setQuantity(cartDto.getQuantity());
         cartEntity.setUserId(cartDto.getUserId());
-        cartEntity.setAdminId(cartDto.getAdminId());
+        cartEntity.setAdminId(adminEntity.getId());
         cartEntity.setGasMaster(gasMaster);
+        if (!ObjectUtils.isEmpty(adminGasMapping)) {
+            cartEntity.setPrice(adminGasMapping.getPrice());
+        }
         return cartEntity;
     }
 
     @Override
     public CartDto convertCartEntityToDto(CartEntity cartEntity) {
+        log.info("GenericService :: convertCartEntityToDto >>> Cart : {} ", cartEntity.getId());
         CartDto cartDto = null;
         if (null != cartEntity) {
             cartDto = new CartDto();
@@ -415,23 +435,25 @@ public class GenericServiceImpl implements GenericService {
             resourceCentreEntity = validationService.validateResourceCentreEntity(cylinderDto.getResourceCentreId());
         }
         CylinderEntity cylinderEntity = null;
-        if (!inventoryRepo.checkIfCylinderCodeExist(cylinderDto.getCylinderCode()).isPresent()) {
+        if (!inventoryRepo.checkIfCylinderCodeExist(cylinderDto.getCylinderCode(), entity.getId()).isPresent()) {
             cylinderEntity = new CylinderEntity();
             CylinderStatus cylinderStatus = CylinderStatus.getByStatus(cylinderDto.getStatus());
             cylinderEntity.setCode(cylinderDto.getCylinderCode());
             cylinderEntity.setCylinderStatus(cylinderStatus);
             cylinderEntity.setManufacturer(cylinderDto.getManufacturer());
+            cylinderEntity.setGasId(cylinderDto.getGasId());
+            cylinderEntity.setIdentifier(cylinderDto.getIdentifier());
             if (!ObjectUtils.isEmpty(cylinderDto.getManufacturingDate())) {
                 cylinderEntity.setManufacturingDate(new Date(Long.parseLong(cylinderDto.getManufacturingDate())));
             }
             if (!ObjectUtils.isEmpty(cylinderDto.getExpiryDate())) {
                 cylinderEntity.setExpiryDate(new Date(Long.parseLong(cylinderDto.getExpiryDate())));
             }
-            if (!ObjectUtils.isEmpty(cylinderDto.getLastService())) {
-                cylinderEntity.setLastService(new Date(Long.parseLong(cylinderDto.getLastService())));
+            if (!ObjectUtils.isEmpty(cylinderDto.getHydroTestingDate())) {
+                cylinderEntity.setHydroTestingDate(new Date(Long.parseLong(cylinderDto.getHydroTestingDate())));
             }
-            if (!ObjectUtils.isEmpty(cylinderDto.getNextService())) {
-                cylinderEntity.setNextService(new Date(Long.parseLong(cylinderDto.getNextService())));
+            if (!ObjectUtils.isEmpty(cylinderDto.getNextHydroTestDueDate())) {
+                cylinderEntity.setNextHydroTestDueDate(new Date(Long.parseLong(cylinderDto.getNextHydroTestDueDate())));
             }
             CylinderInventoryDetailsEntity cylinderInventoryDetailsEntity = new CylinderInventoryDetailsEntity();
             cylinderInventoryDetailsEntity.setInventoryStatus(InventoryStatus.INVENTORY_STATUS_IN);
@@ -477,7 +499,6 @@ public class GenericServiceImpl implements GenericService {
 
 
             case ORDER_STATUS_CANCELLED -> {
-                orderEntity.setActiveFlag(false);
                 orderEntity.setCancellationDate(new Date());
             }
         }
@@ -547,7 +568,7 @@ public class GenericServiceImpl implements GenericService {
     @Override
     public UserEntity checkUserNameAndToken(Long userName) throws BadRequestException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (!userName.equals(auth.getPrincipal())) {
+        if (!String.valueOf(userName).equals(auth.getPrincipal())) {
             throw new BadRequestException(ExceptionConstants.INVALID_USER_TOKEN);
         }
         return null;

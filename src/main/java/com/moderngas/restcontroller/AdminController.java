@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
+import javax.mail.MessagingException;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
@@ -54,7 +55,7 @@ public class AdminController {
     @Secured("ROLE_ADMIN")
     @PostMapping(value = "/addUser/{adminId}")
     public ResponseEntity<ResponseStatus> addUser(@PathVariable("adminId") Long adminId,
-                                                  @RequestBody UserDto userDto) throws BadRequestException, NoSuchAlgorithmException {
+                                                  @RequestBody UserDto userDto) throws BadRequestException, NoSuchAlgorithmException, MessagingException {
         log.info("AdminController :: userEntityDto >>> AdminId : {}", adminId);
         return new ResponseEntity<>(new ResponseStatus(userService.addUser(adminId, userDto)), HttpStatus.OK);
     }
@@ -69,7 +70,7 @@ public class AdminController {
     @PutMapping(value = "/updateUser/{adminId}")
     public ResponseEntity<ResponseStatus> updateUser(@PathVariable("adminId") Long adminId,
                                                      @RequestBody UserDto userDto) throws BadRequestException {
-        log.info("UserController :: updateUser >>> AdminId : {}", adminId);
+        log.info("AdminController :: updateUser >>> AdminId : {}", adminId);
         return new ResponseEntity<>(new ResponseStatus(userService.updateUser(adminId, userDto)), HttpStatus.OK);
     }
 
@@ -84,8 +85,8 @@ public class AdminController {
     @Secured({"ROLE_ADMIN", "ROLE_EMPLOYEE"})
     @PostMapping("/addEmployee/{adminId}")
     public ResponseEntity<?> addEmployee(@PathVariable("adminId") Long adminId,
-                                         @RequestBody UserDto userDto) throws BadRequestException, NoSuchAlgorithmException {
-        log.info("EmployeeController :: addEmployee >>> AdminId : {}", adminId);
+                                         @RequestBody UserDto userDto) throws BadRequestException, NoSuchAlgorithmException, MessagingException {
+        log.info("AdminController :: addEmployee >>> AdminId : {}", adminId);
         return new ResponseEntity<>(new ResponseStatus(employeeService.addEmployee(adminId, userDto)), HttpStatus.OK);
     }
 
@@ -100,8 +101,15 @@ public class AdminController {
     @PostMapping("/updateEmployee/{adminId}")
     public ResponseEntity<?> updateEmployee(@PathVariable("adminId") Long adminId,
                                             @RequestBody UserDto userDto) throws BadRequestException {
-        log.info("EmployeeController :: addEmployee >>> AdminId : {}", adminId);
+        log.info("AdminController :: addEmployee >>> AdminId : {}", adminId);
         return new ResponseEntity<>(new ResponseStatus(employeeService.updateEmployee(adminId, userDto)), HttpStatus.OK);
+    }
+
+    @DeleteMapping("/deleteUser/{adminId}/{userId}")
+    public ResponseEntity<?> deleteUser(@PathVariable("adminId") Long adminId,
+                                        @PathVariable("userId") Long userId) throws BadRequestException {
+        log.info("AdminController :: deleteUser >>> AdminId : {}, UserId : {}", adminId, userId);
+        return new ResponseEntity<>(userService.deleteUser(adminId, userId), HttpStatus.OK);
     }
 
     /**
@@ -203,7 +211,7 @@ public class AdminController {
     }
 
     /**
-     * Get all the Orders as per Admin
+     * Get User Order List For Admin In User Details
      *
      * @param id
      * @return
