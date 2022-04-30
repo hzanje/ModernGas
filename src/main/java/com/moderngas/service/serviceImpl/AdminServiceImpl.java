@@ -142,7 +142,7 @@ public class AdminServiceImpl implements AdminService {
         Set<UserGasCylinderTypeMapping> userGasCylinderTypeMappingSet = new HashSet<>();
         for (CylinderTypeIdPriceDto typeIdPriceDto : typeIdPriceDtoList) {
             UserGasCylinderTypeMapping userGasCylinderTypeMapping = new UserGasCylinderTypeMapping();
-            userGasCylinderTypeMapping.setCylinderType(CylinderType.valueOf(typeIdPriceDto.getType()));
+            userGasCylinderTypeMapping.setCylinderType(CylinderType.getByStatus(typeIdPriceDto.getType()));
             userGasCylinderTypeMapping.setPrice(typeIdPriceDto.getPrice());
             userGasCylinderTypeMappingSet.add(userGasCylinderTypeMapping);
         }
