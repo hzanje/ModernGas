@@ -58,6 +58,9 @@ public class CylinderEntity extends BaseEntity {
     @Column(name = "identifier")
     private String identifier;
 
+    @Column(name = "qr_code_path")
+    private String qrCodePath;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     private UserEntity userEntity;

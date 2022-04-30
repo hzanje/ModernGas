@@ -1,7 +1,5 @@
 package com.moderngas.service.serviceImpl;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
 import com.moderngas.constants.Constants;
 import com.moderngas.constants.ExceptionConstants;
 import com.moderngas.enums.MailSubject;
@@ -63,6 +61,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private AdminGasMappingRepo adminGasMappingRepo;
+
+    @Autowired
+    private UserGasMappingRepo userGasMappingRepo;
 
     @Autowired
     private DeliveryVehicleRepo deliveryVehicleRepo;
@@ -217,9 +218,8 @@ public class UserServiceImpl implements UserService {
             gasDto.setName(adminGasMapping.getGasName());
             gasDto.setCategory(adminGasMapping.getCategoryName());
             gasDto.setAvailable(adminGasMapping.isActiveFlag());
-            gasDto.setPrice(adminGasMapping.getPrice());
             gasDto.setAvailableCylinderType(adminGasMapping.getAdminGasCylinderTypeMapping()
-                    .stream().map(e -> new CylinderTypeDto(e.getCylinderType().getName(), e.getCylinderType().getDescription())).toList());
+                    .stream().map(e -> new CylinderTypeDto(e.getCylinderType().getName(), e.getCylinderType().getDescription(), e.getPrice())).toList());
             gasDtoList.add(gasDto);
         }
         return gasDtoList;
@@ -298,19 +298,25 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public GasDto getGasDetailsById(Long id, Long adminId) throws BadRequestException {
-        AdminGasMapping adminGasMapping = adminGasMappingRepo.getGasMappingByAdminId(id, adminId)
-                .orElseThrow(() -> new BadRequestException(ExceptionConstants.ADMIN_GAS_IS_EMPTY));
+    public GasDto getGasDetailsById(Long id, Long adminId, Long userId) throws BadRequestException {
         GasMaster gasMaster = validationService.validateGasMaster(id);
+        AdminGasMapping adminGasMapping = adminGasMappingRepo.getGasMappingByAdminId(gasMaster.getId(), adminId)
+                .orElseThrow(() -> new BadRequestException(ExceptionConstants.ADMIN_GAS_IS_EMPTY));
+        UserGasMapping userGasMapping = userGasMappingRepo.getGasMappingByGasIdAndAdminIdAndUserId(gasMaster.getId(), adminId, userId);
         GasDto gasDto = new GasDto();
         gasDto.setCategory(gasMaster.getCategoryMaster().getName());
         gasDto.setId(adminGasMapping.getGasId());
         gasDto.setName(adminGasMapping.getGasName());
-        gasDto.setAvailableCylinderType(adminGasMapping.getAdminGasCylinderTypeMapping()
-                .stream().map(e -> new CylinderTypeDto(e.getCylinderType().getName(), e.getCylinderType().getDescription()))
-                .toList());
+        if (ObjectUtils.isEmpty(userGasMapping)) {
+            gasDto.setAvailableCylinderType(adminGasMapping.getAdminGasCylinderTypeMapping()
+                    .stream().map(e -> new CylinderTypeDto(e.getCylinderType().getName(), e.getCylinderType().getDescription(), e.getPrice()))
+                    .toList());
+        } else {
+            gasDto.setAvailableCylinderType(userGasMapping.getUserGasCylinderTypeMapping()
+                    .stream().map(e -> new CylinderTypeDto(e.getCylinderType().getName(), e.getCylinderType().getDescription(), e.getPrice()))
+                    .toList());
+        }
         gasDto.setDescription(adminGasMapping.getDescription());
-        gasDto.setPrice(adminGasMapping.getPrice());
         gasDto.setAvailable(adminGasMapping.isActiveFlag());
         return gasDto;
     }

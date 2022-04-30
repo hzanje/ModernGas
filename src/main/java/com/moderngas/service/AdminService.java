@@ -13,5 +13,5 @@ public interface AdminService {
 
     String saveOnBoardingDetails(OnboardingDtoList onboardingDtoList) throws BadRequestException;
 
-    String updateAdminGas(Long adminId, ProductGasDto productGasDto) throws BadRequestException;
+    String updateAdminGas(Long adminId, Long userId,  ProductGasDto productGasDto) throws BadRequestException;
 }

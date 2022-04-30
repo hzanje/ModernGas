@@ -31,9 +31,6 @@ public class AdminGasMapping extends BaseEntity {
     @Column(name = "description")
     private String description;
 
-    @Column(name = "price")
-    private Float price;
-
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "admin_gas_id", referencedColumnName = "id", nullable = false)
     private Set<AdminGasCylinderTypeMapping> adminGasCylinderTypeMapping;

@@ -4,5 +4,6 @@ CREATE TABLE `category_master` (
   `created_date` datetime DEFAULT NULL,
   `updated_date` datetime DEFAULT NULL,
   `name` varchar(255) DEFAULT NULL,
+  `icon_url` TEXT(255),
   PRIMARY KEY (`id`)
 );

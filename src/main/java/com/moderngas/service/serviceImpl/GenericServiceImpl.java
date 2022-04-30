@@ -145,23 +145,26 @@ public class GenericServiceImpl implements GenericService {
                 gasNameCylinderTypes.stream().map(GasNameCylinderTypeDto::getId).toList());
 
         for (GasNameCylinderTypeDto nameType : gasNameCylinderTypes) {
-            // Get Gas Master as per Dto
             GasMaster gasMaster = gasMasterList.stream().filter(
                     g -> g.getId().equals(nameType.getId())).findFirst()
                     .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_GAS));
-            AdminGasMapping adminGasMapping = new AdminGasMapping();
-            adminGasMapping.setGasId(gasMaster.getId());
-            adminGasMapping.setGasName(gasMaster.getName());
-            adminGasMapping.setCategoryId(gasMaster.getCategoryMaster().getId());
-            adminGasMapping.setCategoryName(gasMaster.getCategoryMaster().getName());
-            adminGasMapping.setDescription(gasMaster.getDescription());
-            adminGasMapping.setPrice((float) gasMaster.getPrice());
-            if (!CollectionUtils.isEmpty(nameType.getTypes())) {
-                adminGasMapping.setAdminGasCylinderTypeMapping(getCylinderTypeSet(nameType.getTypes()));
-            }
+            AdminGasMapping adminGasMapping = createAdminGasMapping(gasMaster, nameType);
             adminGasMappingSet.add(adminGasMapping);
         }
         return adminGasMappingSet;
+    }
+
+    private AdminGasMapping createAdminGasMapping(GasMaster gasMaster, GasNameCylinderTypeDto nameType) {
+        AdminGasMapping adminGasMapping = new AdminGasMapping();
+        adminGasMapping.setGasId(gasMaster.getId());
+        adminGasMapping.setGasName(gasMaster.getName());
+        adminGasMapping.setCategoryId(gasMaster.getCategoryMaster().getId());
+        adminGasMapping.setCategoryName(gasMaster.getCategoryMaster().getName());
+        adminGasMapping.setDescription(gasMaster.getDescription());
+        if (!CollectionUtils.isEmpty(nameType.getTypes())) {
+            adminGasMapping.setAdminGasCylinderTypeMapping(getCylinderTypeSet(nameType.getTypes()));
+        }
+        return null;
     }
 
     private Set<AdminGasCylinderTypeMapping> getCylinderTypeSet(List<String> types) {
@@ -170,6 +173,7 @@ public class GenericServiceImpl implements GenericService {
             if (CylinderType.isExist(type)) {
                 AdminGasCylinderTypeMapping cylinderTypeMapping = new AdminGasCylinderTypeMapping();
                 cylinderTypeMapping.setCylinderType(CylinderType.getByStatus(type));
+                cylinderTypeMapping.setPrice(0f);
                 selectedCylinderType.add(cylinderTypeMapping);
             }
         }
@@ -316,6 +320,7 @@ public class GenericServiceImpl implements GenericService {
                 UserDashboardDto userDashboardDto = new UserDashboardDto();
                 userDashboardDto.setId(categoryMaster.getId());
                 userDashboardDto.setName(categoryMaster.getName());
+                userDashboardDto.setImageURlList(Collections.singletonList(categoryMaster.getIconURL()));
                 userDashboardDtoSet.add(userDashboardDto);
             }
         }
@@ -402,7 +407,7 @@ public class GenericServiceImpl implements GenericService {
         cartEntity.setAdminId(adminEntity.getId());
         cartEntity.setGasMaster(gasMaster);
         if (!ObjectUtils.isEmpty(adminGasMapping)) {
-            cartEntity.setPrice(adminGasMapping.getPrice());
+            cartEntity.setPrice(cartDto.getPrice());
         }
         return cartEntity;
     }
@@ -545,7 +550,6 @@ public class GenericServiceImpl implements GenericService {
             onboardingDto.setCategoryId(adminGas.getCategoryId());
             onboardingDto.setCategoryName(adminGas.getCategoryName());
             onboardingDto.setDescription(adminGas.getDescription());
-            onboardingDto.setPrice(adminGas.getPrice());
             onboardingDto.setCylinderTypeList(getCylinderType(adminGas.getAdminGasCylinderTypeMapping()));
             onBoardingDtoList.add(onboardingDto);
         }
@@ -554,7 +558,7 @@ public class GenericServiceImpl implements GenericService {
 
     private List<CylinderTypeDto> getCylinderType(Set<AdminGasCylinderTypeMapping> adminGasCylinderTypeMapping) {
         return adminGasCylinderTypeMapping.stream()
-                .map(e -> new CylinderTypeDto(e.getCylinderType().getName(), e.getCylinderType().getDescription()))
+                .map(e -> new CylinderTypeDto(e.getCylinderType().getName(), e.getCylinderType().getDescription(), e.getPrice()))
                 .toList();
     }
 

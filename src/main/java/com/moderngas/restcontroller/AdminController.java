@@ -333,11 +333,12 @@ public class AdminController {
      * @return
      * @throws BadRequestException
      */
-    @PutMapping("/updateAdminGas/{adminId}")
+    @PutMapping("/updateAdminGas/{adminId}/{userId}")
     public ResponseEntity<?> updateAdminGas(@PathVariable("adminId") Long adminId,
+                                            @PathVariable (value = "userId", required = false) Long userId,
                                             @RequestBody ProductGasDto productGasDto) throws BadRequestException {
-        log.info("AdminController :: updateAdminGas >>> AdminId : {}", adminId);
-        return new ResponseEntity<>(new ResponseStatus(adminService.updateAdminGas(adminId, productGasDto)), HttpStatus.OK);
+        log.info("AdminController :: updateAdminGas >>> AdminId : {}, UserId : {}", adminId, userId);
+        return new ResponseEntity<>(new ResponseStatus(adminService.updateAdminGas(adminId, userId, productGasDto)), HttpStatus.OK);
     }
 
 }

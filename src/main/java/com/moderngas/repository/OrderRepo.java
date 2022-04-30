@@ -70,7 +70,7 @@ public interface OrderRepo extends JpaRepository<OrderEntity, Long> {
                 " ord.orderStatus, ord.quantity, ord.createdDate) FROM OrderEntity ord LEFT JOIN UserEntity u ON u.id = ord.userId " +
                 " WHERE ord.userId =:userId ORDER BY function('date_format', ord.createdDate, '%Y, %m, %d') DESC, ord.orderStatus ASC ";
 
-        private static final String FREQUENTLY_ORDER_PRODUCT_LIST = "SELECT new com.moderngas.pojo.user.FrequentOrderProductDto(ord.activeFlag, ord.gasMaster.id, ord.gasMaster.name, ord.gasMaster.categoryMaster.name, agm.price) " +
+        private static final String FREQUENTLY_ORDER_PRODUCT_LIST = "SELECT new com.moderngas.pojo.user.FrequentOrderProductDto(ord.activeFlag, ord.gasMaster.id, ord.gasMaster.name, ord.gasMaster.categoryMaster.name) " +
                 "FROM OrderEntity ord " +
                 "LEFT JOIN AdminGasMapping agm ON agm.gasId = ord.gasMaster.id " +
                 "WHERE ord.userId =:userId AND ord.adminId = :adminId " +

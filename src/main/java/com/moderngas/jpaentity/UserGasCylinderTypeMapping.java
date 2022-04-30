@@ -6,12 +6,13 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 @Data
 @NoArgsConstructor
-@Table(name = "admin_gas_cylinder_type_mapping")
-public class AdminGasCylinderTypeMapping {
+@Table(name = "user_gas_cylinder_type_mapping")
+public class UserGasCylinderTypeMapping {
 
     private static final long serialVersionUID = 1L;
 

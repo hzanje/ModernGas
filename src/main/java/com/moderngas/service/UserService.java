@@ -47,7 +47,7 @@ public interface UserService {
 
     List<GasDto> getAllGasList(Long adminId) throws BadRequestException;
 
-    GasDto getGasDetailsById(Long id, Long adminId) throws BadRequestException;
+    GasDto getGasDetailsById(Long id, Long adminId, Long userId) throws BadRequestException;
 
     void checkIfRoleIsNotUser(UserEntity userEntity) throws BadRequestException;
 

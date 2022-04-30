@@ -24,18 +24,15 @@ public class GasDto {
 
     private String description;
 
-    private Float price;
-
     private List<String> imageList;
 
     private List<CylinderTypeDto> availableCylinderType;
 
-    public GasDto(Long id, String name, String category, boolean isAvailable, Float price, List<CylinderTypeDto> availableCylinderType) {
+    public GasDto(Long id, String name, String category, boolean isAvailable, List<CylinderTypeDto> availableCylinderType) {
         this.id = id;
         this.name = name;
         this.category = category;
         this.isAvailable = isAvailable;
-        this.price = price;
         this.availableCylinderType = availableCylinderType;
     }
 }

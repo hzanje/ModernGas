@@ -1,7 +1,6 @@
 package com.moderngas.enums;
 
 import com.moderngas.exception.BadRequestException;
-import com.moderngas.pojo.CylinderTypeDto;
 import org.springframework.util.ObjectUtils;
 
 import java.util.ArrayList;
@@ -57,17 +56,8 @@ public enum CylinderType {
         return CylinderType.values()[ord];
     }
 
-    public static List<CylinderTypeDto> getCylinderTypeDtoList() {
-        List<CylinderTypeDto> cylinderTypeDtoList = new ArrayList<>();
-        for (CylinderType cylinderType : CylinderType.values()) {
-            cylinderTypeDtoList.add(new CylinderTypeDto(cylinderType.getName(), cylinderType.getDescription()));
-        }
-        return cylinderTypeDtoList;
-    }
-
     public static List<CylinderType> getCylinderTypeList() {
-        List<CylinderType> cylinderTypeList = new ArrayList<>();
-        cylinderTypeList.addAll(Arrays.asList(CylinderType.values()));
+        List<CylinderType> cylinderTypeList = new ArrayList<>(Arrays.asList(CylinderType.values()));
         return cylinderTypeList;
     }
 
