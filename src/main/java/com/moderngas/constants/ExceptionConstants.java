@@ -16,7 +16,7 @@ public class ExceptionConstants {
     public static final String INVALID_STATUS = "Please enter valid Status Id";
     public static final String INVALID_REQUEST_DATA = "Please enter valid request Data";
     public static final String INVALID_USER_ACCESS = "Restricted User Access";
-    public static final String INVALID_GAS = "Please enter valid Gas Id";
+    public static final String  INVALID_GAS = "Please enter valid Gas Id";
     public static final String INVALID_CYLINDER_CODE = "Please enter valid Cylinder Code";
     public static final String USER_EMAIL_IS_EMPTY = "Please enter valid email";
     public static final String USER_MOBILE_IS_EMPTY = "Please enter valid mobile number";
