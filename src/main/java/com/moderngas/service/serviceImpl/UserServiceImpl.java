@@ -2,6 +2,7 @@ package com.moderngas.service.serviceImpl;
 
 import com.moderngas.constants.Constants;
 import com.moderngas.constants.ExceptionConstants;
+import com.moderngas.enums.CylinderType;
 import com.moderngas.enums.MailSubject;
 import com.moderngas.enums.UserRole;
 import com.moderngas.exception.BadRequestException;
@@ -35,6 +36,7 @@ import javax.mail.MessagingException;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -312,9 +314,13 @@ public class UserServiceImpl implements UserService {
                     .stream().map(e -> new CylinderTypeDto(e.getCylinderType().getName(), e.getCylinderType().getDescription(), e.getPrice()))
                     .toList());
         } else {
-            gasDto.setAvailableCylinderType(userGasMapping.getUserGasCylinderTypeMapping()
+            List<AdminGasCylinderTypeMapping> uncommonMapping = adminGasMapping.getAdminGasCylinderTypeMapping()
+                    .stream().filter(a -> userGasMapping.getUserGasCylinderTypeMapping().stream().anyMatch(u -> !u.getCylinderType().getName().equals(a.getCylinderType().getName()))).toList();
+            List<CylinderTypeDto> adminCylinderTypeDtoList = userGasMapping.getUserGasCylinderTypeMapping()
                     .stream().map(e -> new CylinderTypeDto(e.getCylinderType().getName(), e.getCylinderType().getDescription(), e.getPrice()))
-                    .toList());
+                    .toList();
+            List<CylinderTypeDto> userCylinderTypeDtoList =uncommonMapping.stream().map(e -> new CylinderTypeDto(e.getCylinderType().getName(), e.getCylinderType().getDescription(), e.getPrice())).toList();
+            gasDto.setAvailableCylinderType(Stream.concat(adminCylinderTypeDtoList.stream(), userCylinderTypeDtoList.stream()).collect(Collectors.toList()));
         }
         gasDto.setDescription(adminGasMapping.getDescription());
         gasDto.setAvailable(adminGasMapping.isActiveFlag());

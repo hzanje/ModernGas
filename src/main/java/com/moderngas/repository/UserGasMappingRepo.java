@@ -12,7 +12,7 @@ import javax.transaction.Transactional;
 @Transactional
 public interface UserGasMappingRepo extends JpaRepository<UserGasMapping, Long> {
 
-    @Query("FROM UserGasMapping ugm where ugm.gasId = :gasId AND ugm.id = :adminId AND ugm.userId = :userId")
+    @Query("FROM UserGasMapping ugm where ugm.gasId = :gasId AND ugm.adminId = :adminId AND ugm.userId = :userId")
     UserGasMapping getGasMappingByGasIdAndAdminIdAndUserId(@Param("gasId") Long gasId,
                                                            @Param("adminId") Long adminId,
                                                            @Param("userId") Long userId);
