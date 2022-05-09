@@ -17,7 +17,6 @@ import com.moderngas.repository.UserRepo;
 import com.moderngas.service.EmployeeService;
 import com.moderngas.service.GenericService;
 import com.moderngas.service.ValidationService;
-import org.apache.catalina.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

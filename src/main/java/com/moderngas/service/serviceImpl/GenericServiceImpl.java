@@ -257,8 +257,9 @@ public class GenericServiceImpl implements GenericService {
         for (int i = 2; i < 6; i++) {
             password[i] = combinedChars.charAt(random.nextInt(combinedChars.length()));
         }
-        log.info("GenericService >> Random Password is : {}", new String(password));
-        return new String(password);
+        String passwordStr = new String(password);
+        log.info("GenericService >> Random Password is : {}", passwordStr);
+        return passwordStr;
     }
 
     @Override
@@ -385,6 +386,10 @@ public class GenericServiceImpl implements GenericService {
                 orderDateStatusDtoList.add(
                         createDateStatusDto(OrderStatus.ORDER_STATUS_CANCELLED, orderEntity.getCancellationDate()));
             }
+
+            default -> {
+
+            }
         }
         return orderDateStatusDtoList;
     }
@@ -416,19 +421,17 @@ public class GenericServiceImpl implements GenericService {
     public CartDto convertCartEntityToDto(CartEntity cartEntity) {
         log.info("GenericService :: convertCartEntityToDto >>> Cart : {} ", cartEntity.getId());
         CartDto cartDto = null;
-        if (null != cartEntity) {
-            cartDto = new CartDto();
-            cartDto.setId(cartEntity.getId());
-            cartDto.setCylinderType(cartEntity.getCylinderType().getName());
-            cartDto.setQuantity(cartEntity.getQuantity());
-            cartDto.setPrice(cartEntity.getPrice());
-            cartDto.setUserId(cartEntity.getUserId());
-            cartDto.setAdminId(cartEntity.getAdminId());
-            if (null != cartEntity.getGasMaster()) {
-                cartDto.setGasId(cartEntity.getGasMaster().getId());
-                cartDto.setGasName(cartEntity.getGasMaster().getName());
-                cartDto.setCategoryName(cartEntity.getGasMaster().getCategoryMaster().getName());
-            }
+        cartDto = new CartDto();
+        cartDto.setId(cartEntity.getId());
+        cartDto.setCylinderType(cartEntity.getCylinderType().getName());
+        cartDto.setQuantity(cartEntity.getQuantity());
+        cartDto.setPrice(cartEntity.getPrice());
+        cartDto.setUserId(cartEntity.getUserId());
+        cartDto.setAdminId(cartEntity.getAdminId());
+        if (null != cartEntity.getGasMaster()) {
+            cartDto.setGasId(cartEntity.getGasMaster().getId());
+            cartDto.setGasName(cartEntity.getGasMaster().getName());
+            cartDto.setCategoryName(cartEntity.getGasMaster().getCategoryMaster().getName());
         }
         return cartDto;
     }
@@ -477,6 +480,7 @@ public class GenericServiceImpl implements GenericService {
         }
         GasMaster gasMaster = validationService.validateGasMaster(cylinderEntity.getGasId());
         CylinderDto cylinderDto = new CylinderDto();
+        cylinderDto.setId(cylinderEntity.getId());
         cylinderDto.setCylinderCode(cylinderEntity.getCode());
         cylinderDto.setStatus(cylinderEntity.getCylinderStatus().getName());
         cylinderDto.setGasName(gasMaster.getName());
@@ -487,10 +491,10 @@ public class GenericServiceImpl implements GenericService {
             cylinderDto.setResourceCentreName(cylinderEntity.getCylinderInventoryDetailsEntity().getResourceCentreEntity().getName());
         }
         cylinderDto.setManufacturer(cylinderEntity.getManufacturer());
-        cylinderDto.setManufacturingDate(String.valueOf(cylinderEntity.getManufacturingDate().getTime()));
-        cylinderDto.setExpiryDate(String.valueOf(cylinderEntity.getExpiryDate().getTime()));
-        cylinderDto.setHydroTestingDate(String.valueOf(cylinderEntity.getHydroTestingDate().getTime()));
-        cylinderDto.setNextHydroTestDueDate(String.valueOf(cylinderEntity.getNextHydroTestDueDate().getTime()));
+        cylinderDto.setManufacturingDate(null == cylinderEntity.getManufacturingDate() ? null : String.valueOf(cylinderEntity.getManufacturingDate().getTime()));
+        cylinderDto.setExpiryDate(null == cylinderEntity.getExpiryDate() ? null : String.valueOf(cylinderEntity.getExpiryDate().getTime()));
+        cylinderDto.setHydroTestingDate(null == cylinderEntity.getHydroTestingDate() ? null : String.valueOf(cylinderEntity.getHydroTestingDate().getTime()));
+        cylinderDto.setNextHydroTestDueDate(null == cylinderEntity.getNextHydroTestDueDate() ? null : String.valueOf(cylinderEntity.getNextHydroTestDueDate().getTime()));
         return cylinderDto;
     }
 
@@ -530,6 +534,10 @@ public class GenericServiceImpl implements GenericService {
 
             case ORDER_STATUS_CANCELLED -> {
                 orderEntity.setCancellationDate(new Date());
+            }
+
+            default -> {
+
             }
         }
         orderEntity.setOrderStatus(orderStatus);

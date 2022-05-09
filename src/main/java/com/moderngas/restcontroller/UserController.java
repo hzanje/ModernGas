@@ -132,7 +132,7 @@ public class UserController {
      */
     @GetMapping(value = "/getGasListByCategoryId")
     public ResponseEntity<?> getGasListByCategoryId(@RequestParam("id") Long categoryId,
-                                                    @RequestParam("adminId") Long adminId) throws BadRequestException {
+                                                    @RequestParam("adminId") Long adminId) {
         log.info("UserController :: getGasListByCategoryId >>> categoryId : {}, adminId : {}", categoryId, adminId);
         return new ResponseEntity<>(userService.getGasListByCategoryId(categoryId, adminId), HttpStatus.OK);
     }

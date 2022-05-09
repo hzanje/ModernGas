@@ -28,13 +28,11 @@ public class MethodSecurityConfig extends GlobalMethodSecurityConfiguration {
 
     @Bean
     public RoleHierarchy roleHierarchy() {
-        RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
-        roleHierarchy.setHierarchy("ROLE_SUPER_ADMIN > ROLE_ADMIN \n " +
+        RoleHierarchyImpl myRoleHierarchy = new RoleHierarchyImpl();
+        myRoleHierarchy.setHierarchy("ROLE_SUPER_ADMIN > ROLE_ADMIN \n " +
         "ROLE_ADMIN > ROLE_EMPLOYEE \n " +
         "ROLE_ADMIN > ROLE_USER " );
-                /*"ROLE_EMPLOYEE > ROLE_PRIVILEGE_ORDER and " +
-                "ROLE_EMPLOYEE > ROLE_PRIVILEGE_USER");*/
-        return roleHierarchy;
+        return myRoleHierarchy;
     }
 
 }

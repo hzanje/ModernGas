@@ -57,8 +57,7 @@ public enum CylinderType {
     }
 
     public static List<CylinderType> getCylinderTypeList() {
-        List<CylinderType> cylinderTypeList = new ArrayList<>(Arrays.asList(CylinderType.values()));
-        return cylinderTypeList;
+        return new ArrayList<>(Arrays.asList(CylinderType.values()));
     }
 
     public String getName() {

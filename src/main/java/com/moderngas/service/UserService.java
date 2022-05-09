@@ -10,7 +10,6 @@ import com.moderngas.pojo.user.*;
 import net.minidev.json.JSONObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
 
 import javax.mail.MessagingException;
 import java.security.NoSuchAlgorithmException;

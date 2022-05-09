@@ -1,6 +1,5 @@
 package com.moderngas.service.serviceImpl;
 
-import com.moderngas.restcontroller.SuperAdminController;
 import lombok.SneakyThrows;
 import org.hibernate.HibernateException;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
@@ -14,13 +13,14 @@ import java.util.Random;
 
 public class MyGenerator implements IdentifierGenerator {
 
-    private static Logger log = LoggerFactory.getLogger(SuperAdminController.class.getName());
+    private static Logger log = LoggerFactory.getLogger(MyGenerator.class.getName());
 
     public static final String GENERATOR_NAME = "myGenerator";
 
     @SneakyThrows
     @Override
     public Serializable generate(SharedSessionContractImplementor sharedSessionContractImplementor, Object o) throws HibernateException {
+        log.info("MyGenerator :: generate >>> Generate Serializable Order Number");
         Random random = SecureRandom.getInstanceStrong();
         int number = random.nextInt(9999999);
 

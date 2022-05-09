@@ -16,7 +16,6 @@ import com.moderngas.service.AdminService;
 import com.moderngas.service.GenericService;
 import com.moderngas.service.ValidationService;
 import lombok.NonNull;
-import org.apache.catalina.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -115,7 +115,7 @@ public class AdminServiceImpl implements AdminService {
         userGasMapping.setGasId(adminGasMapping.getGasId());
         userGasMapping.setUserId(userEntity.getId());
         userGasMapping.setAdminId(adminEntity.getId());
-        userGasMapping.setUserGasCylinderTypeMapping(createUserGasCylinderTypeList(productGasDto.getTypeIdPriceDtoList(), userGasMapping));
+        userGasMapping.setUserGasCylinderTypeMapping(createUserGasCylinderTypeList(productGasDto.getTypeIdPriceDtoList()));
         return userGasMapping;
     }
 
@@ -135,9 +135,9 @@ public class AdminServiceImpl implements AdminService {
         return adminGasCylinderTypeMappingSet;
     }
 
-    private Set<UserGasCylinderTypeMapping> createUserGasCylinderTypeList(List<CylinderTypeIdPriceDto> typeIdPriceDtoList, UserGasMapping userGasMapping) {
+    private Set<UserGasCylinderTypeMapping> createUserGasCylinderTypeList(List<CylinderTypeIdPriceDto> typeIdPriceDtoList) {
         if (CollectionUtils.isEmpty(typeIdPriceDtoList)) {
-            return null;
+            return Collections.emptySet();
         }
         Set<UserGasCylinderTypeMapping> userGasCylinderTypeMappingSet = new HashSet<>();
         for (CylinderTypeIdPriceDto typeIdPriceDto : typeIdPriceDtoList) {

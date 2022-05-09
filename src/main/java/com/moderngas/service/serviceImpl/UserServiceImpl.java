@@ -2,7 +2,6 @@ package com.moderngas.service.serviceImpl;
 
 import com.moderngas.constants.Constants;
 import com.moderngas.constants.ExceptionConstants;
-import com.moderngas.enums.CylinderType;
 import com.moderngas.enums.MailSubject;
 import com.moderngas.enums.UserRole;
 import com.moderngas.exception.BadRequestException;
@@ -320,7 +319,7 @@ public class UserServiceImpl implements UserService {
                     .stream().map(e -> new CylinderTypeDto(e.getCylinderType().getName(), e.getCylinderType().getDescription(), e.getPrice()))
                     .toList();
             List<CylinderTypeDto> userCylinderTypeDtoList =uncommonMapping.stream().map(e -> new CylinderTypeDto(e.getCylinderType().getName(), e.getCylinderType().getDescription(), e.getPrice())).toList();
-            gasDto.setAvailableCylinderType(Stream.concat(adminCylinderTypeDtoList.stream(), userCylinderTypeDtoList.stream()).collect(Collectors.toList()));
+            gasDto.setAvailableCylinderType(Stream.concat(adminCylinderTypeDtoList.stream(), userCylinderTypeDtoList.stream()).toList());
         }
         gasDto.setDescription(adminGasMapping.getDescription());
         gasDto.setAvailable(adminGasMapping.isActiveFlag());

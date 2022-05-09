@@ -5,6 +5,8 @@ import lombok.Data;
 @Data
 public class CylinderDto {
 
+    private Long id;
+
     private String status;
 
     private Long resourceCentreId;

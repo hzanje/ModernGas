@@ -19,7 +19,8 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.Hashtable;
+import java.util.Arrays;
+import java.util.HashMap;
 
 @Service
 public class QRCodeServiceImpl implements QRCodeService {
@@ -44,10 +45,10 @@ public class QRCodeServiceImpl implements QRCodeService {
         try {
             createQRImage(qrFile, qrCodeText, size, fileType);
         } catch (IOException ioException) {
-            log.error(ioException.getStackTrace().toString());
+            log.error(Arrays.toString(ioException.getStackTrace()));
             throw new BadRequestException("Unable to save QR Code in Storage");
         } catch (WriterException writerException) {
-            log.error(writerException.getStackTrace().toString());
+            log.error(Arrays.toString(writerException.getStackTrace()));
             throw new BadRequestException("Unable to generate QR Code");
         }
         return filePath;
@@ -55,7 +56,7 @@ public class QRCodeServiceImpl implements QRCodeService {
 
     private static void createQRImage(File qrFile, String qrCodeText, int size, String fileType)
             throws WriterException, IOException {
-        Hashtable<EncodeHintType, ErrorCorrectionLevel> hintMap = new Hashtable<>();
+        HashMap<EncodeHintType, ErrorCorrectionLevel> hintMap = new HashMap<>();
         hintMap.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.L);
         QRCodeWriter qrCodeWriter = new QRCodeWriter();
         BitMatrix byteMatrix = qrCodeWriter.encode(qrCodeText, BarcodeFormat.QR_CODE, size, size, hintMap);
