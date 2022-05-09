@@ -16,10 +16,7 @@ import com.moderngas.pojo.employee.PrivilegeDto;
 import com.moderngas.pojo.superadmin.GasNameCylinderTypeDto;
 import com.moderngas.pojo.user.*;
 import com.moderngas.repository.*;
-import com.moderngas.service.EmailService;
-import com.moderngas.service.GenericService;
-import com.moderngas.service.ResourceCentreService;
-import com.moderngas.service.ValidationService;
+import com.moderngas.service.*;
 import lombok.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,6 +66,9 @@ public class GenericServiceImpl implements GenericService {
 
     @Autowired
     private EmailService emailService;
+
+    @Autowired
+    private QRCodeService qrCodeService;
 
     @Override
     public UserEntity convertUserDtoToEntity(UserEntity entity, @NonNull UserDto userDto, UserEntity adminEntity, UserRole userRole) throws BadRequestException {
@@ -464,9 +464,34 @@ public class GenericServiceImpl implements GenericService {
             cylinderInventoryDetailsEntity.setInventoryStatus(InventoryStatus.INVENTORY_STATUS_IN);
             cylinderInventoryDetailsEntity.setResourceCentreEntity(resourceCentreEntity);
             cylinderEntity.setCylinderInventoryDetailsEntity(cylinderInventoryDetailsEntity);
+            cylinderEntity.setQrCodePath(qrCodeService.generateAndSaveQRCode(entity.getId(), cylinderEntity.getCode()));
             cylinderEntity.setUserEntity(entity);
         }
         return cylinderEntity;
+    }
+
+    @Override
+    public CylinderDto convertCylinderEntityToDto(CylinderEntity cylinderEntity) throws BadRequestException {
+        if (ObjectUtils.isEmpty(cylinderEntity)) {
+            throw new BadRequestException(ExceptionConstants.INVALID_CYLINDER_CODE);
+        }
+        GasMaster gasMaster = validationService.validateGasMaster(cylinderEntity.getGasId());
+        CylinderDto cylinderDto = new CylinderDto();
+        cylinderDto.setCylinderCode(cylinderEntity.getCode());
+        cylinderDto.setStatus(cylinderEntity.getCylinderStatus().getName());
+        cylinderDto.setGasName(gasMaster.getName());
+        cylinderDto.setIdentifier(cylinderEntity.getIdentifier());
+        if (!ObjectUtils.isEmpty(cylinderEntity.getCylinderInventoryDetailsEntity())
+                && !ObjectUtils.isEmpty(cylinderEntity.getCylinderInventoryDetailsEntity().getResourceCentreEntity())) {
+            cylinderDto.setResourceCentreId(cylinderEntity.getCylinderInventoryDetailsEntity().getResourceCentreEntity().getId());
+            cylinderDto.setResourceCentreName(cylinderEntity.getCylinderInventoryDetailsEntity().getResourceCentreEntity().getName());
+        }
+        cylinderDto.setManufacturer(cylinderEntity.getManufacturer());
+        cylinderDto.setManufacturingDate(String.valueOf(cylinderEntity.getManufacturingDate().getTime()));
+        cylinderDto.setExpiryDate(String.valueOf(cylinderEntity.getExpiryDate().getTime()));
+        cylinderDto.setHydroTestingDate(String.valueOf(cylinderEntity.getHydroTestingDate().getTime()));
+        cylinderDto.setNextHydroTestDueDate(String.valueOf(cylinderEntity.getNextHydroTestDueDate().getTime()));
+        return cylinderDto;
     }
 
     @Override

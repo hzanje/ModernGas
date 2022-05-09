@@ -3,6 +3,7 @@ package com.moderngas.restcontroller;
 import com.moderngas.exception.BadRequestException;
 import com.moderngas.pojo.ResponseStatus;
 import com.moderngas.pojo.admin.CylinderInventoryDto;
+import com.moderngas.service.InventoryService;
 import com.moderngas.service.ResourceCentreService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +32,9 @@ public class OperatorController {
 
     @Autowired
     private ResourceCentreService resourceCentreService;
+
+    @Autowired
+    private InventoryService inventoryService;
 
     /**
      * Fetch the cylinder from Resource Centre
@@ -150,6 +154,12 @@ public class OperatorController {
     public ResponseEntity<?> fillCylinder(@RequestBody List<String> cylinderCodes) throws BadRequestException {
         log.info("OperatorController :: fillCylinder >>> ");
         return new ResponseEntity<>(new ResponseStatus(resourceCentreService.fillCylinder(cylinderCodes)), HttpStatus.OK);
+    }
+
+    @GetMapping("/getCylinderDetailsByCode")
+    public ResponseEntity<?> getCylinderDetailsByCode(@RequestParam("code") String code) throws BadRequestException {
+        log.info("OperatorController :: getCylinderDetailsByCode >>> code : {}", code);
+        return new ResponseEntity<>(inventoryService.getCylinderDetailsByCode(code), HttpStatus.OK);
     }
 
 }

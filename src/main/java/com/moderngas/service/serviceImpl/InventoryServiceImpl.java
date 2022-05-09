@@ -10,10 +10,8 @@ import com.moderngas.pojo.admin.CylinderDto;
 import com.moderngas.pojo.admin.CylinderInventoryDto;
 import com.moderngas.repository.InventoryRepo;
 import com.moderngas.repository.UserRepo;
-import com.moderngas.service.GenericService;
-import com.moderngas.service.InventoryService;
-import com.moderngas.service.UserService;
-import com.moderngas.service.ValidationService;
+import com.moderngas.security.AESUtil;
+import com.moderngas.service.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,5 +90,19 @@ public class InventoryServiceImpl implements InventoryService {
         cylinderInventoryDtoSet.addAll(inventoryRepo.getInventoryCylinderAssignedToUser(id));
         cylinderInventoryDtoSet.addAll(inventoryRepo.getInventoryCylinderOwnedByUser(id));
         return cylinderInventoryDtoSet;
+    }
+
+    @Override
+    public CylinderDto getCylinderDetailsByCode(String code) throws BadRequestException {
+        CylinderEntity cylinderEntity = inventoryRepo.getCylinderDetailsByCode(code);
+        return genericService.convertCylinderEntityToDto(cylinderEntity);
+    }
+
+    @Override
+    public String decryptCylinderEntity(String encryptedCode) throws BadRequestException {
+        if (ObjectUtils.isEmpty(encryptedCode)) {
+            throw new BadRequestException(ExceptionConstants.INVALID_QR_CODE);
+        }
+        return AESUtil.decrypt(encryptedCode);
     }
 }

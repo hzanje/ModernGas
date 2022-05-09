@@ -7,9 +7,11 @@ import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 import com.moderngas.exception.BadRequestException;
+import com.moderngas.security.AESUtil;
 import com.moderngas.service.QRCodeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.imageio.ImageIO;
@@ -24,11 +26,18 @@ public class QRCodeServiceImpl implements QRCodeService {
 
     private static Logger log = LoggerFactory.getLogger(QRCodeServiceImpl.class.getName());
 
+    @Value("${base.doc.path}")
+    private String baseDocPath;
+
+    @Value("${cylinder.qr.path}")
+    private String cylinderCodeQRPath;
+
+
     @Override
-    public String generateAndSaveQRCode(String code) throws BadRequestException {
-        log.info("QRCodeServiceImpl >>> generateQRCode :: code : {} ", code);
-        String qrCodeText = code;
-        String filePath = "CYL_" + code + ".jpeg";
+    public String generateAndSaveQRCode(Long userId, String code) throws BadRequestException {
+        log.info("QRCodeServiceImpl :: generateQRCode >>> code : {} ", code);
+        String qrCodeText = AESUtil.createCylinderCodeJsonEncryption(code);
+        String filePath = baseDocPath + userId +  cylinderCodeQRPath + "/CYL_" + code + ".jpeg";
         int size = 300;
         String fileType = "jpeg";
         File qrFile = new File(filePath);
@@ -39,7 +48,7 @@ public class QRCodeServiceImpl implements QRCodeService {
             throw new BadRequestException("Unable to save QR Code in Storage");
         } catch (WriterException writerException) {
             log.error(writerException.getStackTrace().toString());
-            throw new BadRequestException("Unable to generate QR Code in Storage");
+            throw new BadRequestException("Unable to generate QR Code");
         }
         return filePath;
     }
@@ -66,6 +75,9 @@ public class QRCodeServiceImpl implements QRCodeService {
                     graphics.fillRect(i, j, 1, 1);
                 }
             }
+        }
+        if (!qrFile.getParentFile().exists()) {
+            qrFile.getParentFile().mkdirs();
         }
         ImageIO.write(image, fileType, qrFile);
     }

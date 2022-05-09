@@ -4,5 +4,5 @@ import com.moderngas.exception.BadRequestException;
 
 public interface QRCodeService {
 
-    String generateAndSaveQRCode(String code) throws BadRequestException;
+    String generateAndSaveQRCode(Long userId, String code) throws BadRequestException;
 }

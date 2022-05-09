@@ -9,6 +9,8 @@ public class CylinderDto {
 
     private Long resourceCentreId;
 
+    private String resourceCentreName;
+
     private String cylinderCode;
 
     private String manufacturer;
@@ -22,6 +24,8 @@ public class CylinderDto {
     private String nextHydroTestDueDate;
 
     private Long gasId;
+
+    private String gasName;
 
     private String identifier;
 }

@@ -341,5 +341,18 @@ public class AdminController {
         return new ResponseEntity<>(new ResponseStatus(adminService.updateAdminGas(adminId, userId, productGasDto)), HttpStatus.OK);
     }
 
+    /**
+     * Decrypt the Cylinder Code from Encrypted QR Code Data
+     *
+     * @param encryptedCode
+     * @return
+     * @throws BadRequestException
+     */
+    @GetMapping("/decryptCylinderQR")
+    public ResponseEntity<?> decryptCylinderEntity(@RequestParam("encryptedCode") String encryptedCode) throws BadRequestException {
+        log.info("AdminController :: decryptCylinderEntity >>> EncryptedCode : {}", encryptedCode);
+        return new ResponseEntity<>(inventoryService.decryptCylinderEntity(encryptedCode), HttpStatus.OK);
+    }
+
 }
 
