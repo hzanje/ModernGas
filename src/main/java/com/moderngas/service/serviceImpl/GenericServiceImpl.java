@@ -450,25 +450,32 @@ public class GenericServiceImpl implements GenericService {
             cylinderEntity.setCylinderStatus(cylinderStatus);
             cylinderEntity.setManufacturer(cylinderDto.getManufacturer());
             cylinderEntity.setGasId(cylinderDto.getGasId());
-            cylinderEntity.setIdentifier(cylinderDto.getIdentifier());
-            if (!ObjectUtils.isEmpty(cylinderDto.getManufacturingDate())) {
-                cylinderEntity.setManufacturingDate(new Date(Long.parseLong(cylinderDto.getManufacturingDate())));
-            }
-            if (!ObjectUtils.isEmpty(cylinderDto.getExpiryDate())) {
-                cylinderEntity.setExpiryDate(new Date(Long.parseLong(cylinderDto.getExpiryDate())));
-            }
-            if (!ObjectUtils.isEmpty(cylinderDto.getHydroTestingDate())) {
-                cylinderEntity.setHydroTestingDate(new Date(Long.parseLong(cylinderDto.getHydroTestingDate())));
-            }
-            if (!ObjectUtils.isEmpty(cylinderDto.getNextHydroTestDueDate())) {
-                cylinderEntity.setNextHydroTestDueDate(new Date(Long.parseLong(cylinderDto.getNextHydroTestDueDate())));
-            }
+            cylinderEntity = addUpdatableCylinderParameter(cylinderEntity, cylinderDto);
+
             CylinderInventoryDetailsEntity cylinderInventoryDetailsEntity = new CylinderInventoryDetailsEntity();
             cylinderInventoryDetailsEntity.setInventoryStatus(InventoryStatus.INVENTORY_STATUS_IN);
             cylinderInventoryDetailsEntity.setResourceCentreEntity(resourceCentreEntity);
             cylinderEntity.setCylinderInventoryDetailsEntity(cylinderInventoryDetailsEntity);
             cylinderEntity.setQrCodePath(qrCodeService.generateAndSaveQRCode(entity.getId(), cylinderEntity.getCode()));
             cylinderEntity.setUserEntity(entity);
+        }
+        return cylinderEntity;
+    }
+
+    @Override
+    public CylinderEntity addUpdatableCylinderParameter(CylinderEntity cylinderEntity, CylinderDto cylinderDto) {
+        cylinderEntity.setIdentifier(cylinderDto.getIdentifier());
+        if (!ObjectUtils.isEmpty(cylinderDto.getManufacturingDate())) {
+            cylinderEntity.setManufacturingDate(new Date(Long.parseLong(cylinderDto.getManufacturingDate())));
+        }
+        if (!ObjectUtils.isEmpty(cylinderDto.getExpiryDate())) {
+            cylinderEntity.setExpiryDate(new Date(Long.parseLong(cylinderDto.getExpiryDate())));
+        }
+        if (!ObjectUtils.isEmpty(cylinderDto.getHydroTestingDate())) {
+            cylinderEntity.setHydroTestingDate(new Date(Long.parseLong(cylinderDto.getHydroTestingDate())));
+        }
+        if (!ObjectUtils.isEmpty(cylinderDto.getNextHydroTestDueDate())) {
+            cylinderEntity.setNextHydroTestDueDate(new Date(Long.parseLong(cylinderDto.getNextHydroTestDueDate())));
         }
         return cylinderEntity;
     }
@@ -484,6 +491,7 @@ public class GenericServiceImpl implements GenericService {
         cylinderDto.setCylinderCode(cylinderEntity.getCode());
         cylinderDto.setStatus(cylinderEntity.getCylinderStatus().getName());
         cylinderDto.setGasName(gasMaster.getName());
+        cylinderDto.setGasId(gasMaster.getId());
         cylinderDto.setIdentifier(cylinderEntity.getIdentifier());
         if (!ObjectUtils.isEmpty(cylinderEntity.getCylinderInventoryDetailsEntity())
                 && !ObjectUtils.isEmpty(cylinderEntity.getCylinderInventoryDetailsEntity().getResourceCentreEntity())) {

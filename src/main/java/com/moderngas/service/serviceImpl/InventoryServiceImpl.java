@@ -64,6 +64,26 @@ public class InventoryServiceImpl implements InventoryService {
         return addCylinders(userEntity, cylinderDtoList, UserRole.USER_ROLE_USER.getRole());
     }
 
+    @Override
+    public String updateAdminCylinder(Long adminId, CylinderDto cylinderDto) throws BadRequestException {
+        validationService.validateAdminEntity(adminId);
+        CylinderEntity cylinderEntity = inventoryRepo.findById(cylinderDto.getId())
+                .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_CYLINDER));
+        cylinderEntity = genericService.addUpdatableCylinderParameter(cylinderEntity, cylinderDto);
+        inventoryRepo.save(cylinderEntity);
+        return Constants.SUCCESS_STR;
+    }
+
+    @Override
+    public String updateUserCylinder(Long userId, CylinderDto cylinderDto) throws BadRequestException {
+        validationService.validateUserEntity(userId);
+        CylinderEntity cylinderEntity = inventoryRepo.findById(cylinderDto.getId())
+                .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_CYLINDER));
+        cylinderEntity = genericService.addUpdatableCylinderParameter(cylinderEntity, cylinderDto);
+        inventoryRepo.save(cylinderEntity);
+        return Constants.SUCCESS_STR;
+    }
+
     private String addCylinders(UserEntity entity, List<CylinderDto> cylinderDtoList, String requestedRole) throws BadRequestException {
         Set<CylinderEntity> cylinderEntitySet = CollectionUtils.isEmpty(entity.getCylinderEntitySet()) ? new HashSet<>()  : entity.getCylinderEntitySet() ;
         for (CylinderDto cylinderDto : cylinderDtoList) {
@@ -97,7 +117,7 @@ public class InventoryServiceImpl implements InventoryService {
 
     @Override
     public CylinderDto getCylinderDetailsByCode(String code) throws BadRequestException {
-        CylinderEntity cylinderEntity = inventoryRepo.getCylinderDetailsByCode(code);
+        CylinderEntity cylinderEntity = validationService.validateInventoryByCode(code);
         return genericService.convertCylinderEntityToDto(cylinderEntity);
     }
 

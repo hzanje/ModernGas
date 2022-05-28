@@ -138,6 +138,12 @@ public class ValidationServiceImpl implements ValidationService {
     @Override
     public CylinderEntity validateInventoryById(Long cylinderId) throws BadRequestException {
         return inventoryRepo.findById(cylinderId)
+                .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_CYLINDER));
+    }
+
+    @Override
+    public CylinderEntity validateInventoryByCode(String code) throws BadRequestException {
+        return inventoryRepo.getCylinderDetailsByCode(code)
                 .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_CYLINDER_CODE));
     }
 

@@ -231,6 +231,21 @@ public class UserController {
         return new ResponseEntity<>(new ResponseStatus(inventoryService.addUserCylinder(userId, cylinderDtoList)), HttpStatus.OK);
     }
 
+    /**
+     * Update Cylinder for Specific User by Cylinder Code
+     *
+     * @param userId
+     * @param cylinderDto
+     * @return
+     * @throws BadRequestException
+     */
+    @PostMapping("/updateCylinder/{userId}")
+    public ResponseEntity<ResponseStatus> updateCylinder(@PathVariable("userId") Long userId,
+                                                      @RequestBody CylinderDto cylinderDto) throws BadRequestException {
+        log.info("UserController :: addCylinder >>> UserId :{} ", userId);
+        return new ResponseEntity<>(new ResponseStatus(inventoryService.updateUserCylinder(userId, cylinderDto)), HttpStatus.OK);
+    }
+
     @GetMapping("/frequentlyOrderProduct/{id}")
     public ResponseEntity<?> getFrequentlyOrderProduct(@PathVariable("id") Long userId,
                                                                     @RequestParam("adminId") Long adminId) throws BadRequestException {

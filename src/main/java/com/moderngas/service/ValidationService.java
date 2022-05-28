@@ -25,6 +25,8 @@ public interface ValidationService {
 
     CylinderEntity validateInventoryById(Long cylinderId) throws BadRequestException;
 
+    CylinderEntity validateInventoryByCode(String code) throws BadRequestException;
+
     ResourceCentreEntity validateResourceCentreEntity(Long resourceCentreId) throws BadRequestException;
 
 }

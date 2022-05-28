@@ -67,7 +67,7 @@ public interface InventoryRepo extends JpaRepository<CylinderEntity, Long> {
     Set<CylinderInventoryDto> getInventoryCylinderOwnedByUser(@Param("id") Long id);
 
     @Query("FROM CylinderEntity ce where ce.code = :code")
-    CylinderEntity getCylinderDetailsByCode(@RequestParam("code") String code);
+    Optional<CylinderEntity> getCylinderDetailsByCode(@RequestParam("code") String code);
 
     class QUERIES {
 

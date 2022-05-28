@@ -129,6 +129,22 @@ public class AdminController {
     }
 
     /**
+     * Update Cylinder for Specific Admin by Cylinder Code
+     *
+     * @param adminId
+     * @param cylinderDto
+     * @return
+     * @throws BadRequestException
+     */
+    @Secured({"ROLE_ADMIN", "ROLE_EMPLOYEE"})
+    @PutMapping("/addCylinder/{adminId}")
+    public ResponseEntity<ResponseStatus> updateCylinder(@PathVariable("adminId") Long adminId,
+                                                      @RequestBody CylinderDto cylinderDto) throws BadRequestException {
+        log.info("AdminController :: updateCylinder >>> AdminId : {}", adminId);
+        return new ResponseEntity<>(new ResponseStatus(inventoryService.updateAdminCylinder(adminId, cylinderDto)), HttpStatus.OK);
+    }
+
+    /**
      * Get Filter for Admin in Order Tab
      *
      * @return

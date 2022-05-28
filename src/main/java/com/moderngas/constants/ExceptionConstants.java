@@ -27,4 +27,5 @@ public class ExceptionConstants {
     public static final String INVALID_USER_ADDRESS = "Please Enter Valid User Address";
     public static final String INVALID_DELIVERY_VEHICLE = "Please Enter Valid Delivery Vehicle";
     public static final String INVALID_QR_CODE = "Please Re-Scan or Re-Enter Valid QR Code";
+    public static final String INVALID_CYLINDER = "Please Enter Valid Cylinder";
 }
