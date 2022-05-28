@@ -23,9 +23,11 @@ import org.springframework.hateoas.PagedModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -246,10 +248,33 @@ public class UserController {
         return new ResponseEntity<>(new ResponseStatus(inventoryService.updateUserCylinder(userId, cylinderDto)), HttpStatus.OK);
     }
 
+    /**
+     * Get Frequently Ordered Product for User on User Dashboard.
+     *
+     * @param userId
+     * @param adminId
+     * @return
+     * @throws BadRequestException
+     */
     @GetMapping("/frequentlyOrderProduct/{id}")
     public ResponseEntity<?> getFrequentlyOrderProduct(@PathVariable("id") Long userId,
                                                                     @RequestParam("adminId") Long adminId) throws BadRequestException {
         log.info("UserController :: getFrequentlyOrderProduct >>> UserId : {} , AdminId : {}", userId, adminId);
         return new ResponseEntity<>(userService.getFrequentlyOrderProduct(userId, adminId), HttpStatus.OK);
+    }
+
+    /**
+     * Update Profile Photo Of User
+     *
+     * @param userId
+     * @param file
+     * @return
+     * @throws BadRequestException
+     */
+    @PostMapping(value = "/updateUserProfileImage/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ResponseStatus> updateUserProfileImage(@PathVariable("id") Long userId,
+                                                                 @RequestPart("file") MultipartFile file) throws BadRequestException {
+        log.info("UserController :: updateUserProfileImage >>> UserId : {} ", userId);
+        return new ResponseEntity<>(new ResponseStatus(userService.updateUserProfileImage(userId, file)), HttpStatus.OK);
     }
 }

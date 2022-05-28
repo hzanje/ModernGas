@@ -23,6 +23,7 @@ import net.minidev.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -30,8 +31,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.mail.MessagingException;
+import java.io.File;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -77,6 +80,12 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private ValidationService validationService;
+
+    @Value("${base.doc.path}")
+    private String baseDocPath;
+
+    @Value("${profile.image.doc.path}")
+    private String profileImageDocPath;
 
     @Override
     public String addUser(Long adminId, UserDto userDto) throws BadRequestException, NoSuchAlgorithmException, MessagingException {
@@ -374,5 +383,17 @@ public class UserServiceImpl implements UserService {
         UserEntity adminEntity = validationService.validateAdminEntity(adminId);
         Pageable pageable = PageRequest.of(0, 5);
         return orderRepo.getFrequentlyOrderProduct(pageable ,userEntity.getId(), adminEntity.getId()).getContent();
+    }
+
+    @Override
+    public String updateUserProfileImage(Long userId, MultipartFile file) throws BadRequestException {
+        UserEntity userEntity = validationService.validateUserEntity(userId);
+        String profilePath = baseDocPath + userEntity.getId() + "/" + profileImageDocPath;
+        File imageFile = new File(profilePath);
+
+        if (!imageFile.getParentFile().exists()) {
+            imageFile.getParentFile().mkdirs();
+        }
+        return null;
     }
 }

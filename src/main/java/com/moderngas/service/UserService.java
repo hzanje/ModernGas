@@ -10,6 +10,7 @@ import com.moderngas.pojo.user.*;
 import net.minidev.json.JSONObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.mail.MessagingException;
 import java.security.NoSuchAlgorithmException;
@@ -64,5 +65,5 @@ public interface UserService {
 
     List<FrequentOrderProductDto> getFrequentlyOrderProduct(Long userId, Long adminId) throws BadRequestException;
 
-
+    String updateUserProfileImage(Long userId, MultipartFile file) throws BadRequestException;
 }

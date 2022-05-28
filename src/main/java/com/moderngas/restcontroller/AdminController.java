@@ -137,7 +137,7 @@ public class AdminController {
      * @throws BadRequestException
      */
     @Secured({"ROLE_ADMIN", "ROLE_EMPLOYEE"})
-    @PutMapping("/addCylinder/{adminId}")
+    @PostMapping("/updateCylinder/{adminId}")
     public ResponseEntity<ResponseStatus> updateCylinder(@PathVariable("adminId") Long adminId,
                                                       @RequestBody CylinderDto cylinderDto) throws BadRequestException {
         log.info("AdminController :: updateCylinder >>> AdminId : {}", adminId);
