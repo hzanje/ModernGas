@@ -271,10 +271,10 @@ public class UserController {
      * @return
      * @throws BadRequestException
      */
-    @PostMapping(value = "/updateUserProfileImage/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ResponseStatus> updateUserProfileImage(@PathVariable("id") Long userId,
+    @PostMapping(value = "/addOrUpdateProfileImage/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ResponseStatus> addOrUpdateProfileImage(@PathVariable("id") Long userId,
                                                                  @RequestPart("file") MultipartFile file) throws BadRequestException {
-        log.info("UserController :: updateUserProfileImage >>> UserId : {} ", userId);
-        return new ResponseEntity<>(new ResponseStatus(userService.updateUserProfileImage(userId, file)), HttpStatus.OK);
+        log.info("UserController :: addOrUpdateUserProfile >>> UserId : {} ", userId);
+        return new ResponseEntity<>(new ResponseStatus(userService.addOrUpdateProfileImage(userId, file)), HttpStatus.OK);
     }
 }

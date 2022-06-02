@@ -191,6 +191,7 @@ public class GenericServiceImpl implements GenericService {
             userEntityResponseDto.setMobileNumber(userEntity.getMobileNumber());
             userEntityResponseDto.setCompanyName(userEntity.getCompanyName());
             userEntityResponseDto.setOnboard(userEntity.isOnboarding());
+            userEntityResponseDto.setProfileImageURL(userEntity.getProfileImageURL());
             userEntityResponseDto.setForgetPassword(userEntity.isForgetPassword());
             userEntityResponseDto.setRoles(userEntity.getRoleEntitySet()
                     .stream().map(UserRoleEntity::getRole).toList());

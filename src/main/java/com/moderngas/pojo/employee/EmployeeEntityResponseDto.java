@@ -17,5 +17,7 @@ public class EmployeeEntityResponseDto {
 
     private String companyName;
 
+    private String profileImageURL;
+
     private Set<PrivilegeDto> privilegeDtoList;
 }

@@ -65,5 +65,5 @@ public interface UserService {
 
     List<FrequentOrderProductDto> getFrequentlyOrderProduct(Long userId, Long adminId) throws BadRequestException;
 
-    String updateUserProfileImage(Long userId, MultipartFile file) throws BadRequestException;
+    String addOrUpdateProfileImage(Long userId, MultipartFile file) throws BadRequestException;
 }

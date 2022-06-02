@@ -7,6 +7,8 @@ public interface ValidationService {
 
     UserEntity checkUserAlreadyExistInSystem(Long mobileNumber, UserEntity adminEntity) throws BadRequestException;
 
+    UserEntity validateUser(Long id) throws BadRequestException;
+
     UserEntity validateUserEntity(Long userId) throws BadRequestException;
 
     UserEntity validateAdminEntity(Long adminId) throws BadRequestException;

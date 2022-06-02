@@ -101,6 +101,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         employeeEntityResponseDto.setMobileNumber(employeeEntity.getMobileNumber());
         employeeEntityResponseDto.setEmail(employeeEntity.getEmail());
         employeeEntityResponseDto.setCompanyName(employeeEntity.getCompanyName());
+        employeeEntityResponseDto.setProfileImageURL(employeeEntity.getProfileImageURL());
         if (!CollectionUtils.isEmpty(employeeEntity.getRoleEntitySet())) {
             UserRoleEntity employeeRole = employeeEntity.getRoleEntitySet().stream()
                     .filter(e -> e.getRole().equals(UserRole.USER_ROLE_EMPLOYEE.getRole()))

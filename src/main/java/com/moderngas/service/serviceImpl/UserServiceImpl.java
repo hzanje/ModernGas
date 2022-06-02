@@ -35,6 +35,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.mail.MessagingException;
 import java.io.File;
+import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -386,14 +387,21 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String updateUserProfileImage(Long userId, MultipartFile file) throws BadRequestException {
-        UserEntity userEntity = validationService.validateUserEntity(userId);
-        String profilePath = baseDocPath + userEntity.getId() + "/" + profileImageDocPath;
-        File imageFile = new File(profilePath);
+    public String addOrUpdateProfileImage(Long userId, MultipartFile file) throws BadRequestException {
+        UserEntity userEntity = validationService.validateUser(userId);
+        String profilePath = baseDocPath + userEntity.getId() + profileImageDocPath + "/" + file.getOriginalFilename();
+        try {
+            File imageFile = new File(profilePath);
 
-        if (!imageFile.getParentFile().exists()) {
-            imageFile.getParentFile().mkdirs();
+            if (!imageFile.getParentFile().exists()) {
+                imageFile.getParentFile().mkdirs();
+            }
+            file.transferTo(imageFile);
+        } catch (IOException ioException) {
+            throw new BadRequestException(ioException.getMessage());
         }
-        return null;
+        userEntity.setProfileImageURL(profilePath);
+        userRepo.save(userEntity);
+        return profilePath;
     }
 }
