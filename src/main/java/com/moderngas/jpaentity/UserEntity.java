@@ -2,7 +2,6 @@ package com.moderngas.jpaentity;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
@@ -38,6 +37,9 @@ public class UserEntity extends BaseEntity {
     @Column(name = "is_forget_password", columnDefinition = "tinyint(1) DEFAULT 0")
     private boolean isForgetPassword = false;
 
+    @Column(name = "profile_image_url")
+    private String profileImageURL;
+
     @ElementCollection
     @CollectionTable(name = "user_admin_mapping", joinColumns = @JoinColumn(name = "user_id"))
     @Column(name = "admin_id")
@@ -70,6 +72,5 @@ public class UserEntity extends BaseEntity {
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     private Set<UserTokenEntity> userTokenSet;
-
 
 }

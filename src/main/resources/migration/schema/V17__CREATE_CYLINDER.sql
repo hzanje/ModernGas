@@ -14,8 +14,9 @@ CREATE TABLE `cylinder`(
   `manufacturer` TEXT(255),
   `manufacturing_date` DATETIME,
   `expiry_date` DATETIME,
-  `last_service` DATETIME,
-  `next_service` DATETIME,
+  `hydro_test_date` DATETIME,
+  `next_hydro_test_due_date` DATETIME,
+  `qr_code_path` TEXT(255),
   PRIMARY KEY (`id`),
   CONSTRAINT `FK_USER_ID` FOREIGN KEY (`user_id`) REFERENCES `user`(`id`),
   CONSTRAINT `FK_CYLINDER_DETAILS_ID` FOREIGN KEY (cylinder_detail_id) REFERENCES `cylinder_inventory_details`(id)

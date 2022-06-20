@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
-import java.util.Set;
 
 @Service
 public class ValidationServiceImpl implements ValidationService {
@@ -101,7 +100,8 @@ public class ValidationServiceImpl implements ValidationService {
         return userEntity;
     }
 
-    private UserEntity validateUser(Long id) throws BadRequestException {
+    @Override
+    public UserEntity validateUser(Long id) throws BadRequestException {
         return userRepo.findById(id)
                 .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_REGISTER_USER));
     }
@@ -139,6 +139,12 @@ public class ValidationServiceImpl implements ValidationService {
     @Override
     public CylinderEntity validateInventoryById(Long cylinderId) throws BadRequestException {
         return inventoryRepo.findById(cylinderId)
+                .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_CYLINDER));
+    }
+
+    @Override
+    public CylinderEntity validateInventoryByCode(String code) throws BadRequestException {
+        return inventoryRepo.getCylinderDetailsByCode(code)
                 .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_CYLINDER_CODE));
     }
 

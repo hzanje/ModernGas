@@ -17,7 +17,6 @@ import com.moderngas.repository.UserRepo;
 import com.moderngas.service.EmployeeService;
 import com.moderngas.service.GenericService;
 import com.moderngas.service.ValidationService;
-import org.apache.catalina.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -102,6 +101,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         employeeEntityResponseDto.setMobileNumber(employeeEntity.getMobileNumber());
         employeeEntityResponseDto.setEmail(employeeEntity.getEmail());
         employeeEntityResponseDto.setCompanyName(employeeEntity.getCompanyName());
+        employeeEntityResponseDto.setProfileImageURL(employeeEntity.getProfileImageURL());
         if (!CollectionUtils.isEmpty(employeeEntity.getRoleEntitySet())) {
             UserRoleEntity employeeRole = employeeEntity.getRoleEntitySet().stream()
                     .filter(e -> e.getRole().equals(UserRole.USER_ROLE_EMPLOYEE.getRole()))

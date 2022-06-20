@@ -2,11 +2,12 @@ package com.moderngas.service;
 
 import com.moderngas.exception.BadRequestException;
 import com.moderngas.jpaentity.*;
-import org.apache.catalina.User;
 
 public interface ValidationService {
 
     UserEntity checkUserAlreadyExistInSystem(Long mobileNumber, UserEntity adminEntity) throws BadRequestException;
+
+    UserEntity validateUser(Long id) throws BadRequestException;
 
     UserEntity validateUserEntity(Long userId) throws BadRequestException;
 
@@ -25,6 +26,8 @@ public interface ValidationService {
     GasMaster validateGasMaster(Long gasId) throws BadRequestException;
 
     CylinderEntity validateInventoryById(Long cylinderId) throws BadRequestException;
+
+    CylinderEntity validateInventoryByCode(String code) throws BadRequestException;
 
     ResourceCentreEntity validateResourceCentreEntity(Long resourceCentreId) throws BadRequestException;
 

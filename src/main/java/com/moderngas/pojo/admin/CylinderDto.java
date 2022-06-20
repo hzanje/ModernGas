@@ -5,9 +5,13 @@ import lombok.Data;
 @Data
 public class CylinderDto {
 
+    private Long id;
+
     private String status;
 
     private Long resourceCentreId;
+
+    private String resourceCentreName;
 
     private String cylinderCode;
 
@@ -22,6 +26,8 @@ public class CylinderDto {
     private String nextHydroTestDueDate;
 
     private Long gasId;
+
+    private String gasName;
 
     private String identifier;
 }

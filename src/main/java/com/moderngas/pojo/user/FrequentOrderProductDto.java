@@ -15,13 +15,10 @@ public class FrequentOrderProductDto {
 
     private String categoryName;
 
-    private Float price;
-
-    public FrequentOrderProductDto(boolean isAvailable, Long gasId, String gasName, String categoryName, Float price) {
+    public FrequentOrderProductDto(boolean isAvailable, Long gasId, String gasName, String categoryName) {
         this.isAvailable = isAvailable;
         this.gasId = gasId;
         this.gasName = gasName;
         this.categoryName = categoryName;
-        this.price = price;
     }
 }

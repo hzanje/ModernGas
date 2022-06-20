@@ -84,7 +84,7 @@ public class AdminController {
      */
     @Secured({"ROLE_ADMIN", "ROLE_EMPLOYEE"})
     @PostMapping("/addEmployee/{adminId}")
-    public ResponseEntity<?> addEmployee(@PathVariable("adminId") Long adminId,
+    public ResponseEntity<ResponseStatus> addEmployee(@PathVariable("adminId") Long adminId,
                                          @RequestBody UserDto userDto) throws BadRequestException, NoSuchAlgorithmException, MessagingException {
         log.info("AdminController :: addEmployee >>> AdminId : {}", adminId);
         return new ResponseEntity<>(new ResponseStatus(employeeService.addEmployee(adminId, userDto)), HttpStatus.OK);
@@ -99,7 +99,7 @@ public class AdminController {
      */
     @Secured({"ROLE_ADMIN", "ROLE_EMPLOYEE"})
     @PostMapping("/updateEmployee/{adminId}")
-    public ResponseEntity<?> updateEmployee(@PathVariable("adminId") Long adminId,
+    public ResponseEntity<ResponseStatus> updateEmployee(@PathVariable("adminId") Long adminId,
                                             @RequestBody UserDto userDto) throws BadRequestException {
         log.info("AdminController :: addEmployee >>> AdminId : {}", adminId);
         return new ResponseEntity<>(new ResponseStatus(employeeService.updateEmployee(adminId, userDto)), HttpStatus.OK);
@@ -129,13 +129,29 @@ public class AdminController {
     }
 
     /**
+     * Update Cylinder for Specific Admin by Cylinder Code
+     *
+     * @param adminId
+     * @param cylinderDto
+     * @return
+     * @throws BadRequestException
+     */
+    @Secured({"ROLE_ADMIN", "ROLE_EMPLOYEE"})
+    @PostMapping("/updateCylinder/{adminId}")
+    public ResponseEntity<ResponseStatus> updateCylinder(@PathVariable("adminId") Long adminId,
+                                                      @RequestBody CylinderDto cylinderDto) throws BadRequestException {
+        log.info("AdminController :: updateCylinder >>> AdminId : {}", adminId);
+        return new ResponseEntity<>(new ResponseStatus(inventoryService.updateAdminCylinder(adminId, cylinderDto)), HttpStatus.OK);
+    }
+
+    /**
      * Get Filter for Admin in Order Tab
      *
      * @return
      */
     @Secured({"ROLE_ADMIN", "ROLE_EMPLOYEE"})
     @GetMapping("/filter")
-    public ResponseEntity<?> getFilters() {
+    public ResponseEntity<FilterDto> getFilters() {
         log.info("AdminController :: getFilters >>> ");
         return new ResponseEntity<>(genericService.getFilterList(), HttpStatus.OK);
     }
@@ -177,7 +193,7 @@ public class AdminController {
      */
     @Secured({"ROLE_ADMIN", "ROLE_EMPLOYEE"})
     @DeleteMapping("/vehicle/{id}")
-    public ResponseEntity<?> deleteVehicle(@PathVariable("id") Long vehicleId) throws BadRequestException {
+    public ResponseEntity<ResponseStatus> deleteVehicle(@PathVariable("id") Long vehicleId) throws BadRequestException {
         log.info("AdminController :: deleteVehicle >>> Id : {}", vehicleId);
         return new ResponseEntity<>(new ResponseStatus(userService.deleteVehicle(vehicleId)), HttpStatus.OK);
     }
@@ -305,7 +321,7 @@ public class AdminController {
      */
     @Secured({"ROLE_ADMIN", "ROLE_EMPLOYEE"})
     @PostMapping("/placeOrder/{adminId}")
-    public ResponseEntity<?> placeOrder(@PathVariable("adminId") Long adminId,
+    public ResponseEntity<ResponseStatus> placeOrder(@PathVariable("adminId") Long adminId,
                                         @RequestBody OpenOrderDto openOrderDto) throws BadRequestException, NoSuchAlgorithmException {
         log.info("AdminController :: placeOrder >>> AdminId > {} ", adminId);
         return new ResponseEntity<>(new ResponseStatus(orderService.placeAdminInitiatedOrder(openOrderDto, adminId)), HttpStatus.OK);
@@ -334,10 +350,24 @@ public class AdminController {
      * @throws BadRequestException
      */
     @PutMapping("/updateAdminGas/{adminId}")
-    public ResponseEntity<?> updateAdminGas(@PathVariable("adminId") Long adminId,
+    public ResponseEntity<ResponseStatus> updateAdminGas(@PathVariable("adminId") Long adminId,
+                                            @RequestParam (value = "userId", required = false) Long userId,
                                             @RequestBody ProductGasDto productGasDto) throws BadRequestException {
-        log.info("AdminController :: updateAdminGas >>> AdminId : {}", adminId);
-        return new ResponseEntity<>(new ResponseStatus(adminService.updateAdminGas(adminId, productGasDto)), HttpStatus.OK);
+        log.info("AdminController :: updateAdminGas >>> AdminId : {}, UserId : {}", adminId, userId);
+        return new ResponseEntity<>(new ResponseStatus(adminService.updateAdminGas(adminId, userId, productGasDto)), HttpStatus.OK);
+    }
+
+    /**
+     * Decrypt the Cylinder Code from Encrypted QR Code Data
+     *
+     * @param encryptedCode
+     * @return
+     * @throws BadRequestException
+     */
+    @GetMapping("/decryptCylinderQR")
+    public ResponseEntity<?> decryptCylinderEntity(@RequestParam("encryptedCode") String encryptedCode) throws BadRequestException {
+        log.info("AdminController :: decryptCylinderEntity >>> EncryptedCode : {}", encryptedCode);
+        return new ResponseEntity<>(inventoryService.decryptCylinderEntity(encryptedCode), HttpStatus.OK);
     }
 
 }

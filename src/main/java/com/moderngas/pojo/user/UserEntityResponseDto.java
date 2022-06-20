@@ -29,6 +29,8 @@ public class UserEntityResponseDto {
 
     private boolean isOnboard;
 
+    private String profileImageURL;
+
     private List<ResourceCentreDto> resourceCentreDtoList;
 
     private List<AdminDto> adminDtoList;

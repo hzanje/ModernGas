@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.transaction.Transactional;
 import java.util.List;
@@ -64,6 +65,9 @@ public interface InventoryRepo extends JpaRepository<CylinderEntity, Long> {
 
     @Query(QUERIES.CYLINDER_INVENTORY_DTO + " WHERE ce.userEntity.id = :id ")
     Set<CylinderInventoryDto> getInventoryCylinderOwnedByUser(@Param("id") Long id);
+
+    @Query("FROM CylinderEntity ce where ce.code = :code")
+    Optional<CylinderEntity> getCylinderDetailsByCode(@RequestParam("code") String code);
 
     class QUERIES {
 

@@ -16,10 +16,7 @@ import com.moderngas.pojo.employee.PrivilegeDto;
 import com.moderngas.pojo.superadmin.GasNameCylinderTypeDto;
 import com.moderngas.pojo.user.*;
 import com.moderngas.repository.*;
-import com.moderngas.service.EmailService;
-import com.moderngas.service.GenericService;
-import com.moderngas.service.ResourceCentreService;
-import com.moderngas.service.ValidationService;
+import com.moderngas.service.*;
 import lombok.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,6 +66,9 @@ public class GenericServiceImpl implements GenericService {
 
     @Autowired
     private EmailService emailService;
+
+    @Autowired
+    private QRCodeService qrCodeService;
 
     @Override
     public UserEntity convertUserDtoToEntity(UserEntity entity, @NonNull UserDto userDto, UserEntity adminEntity, UserRole userRole) throws BadRequestException {
@@ -145,23 +145,26 @@ public class GenericServiceImpl implements GenericService {
                 gasNameCylinderTypes.stream().map(GasNameCylinderTypeDto::getId).toList());
 
         for (GasNameCylinderTypeDto nameType : gasNameCylinderTypes) {
-            // Get Gas Master as per Dto
             GasMaster gasMaster = gasMasterList.stream().filter(
                     g -> g.getId().equals(nameType.getId())).findFirst()
                     .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_GAS));
-            AdminGasMapping adminGasMapping = new AdminGasMapping();
-            adminGasMapping.setGasId(gasMaster.getId());
-            adminGasMapping.setGasName(gasMaster.getName());
-            adminGasMapping.setCategoryId(gasMaster.getCategoryMaster().getId());
-            adminGasMapping.setCategoryName(gasMaster.getCategoryMaster().getName());
-            adminGasMapping.setDescription(gasMaster.getDescription());
-            adminGasMapping.setPrice((float) gasMaster.getPrice());
-            if (!CollectionUtils.isEmpty(nameType.getTypes())) {
-                adminGasMapping.setAdminGasCylinderTypeMapping(getCylinderTypeSet(nameType.getTypes()));
-            }
+            AdminGasMapping adminGasMapping = createAdminGasMapping(gasMaster, nameType);
             adminGasMappingSet.add(adminGasMapping);
         }
         return adminGasMappingSet;
+    }
+
+    private AdminGasMapping createAdminGasMapping(GasMaster gasMaster, GasNameCylinderTypeDto nameType) {
+        AdminGasMapping adminGasMapping = new AdminGasMapping();
+        adminGasMapping.setGasId(gasMaster.getId());
+        adminGasMapping.setGasName(gasMaster.getName());
+        adminGasMapping.setCategoryId(gasMaster.getCategoryMaster().getId());
+        adminGasMapping.setCategoryName(gasMaster.getCategoryMaster().getName());
+        adminGasMapping.setDescription(gasMaster.getDescription());
+        if (!CollectionUtils.isEmpty(nameType.getTypes())) {
+            adminGasMapping.setAdminGasCylinderTypeMapping(getCylinderTypeSet(nameType.getTypes()));
+        }
+        return null;
     }
 
     private Set<AdminGasCylinderTypeMapping> getCylinderTypeSet(List<String> types) {
@@ -170,6 +173,7 @@ public class GenericServiceImpl implements GenericService {
             if (CylinderType.isExist(type)) {
                 AdminGasCylinderTypeMapping cylinderTypeMapping = new AdminGasCylinderTypeMapping();
                 cylinderTypeMapping.setCylinderType(CylinderType.getByStatus(type));
+                cylinderTypeMapping.setPrice(0f);
                 selectedCylinderType.add(cylinderTypeMapping);
             }
         }
@@ -187,6 +191,7 @@ public class GenericServiceImpl implements GenericService {
             userEntityResponseDto.setMobileNumber(userEntity.getMobileNumber());
             userEntityResponseDto.setCompanyName(userEntity.getCompanyName());
             userEntityResponseDto.setOnboard(userEntity.isOnboarding());
+            userEntityResponseDto.setProfileImageURL(userEntity.getProfileImageURL());
             userEntityResponseDto.setForgetPassword(userEntity.isForgetPassword());
             userEntityResponseDto.setRoles(userEntity.getRoleEntitySet()
                     .stream().map(UserRoleEntity::getRole).toList());
@@ -253,8 +258,9 @@ public class GenericServiceImpl implements GenericService {
         for (int i = 2; i < 6; i++) {
             password[i] = combinedChars.charAt(random.nextInt(combinedChars.length()));
         }
-        log.info("GenericService >> Random Password is : {}", new String(password));
-        return new String(password);
+        String passwordStr = new String(password);
+        log.info("GenericService >> Random Password is : {}", passwordStr);
+        return passwordStr;
     }
 
     @Override
@@ -316,6 +322,7 @@ public class GenericServiceImpl implements GenericService {
                 UserDashboardDto userDashboardDto = new UserDashboardDto();
                 userDashboardDto.setId(categoryMaster.getId());
                 userDashboardDto.setName(categoryMaster.getName());
+                userDashboardDto.setImageURlList(Collections.singletonList(categoryMaster.getIconURL()));
                 userDashboardDtoSet.add(userDashboardDto);
             }
         }
@@ -380,6 +387,10 @@ public class GenericServiceImpl implements GenericService {
                 orderDateStatusDtoList.add(
                         createDateStatusDto(OrderStatus.ORDER_STATUS_CANCELLED, orderEntity.getCancellationDate()));
             }
+
+            default -> {
+
+            }
         }
         return orderDateStatusDtoList;
     }
@@ -402,7 +413,7 @@ public class GenericServiceImpl implements GenericService {
         cartEntity.setAdminId(adminEntity.getId());
         cartEntity.setGasMaster(gasMaster);
         if (!ObjectUtils.isEmpty(adminGasMapping)) {
-            cartEntity.setPrice(adminGasMapping.getPrice());
+            cartEntity.setPrice(cartDto.getPrice());
         }
         return cartEntity;
     }
@@ -411,19 +422,17 @@ public class GenericServiceImpl implements GenericService {
     public CartDto convertCartEntityToDto(CartEntity cartEntity) {
         log.info("GenericService :: convertCartEntityToDto >>> Cart : {} ", cartEntity.getId());
         CartDto cartDto = null;
-        if (null != cartEntity) {
-            cartDto = new CartDto();
-            cartDto.setId(cartEntity.getId());
-            cartDto.setCylinderType(cartEntity.getCylinderType().getName());
-            cartDto.setQuantity(cartEntity.getQuantity());
-            cartDto.setPrice(cartEntity.getPrice());
-            cartDto.setUserId(cartEntity.getUserId());
-            cartDto.setAdminId(cartEntity.getAdminId());
-            if (null != cartEntity.getGasMaster()) {
-                cartDto.setGasId(cartEntity.getGasMaster().getId());
-                cartDto.setGasName(cartEntity.getGasMaster().getName());
-                cartDto.setCategoryName(cartEntity.getGasMaster().getCategoryMaster().getName());
-            }
+        cartDto = new CartDto();
+        cartDto.setId(cartEntity.getId());
+        cartDto.setCylinderType(cartEntity.getCylinderType().getName());
+        cartDto.setQuantity(cartEntity.getQuantity());
+        cartDto.setPrice(cartEntity.getPrice());
+        cartDto.setUserId(cartEntity.getUserId());
+        cartDto.setAdminId(cartEntity.getAdminId());
+        if (null != cartEntity.getGasMaster()) {
+            cartDto.setGasId(cartEntity.getGasMaster().getId());
+            cartDto.setGasName(cartEntity.getGasMaster().getName());
+            cartDto.setCategoryName(cartEntity.getGasMaster().getCategoryMaster().getName());
         }
         return cartDto;
     }
@@ -442,26 +451,60 @@ public class GenericServiceImpl implements GenericService {
             cylinderEntity.setCylinderStatus(cylinderStatus);
             cylinderEntity.setManufacturer(cylinderDto.getManufacturer());
             cylinderEntity.setGasId(cylinderDto.getGasId());
-            cylinderEntity.setIdentifier(cylinderDto.getIdentifier());
-            if (!ObjectUtils.isEmpty(cylinderDto.getManufacturingDate())) {
-                cylinderEntity.setManufacturingDate(new Date(Long.parseLong(cylinderDto.getManufacturingDate())));
-            }
-            if (!ObjectUtils.isEmpty(cylinderDto.getExpiryDate())) {
-                cylinderEntity.setExpiryDate(new Date(Long.parseLong(cylinderDto.getExpiryDate())));
-            }
-            if (!ObjectUtils.isEmpty(cylinderDto.getHydroTestingDate())) {
-                cylinderEntity.setHydroTestingDate(new Date(Long.parseLong(cylinderDto.getHydroTestingDate())));
-            }
-            if (!ObjectUtils.isEmpty(cylinderDto.getNextHydroTestDueDate())) {
-                cylinderEntity.setNextHydroTestDueDate(new Date(Long.parseLong(cylinderDto.getNextHydroTestDueDate())));
-            }
+            cylinderEntity = addUpdatableCylinderParameter(cylinderEntity, cylinderDto);
+
             CylinderInventoryDetailsEntity cylinderInventoryDetailsEntity = new CylinderInventoryDetailsEntity();
             cylinderInventoryDetailsEntity.setInventoryStatus(InventoryStatus.INVENTORY_STATUS_IN);
             cylinderInventoryDetailsEntity.setResourceCentreEntity(resourceCentreEntity);
             cylinderEntity.setCylinderInventoryDetailsEntity(cylinderInventoryDetailsEntity);
+            cylinderEntity.setQrCodePath(qrCodeService.generateAndSaveQRCode(entity.getId(), cylinderEntity.getCode()));
             cylinderEntity.setUserEntity(entity);
         }
         return cylinderEntity;
+    }
+
+    @Override
+    public CylinderEntity addUpdatableCylinderParameter(CylinderEntity cylinderEntity, CylinderDto cylinderDto) {
+        cylinderEntity.setIdentifier(cylinderDto.getIdentifier());
+        if (!ObjectUtils.isEmpty(cylinderDto.getManufacturingDate())) {
+            cylinderEntity.setManufacturingDate(new Date(Long.parseLong(cylinderDto.getManufacturingDate())));
+        }
+        if (!ObjectUtils.isEmpty(cylinderDto.getExpiryDate())) {
+            cylinderEntity.setExpiryDate(new Date(Long.parseLong(cylinderDto.getExpiryDate())));
+        }
+        if (!ObjectUtils.isEmpty(cylinderDto.getHydroTestingDate())) {
+            cylinderEntity.setHydroTestingDate(new Date(Long.parseLong(cylinderDto.getHydroTestingDate())));
+        }
+        if (!ObjectUtils.isEmpty(cylinderDto.getNextHydroTestDueDate())) {
+            cylinderEntity.setNextHydroTestDueDate(new Date(Long.parseLong(cylinderDto.getNextHydroTestDueDate())));
+        }
+        return cylinderEntity;
+    }
+
+    @Override
+    public CylinderDto convertCylinderEntityToDto(CylinderEntity cylinderEntity) throws BadRequestException {
+        if (ObjectUtils.isEmpty(cylinderEntity)) {
+            throw new BadRequestException(ExceptionConstants.INVALID_CYLINDER_CODE);
+        }
+        GasMaster gasMaster = validationService.validateGasMaster(cylinderEntity.getGasId());
+        CylinderDto cylinderDto = new CylinderDto();
+        cylinderDto.setId(cylinderEntity.getId());
+        cylinderDto.setCylinderCode(cylinderEntity.getCode());
+        cylinderDto.setStatus(cylinderEntity.getCylinderStatus().getName());
+        cylinderDto.setGasName(gasMaster.getName());
+        cylinderDto.setGasId(gasMaster.getId());
+        cylinderDto.setIdentifier(cylinderEntity.getIdentifier());
+        if (!ObjectUtils.isEmpty(cylinderEntity.getCylinderInventoryDetailsEntity())
+                && !ObjectUtils.isEmpty(cylinderEntity.getCylinderInventoryDetailsEntity().getResourceCentreEntity())) {
+            cylinderDto.setResourceCentreId(cylinderEntity.getCylinderInventoryDetailsEntity().getResourceCentreEntity().getId());
+            cylinderDto.setResourceCentreName(cylinderEntity.getCylinderInventoryDetailsEntity().getResourceCentreEntity().getName());
+        }
+        cylinderDto.setManufacturer(cylinderEntity.getManufacturer());
+        cylinderDto.setManufacturingDate(null == cylinderEntity.getManufacturingDate() ? null : String.valueOf(cylinderEntity.getManufacturingDate().getTime()));
+        cylinderDto.setExpiryDate(null == cylinderEntity.getExpiryDate() ? null : String.valueOf(cylinderEntity.getExpiryDate().getTime()));
+        cylinderDto.setHydroTestingDate(null == cylinderEntity.getHydroTestingDate() ? null : String.valueOf(cylinderEntity.getHydroTestingDate().getTime()));
+        cylinderDto.setNextHydroTestDueDate(null == cylinderEntity.getNextHydroTestDueDate() ? null : String.valueOf(cylinderEntity.getNextHydroTestDueDate().getTime()));
+        return cylinderDto;
     }
 
     @Override
@@ -500,6 +543,10 @@ public class GenericServiceImpl implements GenericService {
 
             case ORDER_STATUS_CANCELLED -> {
                 orderEntity.setCancellationDate(new Date());
+            }
+
+            default -> {
+
             }
         }
         orderEntity.setOrderStatus(orderStatus);
@@ -545,7 +592,6 @@ public class GenericServiceImpl implements GenericService {
             onboardingDto.setCategoryId(adminGas.getCategoryId());
             onboardingDto.setCategoryName(adminGas.getCategoryName());
             onboardingDto.setDescription(adminGas.getDescription());
-            onboardingDto.setPrice(adminGas.getPrice());
             onboardingDto.setCylinderTypeList(getCylinderType(adminGas.getAdminGasCylinderTypeMapping()));
             onBoardingDtoList.add(onboardingDto);
         }
@@ -554,7 +600,7 @@ public class GenericServiceImpl implements GenericService {
 
     private List<CylinderTypeDto> getCylinderType(Set<AdminGasCylinderTypeMapping> adminGasCylinderTypeMapping) {
         return adminGasCylinderTypeMapping.stream()
-                .map(e -> new CylinderTypeDto(e.getCylinderType().getName(), e.getCylinderType().getDescription()))
+                .map(e -> new CylinderTypeDto(e.getCylinderType().getName(), e.getCylinderType().getDescription(), e.getPrice()))
                 .toList();
     }
 

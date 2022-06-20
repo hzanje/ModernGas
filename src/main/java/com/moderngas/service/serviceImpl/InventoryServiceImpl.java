@@ -10,6 +10,7 @@ import com.moderngas.pojo.admin.CylinderDto;
 import com.moderngas.pojo.admin.CylinderInventoryDto;
 import com.moderngas.repository.InventoryRepo;
 import com.moderngas.repository.UserRepo;
+import com.moderngas.security.AESUtil;
 import com.moderngas.service.GenericService;
 import com.moderngas.service.InventoryService;
 import com.moderngas.service.UserService;
@@ -63,6 +64,26 @@ public class InventoryServiceImpl implements InventoryService {
         return addCylinders(userEntity, cylinderDtoList, UserRole.USER_ROLE_USER.getRole());
     }
 
+    @Override
+    public String updateAdminCylinder(Long adminId, CylinderDto cylinderDto) throws BadRequestException {
+        validationService.validateAdminEntity(adminId);
+        CylinderEntity cylinderEntity = inventoryRepo.findById(cylinderDto.getId())
+                .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_CYLINDER));
+        cylinderEntity = genericService.addUpdatableCylinderParameter(cylinderEntity, cylinderDto);
+        inventoryRepo.save(cylinderEntity);
+        return Constants.SUCCESS_STR;
+    }
+
+    @Override
+    public String updateUserCylinder(Long userId, CylinderDto cylinderDto) throws BadRequestException {
+        validationService.validateUserEntity(userId);
+        CylinderEntity cylinderEntity = inventoryRepo.findById(cylinderDto.getId())
+                .orElseThrow(() -> new BadRequestException(ExceptionConstants.INVALID_CYLINDER));
+        cylinderEntity = genericService.addUpdatableCylinderParameter(cylinderEntity, cylinderDto);
+        inventoryRepo.save(cylinderEntity);
+        return Constants.SUCCESS_STR;
+    }
+
     private String addCylinders(UserEntity entity, List<CylinderDto> cylinderDtoList, String requestedRole) throws BadRequestException {
         Set<CylinderEntity> cylinderEntitySet = CollectionUtils.isEmpty(entity.getCylinderEntitySet()) ? new HashSet<>()  : entity.getCylinderEntitySet() ;
         for (CylinderDto cylinderDto : cylinderDtoList) {
@@ -92,5 +113,19 @@ public class InventoryServiceImpl implements InventoryService {
         cylinderInventoryDtoSet.addAll(inventoryRepo.getInventoryCylinderAssignedToUser(id));
         cylinderInventoryDtoSet.addAll(inventoryRepo.getInventoryCylinderOwnedByUser(id));
         return cylinderInventoryDtoSet;
+    }
+
+    @Override
+    public CylinderDto getCylinderDetailsByCode(String code) throws BadRequestException {
+        CylinderEntity cylinderEntity = validationService.validateInventoryByCode(code);
+        return genericService.convertCylinderEntityToDto(cylinderEntity);
+    }
+
+    @Override
+    public String decryptCylinderEntity(String encryptedCode) throws BadRequestException {
+        if (ObjectUtils.isEmpty(encryptedCode)) {
+            throw new BadRequestException(ExceptionConstants.INVALID_QR_CODE);
+        }
+        return AESUtil.decrypt(encryptedCode);
     }
 }

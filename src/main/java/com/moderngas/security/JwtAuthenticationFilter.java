@@ -1,7 +1,5 @@
 package com.moderngas.security;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.moderngas.constants.ExceptionConstants;
 import com.moderngas.exception.BadRequestException;

@@ -1,6 +1,9 @@
 package com.moderngas.pojo.admin;
 
+import com.moderngas.pojo.CylinderTypeIdPriceDto;
 import lombok.Data;
+
+import java.util.List;
 
 @Data
 public class ProductGasDto {
@@ -9,5 +12,5 @@ public class ProductGasDto {
 
     private String description;
 
-    private Float price;
+    private List<CylinderTypeIdPriceDto> typeIdPriceDtoList;
 }

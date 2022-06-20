@@ -2,6 +2,7 @@ package com.moderngas.security;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.google.gson.JsonObject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -105,12 +106,17 @@ public class AESUtil {
         return null;
     }
 
-
     public static String createJWTToken(String username) {
         return encrypt(JWT.create()
                 .withSubject(username)
                 .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.EXPIRATION_TIME))
                 .sign(Algorithm.HMAC512(JwtProperties.SECRET.getBytes())));
+    }
+
+    public static String createCylinderCodeJsonEncryption(String code) {
+        JsonObject jsonCylinderCode = new JsonObject();
+        jsonCylinderCode.addProperty("cylinderCode", code);
+        return encrypt(jsonCylinderCode.toString());
     }
 
 

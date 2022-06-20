@@ -23,9 +23,11 @@ import org.springframework.hateoas.PagedModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -132,7 +134,7 @@ public class UserController {
      */
     @GetMapping(value = "/getGasListByCategoryId")
     public ResponseEntity<?> getGasListByCategoryId(@RequestParam("id") Long categoryId,
-                                                    @RequestParam("adminId") Long adminId) throws BadRequestException {
+                                                    @RequestParam("adminId") Long adminId) {
         log.info("UserController :: getGasListByCategoryId >>> categoryId : {}, adminId : {}", categoryId, adminId);
         return new ResponseEntity<>(userService.getGasListByCategoryId(categoryId, adminId), HttpStatus.OK);
     }
@@ -146,9 +148,11 @@ public class UserController {
      * @throws BadRequestException
      */
     @GetMapping(value = "/getGasDetailsById")
-    public ResponseEntity<?> getGasDetailsById(@RequestParam("id") Long id, @RequestParam("adminId") Long adminId) throws BadRequestException {
-        log.info("UserController :: getGasDetailsById >>> GasId : {}, AdminId : {}",id, adminId);
-        return new ResponseEntity<>(userService.getGasDetailsById(id, adminId), HttpStatus.OK);
+    public ResponseEntity<?> getGasDetailsById(@RequestParam("id") Long id,
+                                               @RequestParam("adminId") Long adminId,
+                                               @RequestParam(value = "userId", required = false) Long userId) throws BadRequestException {
+        log.info("UserController :: getGasDetailsById >>> GasId : {}, AdminId : {}, UserId : {}",id, adminId, userId );
+        return new ResponseEntity<>(userService.getGasDetailsById(id, adminId, userId), HttpStatus.OK);
     }
 
 
@@ -229,10 +233,48 @@ public class UserController {
         return new ResponseEntity<>(new ResponseStatus(inventoryService.addUserCylinder(userId, cylinderDtoList)), HttpStatus.OK);
     }
 
+    /**
+     * Update Cylinder for Specific User by Cylinder Code
+     *
+     * @param userId
+     * @param cylinderDto
+     * @return
+     * @throws BadRequestException
+     */
+    @PostMapping("/updateCylinder/{userId}")
+    public ResponseEntity<ResponseStatus> updateCylinder(@PathVariable("userId") Long userId,
+                                                      @RequestBody CylinderDto cylinderDto) throws BadRequestException {
+        log.info("UserController :: addCylinder >>> UserId :{} ", userId);
+        return new ResponseEntity<>(new ResponseStatus(inventoryService.updateUserCylinder(userId, cylinderDto)), HttpStatus.OK);
+    }
+
+    /**
+     * Get Frequently Ordered Product for User on User Dashboard.
+     *
+     * @param userId
+     * @param adminId
+     * @return
+     * @throws BadRequestException
+     */
     @GetMapping("/frequentlyOrderProduct/{id}")
     public ResponseEntity<?> getFrequentlyOrderProduct(@PathVariable("id") Long userId,
                                                                     @RequestParam("adminId") Long adminId) throws BadRequestException {
         log.info("UserController :: getFrequentlyOrderProduct >>> UserId : {} , AdminId : {}", userId, adminId);
         return new ResponseEntity<>(userService.getFrequentlyOrderProduct(userId, adminId), HttpStatus.OK);
+    }
+
+    /**
+     * Update Profile Photo Of User
+     *
+     * @param userId
+     * @param file
+     * @return
+     * @throws BadRequestException
+     */
+    @PostMapping(value = "/addOrUpdateProfileImage/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ResponseStatus> addOrUpdateProfileImage(@PathVariable("id") Long userId,
+                                                                 @RequestPart("file") MultipartFile file) throws BadRequestException {
+        log.info("UserController :: addOrUpdateUserProfile >>> UserId : {} ", userId);
+        return new ResponseEntity<>(new ResponseStatus(userService.addOrUpdateProfileImage(userId, file)), HttpStatus.OK);
     }
 }

@@ -1,7 +1,5 @@
 package com.moderngas.service.serviceImpl;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
 import com.moderngas.constants.Constants;
 import com.moderngas.constants.ExceptionConstants;
 import com.moderngas.enums.MailSubject;
@@ -25,6 +23,7 @@ import net.minidev.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -32,11 +31,15 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.mail.MessagingException;
+import java.io.File;
+import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -65,6 +68,9 @@ public class UserServiceImpl implements UserService {
     private AdminGasMappingRepo adminGasMappingRepo;
 
     @Autowired
+    private UserGasMappingRepo userGasMappingRepo;
+
+    @Autowired
     private DeliveryVehicleRepo deliveryVehicleRepo;
 
     @Autowired
@@ -75,6 +81,12 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private ValidationService validationService;
+
+    @Value("${base.doc.path}")
+    private String baseDocPath;
+
+    @Value("${profile.image.doc.path}")
+    private String profileImageDocPath;
 
     @Override
     public String addUser(Long adminId, UserDto userDto) throws BadRequestException, NoSuchAlgorithmException, MessagingException {
@@ -217,9 +229,8 @@ public class UserServiceImpl implements UserService {
             gasDto.setName(adminGasMapping.getGasName());
             gasDto.setCategory(adminGasMapping.getCategoryName());
             gasDto.setAvailable(adminGasMapping.isActiveFlag());
-            gasDto.setPrice(adminGasMapping.getPrice());
             gasDto.setAvailableCylinderType(adminGasMapping.getAdminGasCylinderTypeMapping()
-                    .stream().map(e -> new CylinderTypeDto(e.getCylinderType().getName(), e.getCylinderType().getDescription())).toList());
+                    .stream().map(e -> new CylinderTypeDto(e.getCylinderType().getName(), e.getCylinderType().getDescription(), e.getPrice())).toList());
             gasDtoList.add(gasDto);
         }
         return gasDtoList;
@@ -298,19 +309,29 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public GasDto getGasDetailsById(Long id, Long adminId) throws BadRequestException {
-        AdminGasMapping adminGasMapping = adminGasMappingRepo.getGasMappingByAdminId(id, adminId)
-                .orElseThrow(() -> new BadRequestException(ExceptionConstants.ADMIN_GAS_IS_EMPTY));
+    public GasDto getGasDetailsById(Long id, Long adminId, Long userId) throws BadRequestException {
         GasMaster gasMaster = validationService.validateGasMaster(id);
+        AdminGasMapping adminGasMapping = adminGasMappingRepo.getGasMappingByAdminId(gasMaster.getId(), adminId)
+                .orElseThrow(() -> new BadRequestException(ExceptionConstants.ADMIN_GAS_IS_EMPTY));
+        UserGasMapping userGasMapping = userGasMappingRepo.getGasMappingByGasIdAndAdminIdAndUserId(gasMaster.getId(), adminId, userId);
         GasDto gasDto = new GasDto();
         gasDto.setCategory(gasMaster.getCategoryMaster().getName());
         gasDto.setId(adminGasMapping.getGasId());
         gasDto.setName(adminGasMapping.getGasName());
-        gasDto.setAvailableCylinderType(adminGasMapping.getAdminGasCylinderTypeMapping()
-                .stream().map(e -> new CylinderTypeDto(e.getCylinderType().getName(), e.getCylinderType().getDescription()))
-                .toList());
+        if (ObjectUtils.isEmpty(userGasMapping)) {
+            gasDto.setAvailableCylinderType(adminGasMapping.getAdminGasCylinderTypeMapping()
+                    .stream().map(e -> new CylinderTypeDto(e.getCylinderType().getName(), e.getCylinderType().getDescription(), e.getPrice()))
+                    .toList());
+        } else {
+            List<AdminGasCylinderTypeMapping> uncommonMapping = adminGasMapping.getAdminGasCylinderTypeMapping()
+                    .stream().filter(a -> userGasMapping.getUserGasCylinderTypeMapping().stream().anyMatch(u -> !u.getCylinderType().getName().equals(a.getCylinderType().getName()))).toList();
+            List<CylinderTypeDto> adminCylinderTypeDtoList = userGasMapping.getUserGasCylinderTypeMapping()
+                    .stream().map(e -> new CylinderTypeDto(e.getCylinderType().getName(), e.getCylinderType().getDescription(), e.getPrice()))
+                    .toList();
+            List<CylinderTypeDto> userCylinderTypeDtoList =uncommonMapping.stream().map(e -> new CylinderTypeDto(e.getCylinderType().getName(), e.getCylinderType().getDescription(), e.getPrice())).toList();
+            gasDto.setAvailableCylinderType(Stream.concat(adminCylinderTypeDtoList.stream(), userCylinderTypeDtoList.stream()).toList());
+        }
         gasDto.setDescription(adminGasMapping.getDescription());
-        gasDto.setPrice(adminGasMapping.getPrice());
         gasDto.setAvailable(adminGasMapping.isActiveFlag());
         return gasDto;
     }
@@ -363,5 +384,24 @@ public class UserServiceImpl implements UserService {
         UserEntity adminEntity = validationService.validateAdminEntity(adminId);
         Pageable pageable = PageRequest.of(0, 5);
         return orderRepo.getFrequentlyOrderProduct(pageable ,userEntity.getId(), adminEntity.getId()).getContent();
+    }
+
+    @Override
+    public String addOrUpdateProfileImage(Long userId, MultipartFile file) throws BadRequestException {
+        UserEntity userEntity = validationService.validateUser(userId);
+        String profilePath = baseDocPath + userEntity.getId() + profileImageDocPath + "/" + file.getOriginalFilename();
+        try {
+            File imageFile = new File(profilePath);
+
+            if (!imageFile.getParentFile().exists()) {
+                imageFile.getParentFile().mkdirs();
+            }
+            file.transferTo(imageFile);
+        } catch (IOException ioException) {
+            throw new BadRequestException(ioException.getMessage());
+        }
+        userEntity.setProfileImageURL(profilePath);
+        userRepo.save(userEntity);
+        return profilePath;
     }
 }

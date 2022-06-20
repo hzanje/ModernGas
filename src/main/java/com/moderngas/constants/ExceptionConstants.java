@@ -16,7 +16,7 @@ public class ExceptionConstants {
     public static final String INVALID_STATUS = "Please enter valid Status Id";
     public static final String INVALID_REQUEST_DATA = "Please enter valid request Data";
     public static final String INVALID_USER_ACCESS = "Restricted User Access";
-    public static final String INVALID_GAS = "Please enter valid Gas Id";
+    public static final String  INVALID_GAS = "Please enter valid Gas Id";
     public static final String INVALID_CYLINDER_CODE = "Please enter valid Cylinder Code";
     public static final String USER_EMAIL_IS_EMPTY = "Please enter valid email";
     public static final String USER_MOBILE_IS_EMPTY = "Please enter valid mobile number";
@@ -26,4 +26,6 @@ public class ExceptionConstants {
     public static final String INVALID_RESOURCE_CENTRE = "Please enter valid Resource Centre";
     public static final String INVALID_USER_ADDRESS = "Please Enter Valid User Address";
     public static final String INVALID_DELIVERY_VEHICLE = "Please Enter Valid Delivery Vehicle";
+    public static final String INVALID_QR_CODE = "Please Re-Scan or Re-Enter Valid QR Code";
+    public static final String INVALID_CYLINDER = "Please Enter Valid Cylinder";
 }

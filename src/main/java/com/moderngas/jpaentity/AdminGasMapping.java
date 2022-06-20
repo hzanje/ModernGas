@@ -2,7 +2,6 @@ package com.moderngas.jpaentity;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.util.Set;
@@ -30,9 +29,6 @@ public class AdminGasMapping extends BaseEntity {
     @Lob
     @Column(name = "description")
     private String description;
-
-    @Column(name = "price")
-    private Float price;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "admin_gas_id", referencedColumnName = "id", nullable = false)

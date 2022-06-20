@@ -10,8 +10,8 @@ import javax.persistence.*;
 @Entity
 @Data
 @NoArgsConstructor
-@Table(name = "admin_gas_cylinder_type_mapping")
-public class AdminGasCylinderTypeMapping {
+@Table(name = "user_gas_cylinder_type_mapping")
+public class UserGasCylinderTypeMapping {
 
     private static final long serialVersionUID = 1L;
 

@@ -53,9 +53,7 @@ public class EmailServiceImpl implements EmailService {
 
         } catch (MailException | AddressException mex) {
             throw mex;
-        } catch (MessagingException e) {
-            throw e;
-        } catch (BadRequestException e) {
+        } catch (MessagingException | BadRequestException e ) {
             throw e;
         }
     }

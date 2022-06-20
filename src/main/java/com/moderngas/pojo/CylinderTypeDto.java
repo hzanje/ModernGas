@@ -10,4 +10,6 @@ public class CylinderTypeDto {
     public final String name;
 
     public final String description;
+
+    public final Float price;
 }
